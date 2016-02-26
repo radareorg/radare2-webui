@@ -9,7 +9,7 @@
             {
               expand: true,
               src: ['js/*.js', '!Gruntfile.js'],
-              dest: './'
+              dest: 'ugly/'
             }
           ]
         }

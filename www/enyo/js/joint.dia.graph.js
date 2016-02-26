@@ -1,1 +1,949 @@
-joint.dia.GraphCells=Backbone.Collection.extend({cellNamespace:joint.shapes,initialize:function(a,b){this.on("change:z",this.sort,this),b.cellNamespace&&(this.cellNamespace=b.cellNamespace),this.graph=b.graph},model:function(a,b){var c=b.collection,d=c.cellNamespace,e="link"===a.type?joint.dia.Link:joint.util.getByPath(d,a.type,".")||joint.dia.Element,f=new e(a,b);return f.graph=c.graph,f},comparator:function(a){return a.get("z")||0}}),joint.dia.Graph=Backbone.Model.extend({initialize:function(a,b){b=b||{};var c=new joint.dia.GraphCells([],{model:b.cellModel,cellNamespace:b.cellNamespace,graph:this});Backbone.Model.prototype.set.call(this,"cells",c),c.on("all",this.trigger,this),this._out={},this._in={},this._nodes={},this._edges={},c.on("add",this._restructureOnAdd,this),c.on("remove",this._restructureOnRemove,this),c.on("reset",this._restructureOnReset,this),c.on("change:source",this._restructureOnChangeSource,this),c.on("change:target",this._restructureOnChangeTarget,this),c.on("remove",this._removeCell,this)},_restructureOnAdd:function(a){if(a.isLink()){this._edges[a.id]=!0;var b=a.get("source"),c=a.get("target");b.id&&((this._out[b.id]||(this._out[b.id]={}))[a.id]=!0),c.id&&((this._in[c.id]||(this._in[c.id]={}))[a.id]=!0)}else this._nodes[a.id]=!0},_restructureOnRemove:function(a){if(a.isLink()){delete this._edges[a.id];var b=a.get("source"),c=a.get("target");b.id&&this._out[b.id]&&this._out[b.id][a.id]&&delete this._out[b.id][a.id],c.id&&this._in[c.id]&&this._in[c.id][a.id]&&delete this._in[c.id][a.id]}else delete this._nodes[a.id]},_restructureOnReset:function(a){a=a.models,this._out={},this._in={},this._nodes={},this._edges={},_.each(a,this._restructureOnAdd,this)},_restructureOnChangeSource:function(a){var b=a.previous("source");b.id&&this._out[b.id]&&delete this._out[b.id][a.id];var c=a.get("source");c.id&&((this._out[c.id]||(this._out[c.id]={}))[a.id]=!0)},_restructureOnChangeTarget:function(a){var b=a.previous("target");b.id&&this._in[b.id]&&delete this._in[b.id][a.id];var c=a.get("target");c.id&&((this._in[c.id]||(this._in[c.id]={}))[a.id]=!0)},getOutboundEdges:function(a){return this._out&&this._out[a]||{}},getInboundEdges:function(a){return this._in&&this._in[a]||{}},toJSON:function(){var a=Backbone.Model.prototype.toJSON.apply(this,arguments);return a.cells=this.get("cells").toJSON(),a},fromJSON:function(a,b){if(!a.cells)throw new Error("Graph JSON must contain cells array.");return this.set(a,b)},set:function(a,b,c){var d;return"object"==typeof a?(d=a,c=b):(d={})[a]=b,d.hasOwnProperty("cells")&&(this.resetCells(d.cells,c),d=_.omit(d,"cells")),Backbone.Model.prototype.set.call(this,d,c)},clear:function(a){a=_.extend({},a,{clear:!0});var b=this.get("cells");if(0===b.length)return this;this.trigger("batch:start",{batchName:"clear"});var c=b.sortBy(function(a){return a.isLink()?1:2});do c.shift().remove(a);while(c.length>0);return this.trigger("batch:stop",{batchName:"clear"}),this},_prepareCell:function(a){var b;if(a instanceof Backbone.Model?(b=a.attributes,a.graph=this):b=a,_.isUndefined(b.z)&&(b.z=this.maxZIndex()+1),!_.isString(b.type))throw new TypeError("dia.Graph: cell type must be a string.");return a},maxZIndex:function(){var a=this.get("cells").last();return a?a.get("z")||0:0},addCell:function(a,b){return _.isArray(a)?this.addCells(a,b):(this.get("cells").add(this._prepareCell(a),b||{}),this)},addCells:function(a,b){return b=b||{},b.position=a.length,_.each(a,function(a){b.position--,this.addCell(a,b)},this),this},resetCells:function(a,b){return this.get("cells").reset(_.map(a,this._prepareCell,this),b),this},_removeCell:function(a,b,c){c=c||{},c.clear||(c.disconnectLinks?this.disconnectLinks(a,c):this.removeLinks(a,c)),this.get("cells").remove(a,{silent:!0}),delete a.graph},getCell:function(a){return this.get("cells").get(a)},getCells:function(){return this.get("cells").toArray()},getElements:function(){return _.map(this._nodes,function(a,b){return this.getCell(b)},this)},getLinks:function(){return _.map(this._edges,function(a,b){return this.getCell(b)},this)},getFirstCell:function(){return this.get("cells").first()},getLastCell:function(){return this.get("cells").last()},getConnectedLinks:function(a,b){b=b||{};var c=b.inbound,d=b.outbound;_.isUndefined(c)&&_.isUndefined(d)&&(c=d=!0);var e=[],f={};if(d&&_.each(this.getOutboundEdges(a.id),function(a,b){f[b]||(e.push(this.getCell(b)),f[b]=!0)},this),c&&_.each(this.getInboundEdges(a.id),function(a,b){f[b]||(e.push(this.getCell(b)),f[b]=!0)},this),b.deep){var g=a.getEmbeddedCells({deep:!0}),h={};_.each(g,function(a){a.isLink()&&(h[a.id]=!0)}),_.each(g,function(a){a.isLink()||(d&&_.each(this.getOutboundEdges(a.id),function(a,b){f[b]||h[b]||(e.push(this.getCell(b)),f[b]=!0)},this),c&&_.each(this.getInboundEdges(a.id),function(a,b){f[b]||h[b]||(e.push(this.getCell(b)),f[b]=!0)},this))},this)}return e},getNeighbors:function(a,b){b=b||{};var c=b.inbound,d=b.outbound;_.isUndefined(c)&&_.isUndefined(d)&&(c=d=!0);var e=_.transform(this.getConnectedLinks(a,b),function(e,f){var g=f.get("source"),h=f.get("target"),i=f.hasLoop(b);if(c&&_.has(g,"id")&&!e[g.id]){var j=this.getCell(g.id);!i&&(!j||j===a||b.deep&&j.isEmbeddedIn(a))||(e[g.id]=j)}if(d&&_.has(h,"id")&&!e[h.id]){var k=this.getCell(h.id);!i&&(!k||k===a||b.deep&&k.isEmbeddedIn(a))||(e[h.id]=k)}},{},this);return _.values(e)},getCommonAncestor:function(){var a=_.map(arguments,function(a){for(var b=[],c=a.get("parent");c;)b.push(c),c=this.getCell(c).get("parent");return b},this);a=_.sortBy(a,"length");var b=_.find(a.shift(),function(b){return _.every(a,function(a){return _.contains(a,b)})});return this.getCell(b)},getSuccessors:function(a,b){b=b||{};var c=[];return this.search(a,function(b){b!==a&&c.push(b)},_.extend({},b,{outbound:!0})),c},cloneCells:function(a){var b={},c={};return _.each(a,function(a){if(!b[a.id]){var d=a.clone();b[a.id]=d,c[d.id]=a.get("embeds")}}),_.each(a,function(a){var d=b[a.id];if(d.isLink()){var e=d.get("source"),f=d.get("target");e.id&&b[e.id]&&d.prop("source/id",b[e.id].id),f.id&&b[f.id]&&d.prop("target/id",b[f.id].id)}var g=d.get("parent");if(g&&b[g]&&d.set("parent",b[g].id),c[d.id]){var h=[];_.each(c[d.id],function(a){b[a]?h.push(b[a].id):h.push(a)}),d.set("embeds",h)}}),b},cloneSubgraph:function(a,b){var c=this.getSubgraph(a,b);return this.cloneCells(c)},getSubgraph:function(a,b){b=b||{};var c=[],d={},e=[],f=[];return _.each(a,function(a){if(d[a.id]||(c.push(a),d[a.id]=a,a.isLink()?f.push(a):e.push(a)),b.deep){var g=a.getEmbeddedCells({deep:!0});_.each(g,function(a){d[a.id]||(c.push(a),d[a.id]=a,a.isLink()?f.push(a):e.push(a))})}}),_.each(f,function(a){var b=a.get("source"),f=a.get("target");if(b.id&&!d[b.id]){var g=this.getCell(b.id);c.push(g),d[g.id]=g,e.push(g)}if(f.id&&!d[f.id]){var h=this.getCell(f.id);c.push(this.getCell(f.id)),d[h.id]=h,e.push(h)}},this),_.each(e,function(a){var e=this.getConnectedLinks(a,b);_.each(e,function(a){var b=a.get("source"),e=a.get("target");!d[a.id]&&b.id&&d[b.id]&&e.id&&d[e.id]&&(c.push(a),d[a.id]=a)})},this),c},getPredecessors:function(a,b){b=b||{};var c=[];return this.search(a,function(b){b!==a&&c.push(b)},_.extend({},b,{inbound:!0})),c},search:function(a,b,c){c=c||{},c.breadthFirst?this.bfs(a,b,c):this.dfs(a,b,c)},bfs:function(a,b,c){c=c||{};var d={},e={},f=[];for(f.push(a),e[a.id]=0;f.length>0;){var g=f.shift();if(!d[g.id]){if(d[g.id]=!0,b(g,e[g.id])===!1)return;_.each(this.getNeighbors(g,c),function(a){e[a.id]=e[g.id]+1,f.push(a)})}}},dfs:function(a,b,c,d,e){c=c||{};var f=d||{},g=e||0;b(a,g)!==!1&&(f[a.id]=!0,_.each(this.getNeighbors(a,c),function(a){f[a.id]||this.dfs(a,b,c,f,g+1)},this))},getSources:function(){var a=[];return _.each(this._nodes,function(b,c){this._in[c]&&!_.isEmpty(this._in[c])||a.push(this.getCell(c))},this),a},getSinks:function(){var a=[];return _.each(this._nodes,function(b,c){this._out[c]&&!_.isEmpty(this._out[c])||a.push(this.getCell(c))},this),a},isSource:function(a){return!this._in[a.id]||_.isEmpty(this._in[a.id])},isSink:function(a){return!this._out[a.id]||_.isEmpty(this._out[a.id])},isSuccessor:function(a,b){var c=!1;return this.search(a,function(d){return d===b&&d!==a?(c=!0,!1):void 0},{outbound:!0}),c},isPredecessor:function(a,b){var c=!1;return this.search(a,function(d){return d===b&&d!==a?(c=!0,!1):void 0},{inbound:!0}),c},isNeighbor:function(a,b,c){c=c||{};var d=c.inbound,e=c.outbound;_.isUndefined(d)&&_.isUndefined(e)&&(d=e=!0);var f=!1;return _.each(this.getConnectedLinks(a,c),function(a){var g=a.get("source"),h=a.get("target");return a.hasLoop(c),d&&_.has(g,"id")&&g.id===b.id?(f=!0,!1):e&&_.has(h,"id")&&h.id===b.id?(f=!0,!1):void 0}),f},disconnectLinks:function(a,b){_.each(this.getConnectedLinks(a),function(c){c.set(c.get("source").id===a.id?"source":"target",g.point(0,0),b)})},removeLinks:function(a,b){_.invoke(this.getConnectedLinks(a),"remove",b)},findModelsFromPoint:function(a){return _.filter(this.getElements(),function(b){return b.getBBox().containsPoint(a)})},findModelsInArea:function(a,b){b=_.defaults(b||{},{strict:!1});var c=b.strict?"containsRect":"intersect";return _.filter(this.getElements(),function(b){return a[c](b.getBBox())})},findModelsUnderElement:function(a,b){b=_.defaults(b||{},{searchBy:"bbox"});var c=a.getBBox(),d="bbox"==b.searchBy?this.findModelsInArea(c):this.findModelsFromPoint(c[b.searchBy]());return _.reject(d,function(b){return a.id==b.id||b.isEmbeddedIn(a)})},getBBox:function(a){return a=a||this.collection.models,_.reduce(a,function(a,b){return b.isLink()?a:a?a.union(b.getBBox()):b.getBBox()},void 0)},translate:function(a,b,c){var d=_.reject(this.getCells(),function(a){return a.isEmbedded()});_.invoke(d,"translate",a,b,c)}});
+//      JointJS, the JavaScript diagramming library.
+//      (c) 2011-2015 client IO
+
+joint.dia.GraphCells = Backbone.Collection.extend({
+
+    cellNamespace: joint.shapes,
+
+    initialize: function(models, opt) {
+
+        // Backbone automatically doesn't trigger re-sort if models attributes are changed later when
+        // they're already in the collection. Therefore, we're triggering sort manually here.
+        this.on('change:z', this.sort, this);
+
+        // Set the optional namespace where all model classes are defined.
+        if (opt.cellNamespace) {
+            this.cellNamespace = opt.cellNamespace;
+        }
+
+        this.graph = opt.graph;
+    },
+
+    model: function(attrs, options) {
+
+        var collection = options.collection;
+        var namespace = collection.cellNamespace;
+
+        // Find the model class in the namespace or use the default one.
+        var ModelClass = (attrs.type === 'link')
+            ? joint.dia.Link
+            : joint.util.getByPath(namespace, attrs.type, '.') || joint.dia.Element;
+
+        var cell = new ModelClass(attrs, options);
+        // Add a reference to the graph. It is necessary to do this here because this is the earliest place
+        // where a new model is created from a plain JS object. For other objects, see `joint.dia.Graph>>_prepareCell()`.
+        cell.graph = collection.graph;
+
+        return cell;
+    },
+
+    // `comparator` makes it easy to sort cells based on their `z` index.
+    comparator: function(model) {
+
+        return model.get('z') || 0;
+    }
+});
+
+
+joint.dia.Graph = Backbone.Model.extend({
+
+    initialize: function(attrs, opt) {
+
+        opt = opt || {};
+
+        // Passing `cellModel` function in the options object to graph allows for
+        // setting models based on attribute objects. This is especially handy
+        // when processing JSON graphs that are in a different than JointJS format.
+        var cells = new joint.dia.GraphCells([], {
+            model: opt.cellModel,
+            cellNamespace: opt.cellNamespace,
+            graph: this
+        });
+        Backbone.Model.prototype.set.call(this, 'cells', cells);
+
+        // Make all the events fired in the `cells` collection available.
+        // to the outside world.
+        cells.on('all', this.trigger, this);
+
+        // `joint.dia.Graph` keeps an internal data structure (an adjacency list)
+        // for fast graph queries. All changes that affect the structure of the graph
+        // must be reflected in the `al` object. This object provides fast answers to
+        // questions such as "what are the neighbours of this node" or "what
+        // are the sibling links of this link".
+
+        // Outgoing edges per node. Note that we use a hash-table for the list
+        // of outgoing edges for a faster lookup.
+        // [node ID] -> Object [edge] -> true
+        this._out = {};
+        // Ingoing edges per node.
+        // [node ID] -> Object [edge] -> true
+        this._in = {};
+        // `_nodes` is useful for quick lookup of all the elements in the graph, without
+        // having to go through the whole cells array.
+        // [node ID] -> true
+        this._nodes = {};
+        // `_edges` is useful for quick lookup of all the links in the graph, without
+        // having to go through the whole cells array.
+        // [edge ID] -> true
+        this._edges = {};
+
+        cells.on('add', this._restructureOnAdd, this);
+        cells.on('remove', this._restructureOnRemove, this);
+        cells.on('reset', this._restructureOnReset, this);
+        cells.on('change:source', this._restructureOnChangeSource, this);
+        cells.on('change:target', this._restructureOnChangeTarget, this);
+
+        cells.on('remove', this._removeCell, this);
+    },
+
+    _restructureOnAdd: function(cell) {
+
+        if (cell.isLink()) {
+            this._edges[cell.id] = true;
+            var source = cell.get('source');
+            var target = cell.get('target');
+            if (source.id) {
+                (this._out[source.id] || (this._out[source.id] = {}))[cell.id] = true;
+            }
+            if (target.id) {
+                (this._in[target.id] || (this._in[target.id] = {}))[cell.id] = true;
+            }
+        } else {
+            this._nodes[cell.id] = true;
+        }
+    },
+    _restructureOnRemove: function(cell) {
+
+        if (cell.isLink()) {
+            delete this._edges[cell.id];
+            var source = cell.get('source');
+            var target = cell.get('target');
+            if (source.id && this._out[source.id] && this._out[source.id][cell.id]) {
+                delete this._out[source.id][cell.id];
+            }
+            if (target.id && this._in[target.id] && this._in[target.id][cell.id]) {
+                delete this._in[target.id][cell.id];
+            }
+        } else {
+            delete this._nodes[cell.id];
+        }
+    },
+    _restructureOnReset: function(cells) {
+
+        // Normalize into an array of cells. The original `cells` is GraphCells Backbone collection.
+        cells = cells.models;
+
+        this._out = {};
+        this._in = {};
+        this._nodes = {};
+        this._edges = {};
+
+        _.each(cells, this._restructureOnAdd, this);
+    },
+    _restructureOnChangeSource: function(link) {
+
+        var prevSource = link.previous('source');
+        if (prevSource.id && this._out[prevSource.id]) {
+            delete this._out[prevSource.id][link.id];
+        }
+        var source = link.get('source');
+        if (source.id) {
+            (this._out[source.id] || (this._out[source.id] = {}))[link.id] = true;
+        }
+    },
+    _restructureOnChangeTarget: function(link) {
+
+        var prevTarget = link.previous('target');
+        if (prevTarget.id && this._in[prevTarget.id]) {
+            delete this._in[prevTarget.id][link.id];
+        }
+        var target = link.get('target');
+        if (target.id) {
+            (this._in[target.id] || (this._in[target.id] = {}))[link.id] = true;
+        }
+    },
+
+    // Return all outbound edges for the node. Return value is an object
+    // of the form: [edge] -> true
+    getOutboundEdges: function(node) {
+
+        return (this._out && this._out[node]) || {};
+    },
+
+    // Return all inbound edges for the node. Return value is an object
+    // of the form: [edge] -> true
+    getInboundEdges: function(node) {
+
+        return (this._in && this._in[node]) || {};
+    },
+
+    toJSON: function() {
+
+        // Backbone does not recursively call `toJSON()` on attributes that are themselves models/collections.
+        // It just clones the attributes. Therefore, we must call `toJSON()` on the cells collection explicitely.
+        var json = Backbone.Model.prototype.toJSON.apply(this, arguments);
+        json.cells = this.get('cells').toJSON();
+        return json;
+    },
+
+    fromJSON: function(json, opt) {
+
+        if (!json.cells) {
+
+            throw new Error('Graph JSON must contain cells array.');
+        }
+
+        return this.set(json, opt);
+    },
+
+    set: function(key, val, opt) {
+
+        var attrs;
+
+        // Handle both `key`, value and {key: value} style arguments.
+        if (typeof key === 'object') {
+            attrs = key;
+            opt = val;
+        } else {
+            (attrs = {})[key] = val;
+        }
+
+        // Make sure that `cells` attribute is handled separately via resetCells().
+        if (attrs.hasOwnProperty('cells')) {
+            this.resetCells(attrs.cells, opt);
+            attrs = _.omit(attrs, 'cells');
+        }
+
+        // The rest of the attributes are applied via original set method.
+        return Backbone.Model.prototype.set.call(this, attrs, opt);
+    },
+
+    clear: function(opt) {
+
+        opt = _.extend({}, opt, { clear: true });
+
+        var collection = this.get('cells');
+
+        if (collection.length === 0) return this;
+
+        this.trigger('batch:start', { batchName: 'clear' });
+
+        // The elements come after the links.
+        var cells = collection.sortBy(function(cell) {
+            return cell.isLink() ? 1 : 2;
+        });
+
+        do {
+
+            // Remove all the cells one by one.
+            // Note that all the links are removed first, so it's
+            // safe to remove the elements without removing the connected
+            // links first.
+            cells.shift().remove(opt);
+
+        } while (cells.length > 0);
+
+        this.trigger('batch:stop', { batchName: 'clear' });
+
+        return this;
+    },
+
+    _prepareCell: function(cell) {
+
+        var attrs;
+        if (cell instanceof Backbone.Model) {
+            attrs = cell.attributes;
+            cell.graph = this;
+        } else {
+            // In case we're dealing with a plain JS object, we have to set the reference
+            // to the `graph` right after the actual model is created. This happens in the `model()` function
+            // of `joint.dia.GraphCells`.
+            attrs = cell;
+        }
+
+        if (_.isUndefined(attrs.z)) {
+            attrs.z = this.maxZIndex() + 1;
+        }
+
+        if (!_.isString(attrs.type)) {
+            throw new TypeError('dia.Graph: cell type must be a string.');
+        }
+
+        return cell;
+    },
+
+    maxZIndex: function() {
+
+        var lastCell = this.get('cells').last();
+        return lastCell ? (lastCell.get('z') || 0) : 0;
+    },
+
+    addCell: function(cell, options) {
+
+        if (_.isArray(cell)) {
+
+            return this.addCells(cell, options);
+        }
+
+        this.get('cells').add(this._prepareCell(cell), options || {});
+
+        return this;
+    },
+
+    addCells: function(cells, options) {
+
+        options = options || {};
+        options.position = cells.length;
+
+        _.each(cells, function(cell) {
+            options.position--;
+            this.addCell(cell, options);
+        }, this);
+
+        return this;
+    },
+
+    // When adding a lot of cells, it is much more efficient to
+    // reset the entire cells collection in one go.
+    // Useful for bulk operations and optimizations.
+    resetCells: function(cells, opt) {
+
+        this.get('cells').reset(_.map(cells, this._prepareCell, this), opt);
+
+        return this;
+    },
+
+    _removeCell: function(cell, collection, options) {
+
+        options = options || {};
+
+        if (!options.clear) {
+            // Applications might provide a `disconnectLinks` option set to `true` in order to
+            // disconnect links when a cell is removed rather then removing them. The default
+            // is to remove all the associated links.
+            if (options.disconnectLinks) {
+
+                this.disconnectLinks(cell, options);
+
+            } else {
+
+                this.removeLinks(cell, options);
+            }
+        }
+        // Silently remove the cell from the cells collection. Silently, because
+        // `joint.dia.Cell.prototype.remove` already triggers the `remove` event which is
+        // then propagated to the graph model. If we didn't remove the cell silently, two `remove` events
+        // would be triggered on the graph model.
+        this.get('cells').remove(cell, { silent: true });
+
+        delete cell.graph;
+    },
+
+    // Get a cell by `id`.
+    getCell: function(id) {
+
+        return this.get('cells').get(id);
+    },
+
+    getCells: function() {
+
+        return this.get('cells').toArray();
+    },
+
+    getElements: function() {
+
+        return _.map(this._nodes, function(exists, node) { return this.getCell(node); }, this);
+    },
+
+    getLinks: function() {
+
+        return _.map(this._edges, function(exists, edge) { return this.getCell(edge); }, this);
+    },
+
+    getFirstCell: function() {
+
+        return this.get('cells').first();
+    },
+
+    getLastCell: function() {
+
+        return this.get('cells').last();
+    },
+
+    // Get all inbound and outbound links connected to the cell `model`.
+    getConnectedLinks: function(model, opt) {
+
+        opt = opt || {};
+
+        var inbound = opt.inbound;
+        var outbound = opt.outbound;
+        if (_.isUndefined(inbound) && _.isUndefined(outbound)) {
+            inbound = outbound = true;
+        }
+
+        // The final array of connected link models.
+        var links = [];
+        // Connected edges. This hash table ([edge] -> true) serves only
+        // for a quick lookup to check if we already added a link.
+        var edges = {};
+
+        if (outbound) {
+            _.each(this.getOutboundEdges(model.id), function(exists, edge) {
+                if (!edges[edge]) {
+                    links.push(this.getCell(edge));
+                    edges[edge] = true;
+                }
+            }, this);
+        }
+        if (inbound) {
+            _.each(this.getInboundEdges(model.id), function(exists, edge) {
+                // Skip links that were already added. Those must be self-loop links
+                // because they are both inbound and outbond edges of the same element.
+                if (!edges[edge]) {
+                    links.push(this.getCell(edge));
+                    edges[edge] = true;
+                }
+            }, this);
+        }
+
+        // If 'deep' option is 'true', return all the links that are connected to any of the descendent cells
+        // and are not descendents themselves.
+        if (opt.deep) {
+
+            var embeddedCells = model.getEmbeddedCells({ deep: true });
+            // In the first round, we collect all the embedded edges so that we can exclude
+            // them from the final result.
+            var embeddedEdges = {};
+            _.each(embeddedCells, function(cell) {
+                if (cell.isLink()) {
+                    embeddedEdges[cell.id] = true;
+                }
+            });
+            _.each(embeddedCells, function(cell) {
+                if (cell.isLink()) return;
+                if (outbound) {
+                    _.each(this.getOutboundEdges(cell.id), function(exists, edge) {
+                        if (!edges[edge] && !embeddedEdges[edge]) {
+                            links.push(this.getCell(edge));
+                            edges[edge] = true;
+                        }
+                    }, this);
+                }
+                if (inbound) {
+                    _.each(this.getInboundEdges(cell.id), function(exists, edge) {
+                        if (!edges[edge] && !embeddedEdges[edge]) {
+                            links.push(this.getCell(edge));
+                            edges[edge] = true;
+                        }
+                    }, this);
+                }
+            }, this);
+        }
+
+        return links;
+    },
+
+    getNeighbors: function(model, opt) {
+
+        opt = opt || {};
+
+        var inbound = opt.inbound;
+        var outbound = opt.outbound;
+        if (_.isUndefined(inbound) && _.isUndefined(outbound)) {
+            inbound = outbound = true;
+        }
+
+        var neighbors = _.transform(this.getConnectedLinks(model, opt), function(res, link) {
+
+            var source = link.get('source');
+            var target = link.get('target');
+            var loop = link.hasLoop(opt);
+
+            // Discard if it is a point, or if the neighbor was already added.
+            if (inbound && _.has(source, 'id') && !res[source.id]) {
+
+                var sourceElement = this.getCell(source.id);
+
+                if (loop || (sourceElement && sourceElement !== model && (!opt.deep || !sourceElement.isEmbeddedIn(model)))) {
+                    res[source.id] = sourceElement;
+                }
+            }
+
+            // Discard if it is a point, or if the neighbor was already added.
+            if (outbound && _.has(target, 'id') && !res[target.id]) {
+
+                var targetElement = this.getCell(target.id);
+
+                if (loop || (targetElement && targetElement !== model && (!opt.deep || !targetElement.isEmbeddedIn(model)))) {
+                    res[target.id] = targetElement;
+                }
+            }
+
+        }, {}, this);
+
+        return _.values(neighbors);
+    },
+
+    getCommonAncestor: function(/* cells */) {
+
+        var cellsAncestors = _.map(arguments, function(cell) {
+
+            var ancestors = [];
+            var parentId = cell.get('parent');
+
+            while (parentId) {
+
+                ancestors.push(parentId);
+                parentId = this.getCell(parentId).get('parent');
+            }
+
+            return ancestors;
+
+        }, this);
+
+        cellsAncestors = _.sortBy(cellsAncestors, 'length');
+
+        var commonAncestor = _.find(cellsAncestors.shift(), function(ancestor) {
+
+            return _.every(cellsAncestors, function(cellAncestors) {
+                return _.contains(cellAncestors, ancestor);
+            });
+        });
+
+        return this.getCell(commonAncestor);
+    },
+
+    // Find the whole branch starting at `element`.
+    // If `opt.deep` is `true`, take into account embedded elements too.
+    // If `opt.breadthFirst` is `true`, use the Breadth-first search algorithm, otherwise use Depth-first search.
+    getSuccessors: function(element, opt) {
+
+        opt = opt || {};
+        var res = [];
+        // Modify the options so that it includes the `outbound` neighbors only. In other words, search forwards.
+        this.search(element, function(el) {
+            if (el !== element) {
+                res.push(el);
+            }
+        }, _.extend({}, opt, { outbound: true }));
+        return res;
+    },
+
+    // Clone `cells` returning an object that maps the original cell ID to the clone. The number
+    // of clones is exactly the same as the `cells.length`.
+    // This function simply clones all the `cells`. However, it also reconstructs
+    // all the `source/target` and `parent/embed` references within the `cells`.
+    // This is the main difference from the `cell.clone()` method. The
+    // `cell.clone()` method works on one single cell only.
+    // For example, for a graph: `A --- L ---> B`, `cloneCells([A, L, B])`
+    // returns `[A2, L2, B2]` resulting to a graph: `A2 --- L2 ---> B2`, i.e.
+    // the source and target of the link `L2` is changed to point to `A2` and `B2`.
+    cloneCells: function(cells) {
+
+        // A map of the form [original cell ID] -> [clone] helping
+        // us to reconstruct references for source/target and parent/embeds.
+        // This is also the returned value.
+        var cloneMap = {};
+        // A map [original cell ID] -> [Array of original embeds].
+        // This mapping caches the `embeds` array of original cells.
+        // This is needed because when using a shallow clone (without `deep` set to `true`),
+        // `embeds` are reset (see joint.dia.Cell >> clone()).
+        var embedsCache = {};
+
+        _.each(cells, function(cell) {
+            if (!cloneMap[cell.id]) {
+                var clone = cell.clone();
+                cloneMap[cell.id] = clone;
+                embedsCache[clone.id] = cell.get('embeds');
+            }
+        });
+
+        _.each(cells, function(cell) {
+
+            var clone = cloneMap[cell.id];
+            // assert(clone exists)
+
+            if (clone.isLink()) {
+                var source = clone.get('source');
+                var target = clone.get('target');
+                if (source.id && cloneMap[source.id]) {
+                    // Source points to an element and the element is among the clones.
+                    // => Update the source of the cloned link.
+                    clone.prop('source/id', cloneMap[source.id].id);
+                }
+                if (target.id && cloneMap[target.id]) {
+                    // Target points to an element and the element is among the clones.
+                    // => Update the target of the cloned link.
+                    clone.prop('target/id', cloneMap[target.id].id);
+                }
+            }
+
+            var parent = clone.get('parent');
+            if (parent && cloneMap[parent]) {
+                clone.set('parent', cloneMap[parent].id);
+            }
+
+            if (embedsCache[clone.id]) {
+                var newEmbeds = [];
+                _.each(embedsCache[clone.id], function(embed) {
+                    if (cloneMap[embed]) {
+                        newEmbeds.push(cloneMap[embed].id);
+                    } else {
+                        newEmbeds.push(embed);
+                    }
+                });
+                clone.set('embeds', newEmbeds);
+            }
+        });
+
+        return cloneMap;
+    },
+
+    // Clone the whole subgraph (including all the connected links whose source/target is in the subgraph).
+    // If `opt.deep` is `true`, also take into account all the embedded cells of all the subgraph cells.
+    // Return a map of the form: [original cell ID] -> [clone].
+    cloneSubgraph: function(cells, opt) {
+
+        var subgraph = this.getSubgraph(cells, opt);
+        return this.cloneCells(subgraph);
+    },
+
+    // Return `cells` and all the connected links that connect cells in the `cells` array.
+    // If `opt.deep` is `true`, return all the cells including all their embedded cells
+    // and all the links that connect any of the returned cells.
+    // For example, for a single shallow element, the result is that very same element.
+    // For two elements connected with a link: `A --- L ---> B`, the result for
+    // `getSubgraph([A, B])` is `[A, L, B]`. The same goes for `getSubgraph([L])`, the result is again `[A, L, B]`.
+    getSubgraph: function(cells, opt) {
+
+        opt = opt || {};
+
+        var subgraph = [];
+        // `cellMap` is used for a quick lookup of existance of a cell in the `cells` array.
+        var cellMap = {};
+        var elements = [];
+        var links = [];
+
+        _.each(cells, function(cell) {
+            if (!cellMap[cell.id]) {
+                subgraph.push(cell);
+                cellMap[cell.id] = cell;
+                if (cell.isLink()) {
+                    links.push(cell);
+                } else {
+                    elements.push(cell);
+                }
+            }
+
+            if (opt.deep) {
+                var embeds = cell.getEmbeddedCells({ deep: true });
+                _.each(embeds, function(embed) {
+                    if (!cellMap[embed.id]) {
+                        subgraph.push(embed);
+                        cellMap[embed.id] = embed;
+                        if (embed.isLink()) {
+                            links.push(embed);
+                        } else {
+                            elements.push(embed);
+                        }
+                    }
+                });
+            }
+        });
+
+        _.each(links, function(link) {
+            // For links, return their source & target (if they are elements - not points).
+            var source = link.get('source');
+            var target = link.get('target');
+            if (source.id && !cellMap[source.id]) {
+                var sourceElement = this.getCell(source.id);
+                subgraph.push(sourceElement);
+                cellMap[sourceElement.id] = sourceElement;
+                elements.push(sourceElement);
+            }
+            if (target.id && !cellMap[target.id]) {
+                var targetElement = this.getCell(target.id);
+                subgraph.push(this.getCell(target.id));
+                cellMap[targetElement.id] = targetElement;
+                elements.push(targetElement);
+            }
+        }, this);
+
+        _.each(elements, function(element) {
+            // For elements, include their connected links if their source/target is in the subgraph;
+            var links = this.getConnectedLinks(element, opt);
+            _.each(links, function(link) {
+                var source = link.get('source');
+                var target = link.get('target');
+                if (!cellMap[link.id] && source.id && cellMap[source.id] && target.id && cellMap[target.id]) {
+                    subgraph.push(link);
+                    cellMap[link.id] = link;
+                }
+            });
+        }, this);
+
+        return subgraph;
+    },
+
+    // Find all the predecessors of `element`. This is a reverse operation of `getSuccessors()`.
+    // If `opt.deep` is `true`, take into account embedded elements too.
+    // If `opt.breadthFirst` is `true`, use the Breadth-first search algorithm, otherwise use Depth-first search.
+    getPredecessors: function(element, opt) {
+
+        opt = opt || {};
+        var res = [];
+        // Modify the options so that it includes the `inbound` neighbors only. In other words, search backwards.
+        this.search(element, function(el) {
+            if (el !== element) {
+                res.push(el);
+            }
+        }, _.extend({}, opt, { inbound: true }));
+        return res;
+    },
+
+    // Perform search on the graph.
+    // If `opt.breadthFirst` is `true`, use the Breadth-first Search algorithm, otherwise use Depth-first search.
+    // By setting `opt.inbound` to `true`, you can reverse the direction of the search.
+    // If `opt.deep` is `true`, take into account embedded elements too.
+    // `iteratee` is a function of the form `function(element) {}`.
+    // If `iteratee` explicitely returns `false`, the searching stops.
+    search: function(element, iteratee, opt) {
+
+        opt = opt || {};
+        if (opt.breadthFirst) {
+            this.bfs(element, iteratee, opt);
+        } else {
+            this.dfs(element, iteratee, opt);
+        }
+    },
+
+    // Breadth-first search.
+    // If `opt.deep` is `true`, take into account embedded elements too.
+    // If `opt.inbound` is `true`, reverse the search direction (it's like reversing all the link directions).
+    // `iteratee` is a function of the form `function(element, distance) {}`.
+    // where `element` is the currently visited element and `distance` is the distance of that element
+    // from the root `element` passed the `bfs()`, i.e. the element we started the search from.
+    // Note that the `distance` is not the shortest or longest distance, it is simply the number of levels
+    // crossed till we visited the `element` for the first time. It is especially useful for tree graphs.
+    // If `iteratee` explicitely returns `false`, the searching stops.
+    bfs: function(element, iteratee, opt) {
+
+        opt = opt || {};
+        var visited = {};
+        var distance = {};
+        var queue = [];
+
+        queue.push(element);
+        distance[element.id] = 0;
+
+        while (queue.length > 0) {
+            var next = queue.shift();
+            if (!visited[next.id]) {
+                visited[next.id] = true;
+                if (iteratee(next, distance[next.id]) === false) return;
+                _.each(this.getNeighbors(next, opt), function(neighbor) {
+                    distance[neighbor.id] = distance[next.id] + 1;
+                    queue.push(neighbor);
+                });
+            }
+        }
+    },
+
+    // Depth-first search.
+    // If `opt.deep` is `true`, take into account embedded elements too.
+    // If `opt.inbound` is `true`, reverse the search direction (it's like reversing all the link directions).
+    // `iteratee` is a function of the form `function(element, distance) {}`.
+    // If `iteratee` explicitely returns `false`, the search stops.
+    dfs: function(element, iteratee, opt, _visited, _distance) {
+
+        opt = opt || {};
+        var visited = _visited || {};
+        var distance = _distance || 0;
+        if (iteratee(element, distance) === false) return;
+        visited[element.id] = true;
+
+        _.each(this.getNeighbors(element, opt), function(neighbor) {
+            if (!visited[neighbor.id]) {
+                this.dfs(neighbor, iteratee, opt, visited, distance + 1);
+            }
+        }, this);
+    },
+
+    // Get all the roots of the graph. Time complexity: O(|V|).
+    getSources: function() {
+
+        var sources = [];
+        _.each(this._nodes, function(exists, node) {
+            if (!this._in[node] || _.isEmpty(this._in[node])) {
+                sources.push(this.getCell(node));
+            }
+        }, this);
+        return sources;
+    },
+
+    // Get all the leafs of the graph. Time complexity: O(|V|).
+    getSinks: function() {
+
+        var sinks = [];
+        _.each(this._nodes, function(exists, node) {
+            if (!this._out[node] || _.isEmpty(this._out[node])) {
+                sinks.push(this.getCell(node));
+            }
+        }, this);
+        return sinks;
+    },
+
+    // Return `true` if `element` is a root. Time complexity: O(1).
+    isSource: function(element) {
+
+        return !this._in[element.id] || _.isEmpty(this._in[element.id]);
+    },
+
+    // Return `true` if `element` is a leaf. Time complexity: O(1).
+    isSink: function(element) {
+
+        return !this._out[element.id] || _.isEmpty(this._out[element.id]);
+    },
+
+    // Return `true` is `elementB` is a successor of `elementA`. Return `false` otherwise.
+    isSuccessor: function(elementA, elementB) {
+
+        var isSuccessor = false;
+        this.search(elementA, function(element) {
+            if (element === elementB && element !== elementA) {
+                isSuccessor = true;
+                return false;
+            }
+        }, { outbound: true });
+        return isSuccessor;
+    },
+
+    // Return `true` is `elementB` is a predecessor of `elementA`. Return `false` otherwise.
+    isPredecessor: function(elementA, elementB) {
+
+        var isPredecessor = false;
+        this.search(elementA, function(element) {
+            if (element === elementB && element !== elementA) {
+                isPredecessor = true;
+                return false;
+            }
+        }, { inbound: true });
+        return isPredecessor;
+    },
+
+    // Return `true` is `elementB` is a neighbor of `elementA`. Return `false` otherwise.
+    // `opt.deep` controls whether to take into account embedded elements as well. See `getNeighbors()`
+    // for more details.
+    // If `opt.outbound` is set to `true`, return `true` only if `elementB` is a successor neighbor.
+    // Similarly, if `opt.inbound` is set to `true`, return `true` only if `elementB` is a predecessor neighbor.
+    isNeighbor: function(elementA, elementB, opt) {
+
+        opt = opt || {};
+
+        var inbound = opt.inbound;
+        var outbound = opt.outbound;
+        if (_.isUndefined(inbound) && _.isUndefined(outbound)) {
+            inbound = outbound = true;
+        }
+
+        var isNeighbor = false;
+
+        _.each(this.getConnectedLinks(elementA, opt), function(link) {
+
+            var source = link.get('source');
+            var target = link.get('target');
+            var loop = link.hasLoop(opt);
+
+            // Discard if it is a point.
+            if (inbound && _.has(source, 'id') && source.id === elementB.id) {
+                isNeighbor = true;
+                return false;
+            }
+
+            // Discard if it is a point, or if the neighbor was already added.
+            if (outbound && _.has(target, 'id') && target.id === elementB.id) {
+                isNeighbor = true;
+                return false;
+            }
+        });
+
+        return isNeighbor;
+    },
+
+    // Disconnect links connected to the cell `model`.
+    disconnectLinks: function(model, options) {
+
+        _.each(this.getConnectedLinks(model), function(link) {
+
+            link.set(link.get('source').id === model.id ? 'source' : 'target', g.point(0, 0), options);
+        });
+    },
+
+    // Remove links connected to the cell `model` completely.
+    removeLinks: function(model, options) {
+
+        _.invoke(this.getConnectedLinks(model), 'remove', options);
+    },
+
+    // Find all elements at given point
+    findModelsFromPoint: function(p) {
+
+        return _.filter(this.getElements(), function(el) {
+            return el.getBBox().containsPoint(p);
+        });
+    },
+
+    // Find all elements in given area
+    findModelsInArea: function(rect, opt) {
+
+        opt = _.defaults(opt || {}, { strict: false });
+
+        var method = opt.strict ? 'containsRect' : 'intersect';
+
+        return _.filter(this.getElements(), function(el) {
+            return rect[method](el.getBBox());
+        });
+    },
+
+    // Find all elements under the given element.
+    findModelsUnderElement: function(element, opt) {
+
+        opt = _.defaults(opt || {}, { searchBy: 'bbox' });
+
+        var bbox = element.getBBox();
+        var elements = (opt.searchBy == 'bbox')
+            ? this.findModelsInArea(bbox)
+            : this.findModelsFromPoint(bbox[opt.searchBy]());
+
+        // don't account element itself or any of its descendents
+        return _.reject(elements, function(el) {
+            return element.id == el.id || el.isEmbeddedIn(element);
+        });
+    },
+
+    // Return the bounding box of all cells in array provided. If no array
+    // provided returns bounding box of all cells. Links are being ignored.
+    getBBox: function(cells) {
+
+        cells = cells || this.collection.models;
+
+        return _.reduce(cells, function(memo, cell) {
+            if (cell.isLink()) return memo;
+            if (memo) {
+                return memo.union(cell.getBBox());
+            } else {
+                return cell.getBBox();
+            }
+        }, undefined);
+    },
+
+    translate: function(dx, dy, opt) {
+
+        // Don't translate cells that are embedded in any other cell.
+        var cells = _.reject(this.getCells(), function(cell) {
+            return cell.isEmbedded();
+        });
+
+        _.invoke(cells, 'translate', dx, dy, opt);
+    }
+});

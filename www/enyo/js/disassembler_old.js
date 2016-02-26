@@ -1,1 +1,120 @@
-function docss(a){return"<font color=black>"+a+"</font>"}enyo.kind({name:"DisassemblerOld",kind:"Scroller",tag:"div",style:"margin:0px;background-color:#c0c0c0",data:null,components:[{tag:"div",allowHtml:!0,classes:"colorbar",name:"colorbar"},{tag:"br"},{tag:"div",content:"^",classes:"moreless",ontap:"less"},{tag:"pre",allowHtml:!0,name:"text",content:"..",style:"margin-left:5px"},{tag:"div",content:"v",classes:"moreless",ontap:"more"}],min:0,max:0,block:512,base:"entry0",less:function(){var a=this.$.text;this.min+=this.block,r2.get_disasm(this.base+"-"+this.min,this.block,function(b){b=docss(r2.filter_asm(b,"pd"));var c=r2ui._dis.getScrollBounds().height;a.setContent("<div class='enyo-selectable'>"+b+a.getContent()+"</div>");var d=r2ui._dis.getScrollBounds().height;r2ui._dis.scrollTo(0,d-c)})},more:function(){var a=this.$.text;this.max+=this.block,r2.get_disasm(this.base+"+"+this.max,this.block,function(b){b=docss(r2.filter_asm(b,"pd")),a.setContent("<div class='enyo-selectable'>"+a.getContent()+b+"</div>")})},seek:function(a){var b=this.$.text;this.base=a,this.min=this.max=0,r2.get_disasm(a,this.block,function(a){a=docss(r2.filter_asm(a,"pd")),b.setContent("<div class='enyo-selectable'>"+a+"</div>")}),this.scrollTo(0,0)},create:function(){this.inherited(arguments),this.$.text,r2.cmd("e asm.lineswidth = 20",function(a){}),this.seek("entry0"),r2ui._dis=this,r2ui.history_push("entry0")},colorbar_create:function(){var a=this;r2.cmd("pvj 24",function(b){try{var c=JSON.parse(b)}catch(d){return void alert(d)}console.log(c);for(var e="<table class='colorbar'><tr valign=top style='height:8px;border-spacing:0'>",f={flags:"#c0c0c0",comments:"yellow",functions:"#5050f0",strings:"orange"},g="",h=16,i=0;i<c.blocks.length;i++){var j=c.blocks[i],k="<div style='overflow:hidden;width:12px;'>____</div>";if(j.offset){var k="<table width='width:100%' height="+h+" style='border-spacing:0px'>",l=0;for(var m in f)j[m]&&l++;if(l++,1==l)break;var n=h/l;for(var m in f)f[m],j[m]&&(k+="<tr><td class='colorbar_item' style='background-color:"+f[m]+"'><div style='width:12px;overflow:hidden;height:"+n+"px'>____</div></td></tr>");k+="</table>",g="0x"+j.offset.toString(16)}else g="0x"+(c.from+c.blocksize*i).toString(16);e+="<td onclick='r2ui.seek("+g+",true)' title='"+g+"' style='height:"+h+"px' width=15px>"+k+"</td>"}e+="</tr></table>",a.$.colorbar.setContent(e)})}});
+function docss(x) {
+  return '<font color=black>'+x+'</font>';
+}
+
+enyo.kind ({
+  name: "DisassemblerOld",
+  kind: "Scroller",
+  tag: "div",
+  style:"margin:0px;background-color:#c0c0c0",
+  data: null,
+  components: [
+    {tag: "div", allowHtml: true, classes: "colorbar", name: "colorbar" },
+    {tag: "br" },
+    {tag: "div", content: "^", classes: "moreless", ontap: "less"},
+    {tag: "pre", allowHtml: true, name: "text", content: "..", style:"margin-left:5px"},
+    {tag: "div", content: "v", classes: "moreless", ontap: "more"},
+  ],
+  min: 0,
+  max: 0,
+  block: 512,
+  base: "entry0",
+  less: function() {
+    var self = this;
+    var text = this.$.text;
+    this.min += this.block;
+    r2.get_disasm (this.base+"-"+this.min, this.block, function (x) {
+      x = docss (r2.filter_asm (x, "pd"));
+      var oldy = r2ui._dis.getScrollBounds().height;
+      text.setContent ("<div class='enyo-selectable'>" + x + text.getContent() + "</div>");
+      var newy = r2ui._dis.getScrollBounds().height;
+      r2ui._dis.scrollTo (0, newy-oldy);
+    });
+  },
+  more: function() {
+    var text = this.$.text;
+    this.max += this.block;
+    r2.get_disasm (this.base+"+"+this.max, this.block, function (x) {
+      x = docss (r2.filter_asm (x, "pd"));
+      text.setContent ("<div class='enyo-selectable'>" + text.getContent() + x + "</div>");
+    });
+  },
+  seek: function(addr) {
+    var text = this.$.text;
+    this.base = addr;
+    this.min = this.max = 0;
+    r2.get_disasm (addr, this.block, function (x) {
+      x = docss (r2.filter_asm (x, "pd"));
+      text.setContent("<div class='enyo-selectable'>" + x + "</div>");
+    });
+    this.scrollTo (0, 0);
+    //this.colorbar_create ();
+  },
+  create: function() {
+    this.inherited (arguments);
+ //   this.$.list.setCount (this.data.length) ;
+    var text = this.$.text;
+    r2.cmd("e asm.lineswidth = 20", function(x){});
+    this.seek ("entry0");
+    r2ui._dis = this;
+    r2ui.history_push ("entry0");
+
+    //this.colorbar_create ();
+    //this.refresh ();
+  },
+  colorbar_create: function () {
+    var self = this;
+    r2.cmd ("pvj 24", function(x) {
+      try {
+        var y = JSON.parse (x);
+      } catch (e) {
+        alert (e);
+        return;
+      }
+      console.log (y);
+
+// TODO: use canvas api for faster rendering and smaller dom
+      var c = "<table class='colorbar'>"+
+          "<tr valign=top style='height:8px;border-spacing:0'>";
+      var colors = {
+        flags: "#c0c0c0",
+        comments: "yellow",
+        functions: "#5050f0",
+        strings: "orange",
+      };
+      var off = "";
+      var WIDTH = '100%';
+      var HEIGHT = 16;
+      for (var i=0; i< y.blocks.length; i++) {
+        var block = y.blocks[i];
+        var r = "<div style='overflow:hidden;width:12px;'>____</div>";
+        if (block.offset) {  // Object.keys(block).length>1) {
+          var r = "<table width='width:100%' height="+HEIGHT+" style='border-spacing:0px'>";
+          var count = 0;
+          for (var k in colors)
+            if (block[k])
+              count++;
+	  count++; // avoid 0div wtf
+	  if (count==1) break;
+          var h = HEIGHT / count;
+          for (var k in colors) {
+            var color = colors[k];
+            if (block[k])
+              r += "<tr><td class='colorbar_item' style='background-color:"
+                  + colors[k]+"'><div style='width:12px;overflow:"
+                  + "hidden;height:"+h+"px'>____</div></td></tr>";
+          }
+          r += "</table>";
+          off = "0x"+block.offset.toString (16);
+        } else {
+          off = "0x"+(y.from + (y.blocksize * i)).toString (16);
+        }
+        c += "<td onclick='r2ui.seek("+off+",true)' title='"+off
+              + "' style='height:"+HEIGHT+"px' "
+	      + "width=15px>"+r+"</td>";
+      }
+      c += "</tr></table>";
+      self.$.colorbar.setContent (c);
+    });
+  }
+});

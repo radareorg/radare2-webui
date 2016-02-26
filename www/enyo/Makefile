@@ -14,7 +14,7 @@ BOWER=$(shell npm bin)/bower
 index.js: node_modules
 	$(BOWER) install
 	$(GRUNT)
-	cat build/*.js js/*.js > index.js
+	cat build/*.js ugly/js/*.js > index.js
 
 ENYO=http://enyojs.com/sampler/latest/build
 JOINT=http://www.jointjs.com/cms/downloads/
@@ -31,6 +31,9 @@ enyo-sync:
 	wget -O build/joint.min.css $(JOINT)/joint.min.css
 	# jQuery
 	wget -O build/jquery.min.js http://code.jquery.com/jquery-2.0.3.min.js
+
+run:
+	r2 -q -e http.root=$(PWD)/../ -c=H /bin/ls
 
 clean:
 	rm -rf node_modules
