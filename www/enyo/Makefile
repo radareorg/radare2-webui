@@ -14,8 +14,7 @@ BOWER=$(shell npm bin)/bower
 index.js: node_modules
 	$(BOWER) install
 	$(GRUNT)
-	cd ./js/
-	cat *.js > ./js/index.js
+	cat build/*.js js/*.js > index.js
 
 ENYO=http://enyojs.com/sampler/latest/build
 JOINT=http://www.jointjs.com/cms/downloads/
