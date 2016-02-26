@@ -1,23 +1,20 @@
-.PHONY: index.js
+.PHONY: all debug enyo-sync index.js
+
 all: index.js
 
-node_modules/.bin/uglifyjs:
-	mkdir -p node_modules
-#	npm install uglify-js
-	npm install grunt-contrib-uglify --save-dev
+node_modules:
+	npm install
 
 debug:
 	cat js/*.js > index.js
 
-#U=bower_components/uglify-js/bin/uglifyjs
-index.js: $U
+GRUNT=$(shell npm bin)/grunt
 
-	coffee -c Gruntfile.coffee
-	grunt
+index.js: node_modules
+	$(shell npm bin)/bower install
+	$(GRUNT)
 	cd ./js/
 	cat *.js > ./js/index.js
-
-
 
 ENYO=http://enyojs.com/sampler/latest/build
 JOINT=http://www.jointjs.com/cms/downloads/
