@@ -3,15 +3,21 @@ all: index.js
 
 node_modules/.bin/uglifyjs:
 	mkdir -p node_modules
-	npm install uglify-js
+#	npm install uglify-js
+	npm install grunt-contrib-uglify --save-dev
 
 debug:
 	cat js/*.js > index.js
 
-U=node_modules/.bin/uglifyjs
+#U=bower_components/uglify-js/bin/uglifyjs
 index.js: $U
-#	cat js/*.js > index.js
-	cat js/*.js | $U > index.js || cat js/*.js > index.js
+
+	coffee -c Gruntfile.coffee
+	grunt
+	cd ./js/
+	cat *.js > ./js/index.js
+
+
 
 ENYO=http://enyojs.com/sampler/latest/build
 JOINT=http://www.jointjs.com/cms/downloads/

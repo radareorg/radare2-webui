@@ -3,5 +3,5 @@ all:
 
 node_modules:
 	mkdir node_modules
-	npm install grunt-cli bower
-	cd www/enyo ; $(shell npm bin)/bower install
+	npm install grunt grunt-cli bower --save-dev
+	cd www/enyo ; make node_modules ;$(shell npm bin)/bower install
