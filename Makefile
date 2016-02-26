@@ -1,0 +1,2 @@
+all:
+	bower install
