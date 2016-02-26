@@ -10,8 +10,8 @@
     "grunt": "*",
     "grunt-cli": "*",
     "bower": "*",
-    "grunt-contrib-uglify": "*",
-    "uglify-js": "*"
+    "grunt-contrib-uglify": "*"
+    "uglify": "*"
   },
   "description": "Collection of radare2 web user interfaces",
   "homepage": "https://radare.org",

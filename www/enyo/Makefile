@@ -9,9 +9,10 @@ debug:
 	cat js/*.js > index.js
 
 GRUNT=$(shell npm bin)/grunt
+BOWER=$(shell npm bin)/bower
 
 index.js: node_modules
-	$(shell npm bin)/bower install
+	$(BOWER) install
 	$(GRUNT)
 	cd ./js/
 	cat *.js > ./js/index.js
@@ -31,3 +32,6 @@ enyo-sync:
 	wget -O build/joint.min.css $(JOINT)/joint.min.css
 	# jQuery
 	wget -O build/jquery.min.js http://code.jquery.com/jquery-2.0.3.min.js
+
+clean:
+	rm -rf node_modules

@@ -17,9 +17,9 @@
   ],
   "dependencies": {
     "joint": "0.9.4",
-    "enyo-ilib": "git@github.com:enyojs/enyo-ilib",
+    "enyo-ilib": "https://github.com/enyojs/enyo-ilib",
     "enyo": "2.6.3-rc.1",
-    "uglify-js":"git@github.com:mishoo/UglifyJS2",
+    "uglify-js":"https://github.com/mishoo/UglifyJS2",
     "grunt-contrib-uglify":"0.11.0",
     "coffee-script":"1.10.0"
   }

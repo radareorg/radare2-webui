@@ -3,4 +3,4 @@ all: enyo
 
 enyo:
 	cd www/enyo ; npm install
-	cd www/enyo ; $(shell npm bin)/bower install
+#	cd www/enyo ; $(shell npm bin)/bower install
