@@ -6,13 +6,7 @@
   "bugs": {
     "url": "https://github.com/radare/radare2-webui"
   },
-  "dependencies": {
-    "grunt": "*",
-    "grunt-cli": "*",
-    "bower": "*",
-    "grunt-contrib-uglify": "*",
-    "uglify-js": "*"
-  },
+  "dependencies": {},
   "description": "Collection of radare2 web user interfaces",
   "homepage": "https://radare.org",
   "license": "MIT",
@@ -28,5 +22,11 @@
     "url": "git://github.com/radare/radare2-webui.git"
   },
   "scripts": {},
-  "version": "0.10.2"
+  "version": "0.10.2",
+  "devDependencies": {
+    "bower": "*",
+    "gulp-clean-css": "^2.0.3",
+    "gulp-concat": "^2.6.0",
+    "gulp-uglify": "^1.5.3"
+  }
 }

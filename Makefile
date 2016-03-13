@@ -6,7 +6,6 @@ run:
 
 enyo:
 	$(MAKE) -C www/enyo
-#	cd www/enyo ; $(shell npm bin)/bower install
 
 clean:
 	$(MAKE) -C www/enyo clean
