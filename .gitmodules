@@ -1,0 +1,3 @@
+[submodule "rarop"]
+	path = rarop
+	url = https://github.com/jpenalbae/rarop.git
