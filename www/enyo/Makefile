@@ -1,4 +1,5 @@
 modules:
+	echo "Building enyo-based UI"
 	npm install
 	gulp
 

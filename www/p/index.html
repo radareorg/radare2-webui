@@ -7,43 +7,38 @@
 
 	<title>radare2</title>
 
-	<link rel="stylesheet" type="text/css" href="./lib/css/layout-default-latest.css" />
-	<link rel="stylesheet" type="text/css" href="./lib/css/jquery.ui.tabs.css" />
-	<link rel="stylesheet" type="text/css" href="./lib/css/jquery-ui.css" />
-	<link rel="stylesheet" type="text/css" href="../enyo/css/disasm.css" />
-	<link rel="stylesheet" type="text/css" href="../enyo/vendors/jointjs/dist/joint.min.css" />
-	<link rel="stylesheet" type="text/css" href="./lib/css/tree.jquery.css" />
-	<link rel="stylesheet" type="text/css" href="./lib/css/main.css" />
-	<link rel="stylesheet" type="text/css" href="./lib/css/jquery.onoff.css" />
+	<link rel="stylesheet" type="text/css" href="./vendors/jquery.layout/dist/layout-default-latest.css" />
+	<link rel="stylesheet" type="text/css" href="./vendors/jointjs/dist/joint.min.css" />
+	<link rel="stylesheet" type="text/css" href="./vendors/onoff/dist/jquery.onoff.css" /> 
 
-<!--
-	<script type="text/javascript" src="index.js"></script>
--->
-	<script type="text/javascript" src="./lib/js/jquery.min.js"></script>
-	<script type="text/javascript" src="./lib/js/jquery-ui-latest.js"></script>
-	<script type="text/javascript" src="./lib/js/jquery.onoff.js"></script>
-	<script type="text/javascript" src="./lib/js/taphold.js"></script>
-	<script type="text/javascript" src="./lib/js/jquery.ui-contextmenu.js"></script>
-	<script type="text/javascript" src="./lib/js/jquery.layout-latest.js"></script>
-	<script type="text/javascript" src="./lib/js/jquery.donetyping.js"></script>
-	<script type="text/javascript" src="./lib/js/tree.jquery.js"></script>
-	<script type="text/javascript" src="./lib/js/jquery.layout.resizePaneAccordions-latest.js"></script>
-	<script type="text/javascript" src="./lib/js/jquery.scrollTo-latest.js"></script>
-	<script type="text/javascript" src="./lib/js/disasm_panel.js"></script>
-	<script type="text/javascript" src="./lib/js/entropy_panel.js"></script>
-	<script type="text/javascript" src="./lib/js/strings_panel.js"></script>
-	<script type="text/javascript" src="./lib/js/hex_panel.js"></script>
-	<script type="text/javascript" src="./lib/js/settings_panel.js"></script>
-	<script type="text/javascript" src="./lib/js/projects_panel.js"></script>
-	<script type="text/javascript" src="./lib/js/types_panel.js"></script>
-	<script type="text/javascript" src="../enyo/vendors/lodash/lodash.min.js"></script>
-	<script type="text/javascript" src="../enyo/vendors/backbone/backbone-min.js"></script>
-	<script type="text/javascript" src="../enyo/vendors/jointjs/dist/joint.min.js"></script>
-	<script type="text/javascript" src="../enyo/vendors/jointjs/plugins/layout/DirectedGraph/joint.layout.DirectedGraph.js"></script>
-	<script type="text/javascript" src="../enyo/js/core/r2.js"></script>
-	<script type="text/javascript" src="../enyo/js/core/r2ui.js"></script>
-	<script type="text/javascript" src="../enyo/js/core/disasm.js"></script>
-	<script type="text/javascript" src="./lib/js/main.js"></script>
+	<link rel="stylesheet" type="text/css" href="./dist/r2core.css" />
+	<link rel="stylesheet" type="text/css" href="./dist/dependencies.css" />
+
+	<!-- jQuery -->
+	<script type="text/javascript" src="./vendors/jquery/dist/jquery.min.js"></script>
+	<script type="text/javascript" src="./vendors/jquery.scrollTo/jquery.scrollTo.min.js"></script>
+	<script type="text/javascript" src="./vendors/jquery.layout/dist/jquery.layout-latest.min.js"></script> <!-- Resize pane -->
+	<script type="text/javascript" src="./vendors/jquery-ui/ui/minified/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="./vendors/jquery-ui-contextmenu/jquery.ui-contextmenu.min.js"></script>
+	<script type="text/javascript" src="./vendors/onoff/dist/jquery.onoff.min.js"></script>
+
+	<!-- Other dependencies -->
+	<script type="text/javascript" src="./dist/dependencies.js"></script> <!-- Not reachable with bower -->
+
+	<!-- Panels -->
+	<script type="text/javascript" src="./dist/panels.js"></script>
+
+	<!-- Joint dependencies -->
+	<script type="text/javascript" src="./vendors/lodash/lodash.min.js"></script>
+	<script type="text/javascript" src="./vendors/backbone/backbone-min.js"></script>
+	<script type="text/javascript" src="./vendors/jointjs/dist/joint.min.js"></script>
+	<script type="text/javascript" src="./vendors/jointjs/plugins/layout/DirectedGraph/joint.layout.DirectedGraph.js"></script>
+
+	<!-- R2 Core -->
+	<script type="text/javascript" src="./dist/r2core.js"></script>
+
+	<!-- Main -->
+	<script type="text/javascript" src="./dist/main.js"></script>
 </head>
 <body>
 

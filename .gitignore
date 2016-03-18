@@ -1,4 +1,7 @@
-www/enyo/nodes_modules/
-www/enyo/vendors/
-www/enyo/dist/
+node_modules/
+vendors/
+dist/
 .config
+*.log
+npm-debug.log*
+*~
