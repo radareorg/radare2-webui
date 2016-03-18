@@ -1,9 +1,8 @@
-modules:
-	echo "Building enyo-based UI"
+build:
 	npm install
-	gulp
+	$(shell npm bin)/gulp
 
-run:
+run: build
 	r2 -q -e http.root=$(PWD)/../ -c=H /bin/ls
 
 clean:

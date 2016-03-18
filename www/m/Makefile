@@ -1,11 +1,9 @@
-all:
-	r2 -qe http.root=$$PWD -e http.ui= -c=H /bin/ls
+build:
+	npm install
+	$(shell npm bin)/gulp
 
-sync up update:
-	rm -f material.min.js
-	wget http://www.getmdl.io/material.min.js
-	rm -f material.min.css
-	wget http://www.getmdl.io/material.min.css
+all: build
+	r2 -qe http.root=$$PWD -e http.ui= -c=H /bin/ls
 
 FILES=$(shell git ls-files .)
 

@@ -7,7 +7,7 @@
     "url": "https://github.com/radare/radare2-webui"
   },
   "dependencies": {},
-  "description": "Collection of radare2 web user interfaces",
+  "description": "Tiles UI for radare2",
   "homepage": "https://radare.org",
   "license": "MIT",
   "maintainers": [
@@ -24,9 +24,7 @@
   "scripts": {},
   "version": "0.10.2",
   "devDependencies": {
-    "bower": "*",
     "gulp": "^3.9.1",
-    "gulp-bower": "0.0.13",
     "gulp-clean-css": "^2.0.3",
     "gulp-concat": "^2.6.0",
     "gulp-uglify": "^1.5.3"
