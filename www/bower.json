@@ -1,0 +1,21 @@
+{
+  "name": "enyo",
+  "main": "main.js",
+  "homepage": "https://github.com/radare/radare2",
+  "authors": [
+    "pancake <pancake@nopcode.org>"
+  ],
+  "description": "Home UI for radare2",
+  "moduleType": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^2.2.1"
+  }
+}

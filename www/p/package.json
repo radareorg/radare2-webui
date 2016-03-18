@@ -7,7 +7,7 @@
     "url": "https://github.com/radare/radare2-webui"
   },
   "dependencies": {},
-  "description": "Collection of radare2 web user interfaces",
+  "description": "Panel UI for radare2",
   "homepage": "https://radare.org",
   "license": "MIT",
   "maintainers": [
