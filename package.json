@@ -6,8 +6,7 @@
   "bugs": {
     "url": "https://github.com/radare/radare2-webui"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "description": "Collection of radare2 web user interfaces",
   "homepage": "https://radare.org",
   "license": "MIT",
@@ -23,5 +22,9 @@
     "url": "git://github.com/radare/radare2-webui.git"
   },
   "scripts": {},
-  "version": "0.10.2"
+  "version": "0.10.2",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-google-webfonts": "0.0.12"
+  }
 }
