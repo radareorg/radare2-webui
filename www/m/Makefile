@@ -1,9 +1,11 @@
+all: build
+
 build:
 	npm install
 	$(shell npm bin)/gulp
 
-all: build
-	r2 -qe http.root=$$PWD -e http.ui= -c=H /bin/ls
+run: build
+	r2 -qe http.root=$$PWD/.. -e http.ui=m -c=H /bin/ls
 
 FILES=$(shell git ls-files .)
 

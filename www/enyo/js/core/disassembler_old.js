@@ -64,7 +64,7 @@ enyo.kind ({
   },
   colorbar_create: function () {
     var self = this;
-    r2.cmd ("pvj 24", function(x) {
+    r2.cmd ("p-j 24", function(x) {
       try {
         var y = JSON.parse (x);
       } catch (e) {

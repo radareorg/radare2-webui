@@ -1,7 +1,8 @@
+all: build
+
 build:
 	npm install
 	$(shell npm bin)/gulp
 
-all: build
-	r2 -e http.ui=t -e http.root=$$PWD -qc=H /bin/ls
-
+run:
+	r2 -e http.ui=dist -e http.root=$$PWD -qc=H /bin/ls
