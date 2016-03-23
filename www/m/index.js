@@ -1,4 +1,3 @@
-
 var update = function() {/* nop */}
 var inColor = true;
 var lastView = 'pd';
@@ -375,7 +374,7 @@ function panelSettings() {
 			{ name: "csr", js: 'configArch' },
 			{ name: "dcpu16", js: 'configArch' },
 			{ name: "ebc", js: 'configArch' },
-		]}, 
+		]},
 	     { name: "Bits", buttons: [
 			{ name: "64", js: 'configBits64' },
 			{ name: "32", js: 'configBits32', default:true },
@@ -1091,6 +1090,34 @@ function updateInfo() {
 	});
 }
 
+function updateEntropy() {
+	r2.cmd ("p=", function(d) {
+		var lines = d.split(/\n/g);
+		var body = "";
+		var values = new Array();
+
+		for (var i in lines) {
+			var vals = lines[i].split(' ');
+			var val = parseInt(vals[2], 16);
+			if (isNaN(val)) continue;
+			values.push(val);
+		}
+
+		var nbvals = values.length;
+		var min = Math.min.apply(null, values);
+		var max = Math.max.apply(null, values);
+		var inc = 500.0 / nbvals;
+
+		// Minimum entropy has 0.1 transparency. Max has 1.
+		for (var i in values) {
+			var y = 0.1 + (1 - 0.1) * ((values[i] - min) / (max - min));
+			body += "<rect x=\""+ (inc * i).toString()  +"\" y=\"0\" width=\""+ inc.toString() +"\" height=\"250\"  style=\"fill:black;fill-opacity:"+ y.toString()  +";\" />";
+		}
+
+		document.getElementById('Layer_5').innerHTML = body;
+    	});
+}
+
 function onClick(a,b) {
 	var h = document.getElementById(a);
 	if (h) {
@@ -1116,6 +1143,7 @@ function ready() {
 	twice = true;
 	updateFortune();
 	updateInfo();
+	updateEntropy();
 
 	/* left menu */
 	onClick('menu_headers', panelHeaders);
