@@ -1107,16 +1107,17 @@ function updateEntropy() {
 		for (var i in values) {
 			var y = 0.1 + (1 - 0.1) * ((values[i] - min) / (max - min));
 			var addr = '0x' + res['entropy'][i]['addr'].toString(16);
-			body += '<rect x="' + (inc * i).toString()
-				+ '" y="0" width="' + inc.toString()
-				+ '" height="240" style="fill:black;fill-opacity:'
-				+ y.toString() + ';"><title>' + addr + ' </title></rect>' ;
+			body += '<rect x="' + (inc * i).toString();
+			body += '" y="0" width="' + inc.toString();
+			body += '" height="240" style="fill:black;fill-opacity:';
+			body += y.toString() + ';"><title>';
+			body += addr + ' </title></rect>' ;
 
 			if (i % 24 == 0) {
-				body += '<text transform="matrix(1 0 0 1 '
-					+ i * 230 / 24
-					+ ' 249)" fill="888888" font-family="\'Roboto'" font-size="9">''
-					+ addr + '</text>';
+				body += '<text transform="matrix(1 0 0 1 ';
+				body += (i * 230 / 24).toString();
+				body += ' 249)" fill="888888" font-family="\'Roboto\'" font-size="9">';
+				body += addr + '</text>';
 			}
 		}
 
