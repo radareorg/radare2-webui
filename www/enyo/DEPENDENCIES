@@ -1,0 +1,6 @@
+Dependencies are handled by both bower and gulp. Gulp has the responsability to run bower.
+
+Makefile is still available (runs gulp).
+
+
+Special case for enyo! Dependencies were broken, I've copied the version from radare2 repository. I've made some researches about the official enyo repository but the four files (enyo.js/css and app.js/css) were extracted from an example and not from the official repository. There is some incompatibilities when an other version of enyo is downloaded (I've checked several versions around the date of the radare2 last commit about those files). So, for now, I've inserted them in the repository waiting for a better solution.

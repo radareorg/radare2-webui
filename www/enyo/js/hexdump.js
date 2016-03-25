@@ -73,7 +73,7 @@ enyo.kind ({
 /* TODO: spaggety. see disassemble.js . must be a separate kind */
   colorbar_create: function () {
     var self = this;
-    r2.cmd ("pvj", function(x) {
+    r2.cmd ("p-j", function(x) {
       try {
         var y = JSON.parse (x);
       } catch (e) {
