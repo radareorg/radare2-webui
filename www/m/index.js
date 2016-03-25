@@ -1091,17 +1091,12 @@ function updateInfo() {
 }
 
 function updateEntropy() {
-	r2.cmd ("p=", function(d) {
-		var lines = d.split(/\n/g);
-		var body = "";
+	r2.cmd ('p=ej 50 $s @ $M', function(d) {
+		var body = '';
+		var res = JSON.parse(d);
 		var values = new Array();
 
-		for (var i in lines) {
-			var vals = lines[i].split(' ');
-			var val = parseInt(vals[2], 16);
-			if (isNaN(val)) continue;
-			values.push(val);
-		}
+		for (var i in res['entropy']) values.push(res['entropy'][i]['value']);
 
 		var nbvals = values.length;
 		var min = Math.min.apply(null, values);
@@ -1111,11 +1106,22 @@ function updateEntropy() {
 		// Minimum entropy has 0.1 transparency. Max has 1.
 		for (var i in values) {
 			var y = 0.1 + (1 - 0.1) * ((values[i] - min) / (max - min));
-			body += "<rect x=\""+ (inc * i).toString()  +"\" y=\"0\" width=\""+ inc.toString() +"\" height=\"250\"  style=\"fill:black;fill-opacity:"+ y.toString()  +";\" />";
+			var addr = '0x' + res['entropy'][i]['addr'].toString(16);
+			body += '<rect x="' + (inc * i).toString()
+				+ '" y="0" width="' + inc.toString()
+				+ '" height="240" style="fill:black;fill-opacity:'
+				+ y.toString() + ';"><title>' + addr + ' </title></rect>' ;
+
+			if (i % 24 == 0) {
+				body += '<text transform="matrix(1 0 0 1 '
+					+ i * 230 / 24
+					+ ' 249)" fill="888888" font-family="\'Roboto'" font-size="9">''
+					+ addr + '</text>';
+			}
 		}
 
-		document.getElementById('Layer_5').innerHTML = body;
-    	});
+		document.getElementById('entropy-graph').innerHTML = body;
+	});
 }
 
 function onClick(a,b) {
