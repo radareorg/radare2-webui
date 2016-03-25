@@ -10,6 +10,7 @@ $(document).ready( function() {
       else if(ui.tab.innerHTML.indexOf("Settings") > -1) r2ui._set.render();
       else if(ui.tab.innerHTML.indexOf("Projects") > -1) r2ui._prj.render();
       else if(ui.tab.innerHTML.indexOf("Hex") > -1) r2ui._hex.render();
+      else if(ui.tab.innerHTML.indexOf("Logs") > -1) r2ui._log.render();
     },
     activate: function( event, ui ) {
       if ( ui.newTab[0].innerHTML.indexOf("Disas") > -1 ) {r2ui._dis.render();}
@@ -46,6 +47,7 @@ $(document).ready( function() {
   var types_panel = new TypesPanel();
   var settings_panel = new SettingsPanel();
   var projects_panel = new ProjectsPanel();
+  var logs_panel = new LogsPanel();
   r2ui._ent = entropy_panel;
   r2ui._dis = disasm_panel;
   r2ui._str = strings_panel;
@@ -53,6 +55,7 @@ $(document).ready( function() {
   r2ui._set = settings_panel;
   r2ui._hex = hex_panel;
   r2ui._prj = projects_panel;
+  r2ui._log = logs_panel;
 
   // For enyo compatibility
   r2ui.ra = {};
