@@ -819,7 +819,7 @@ function panelHexdump() {
 	out += uiButton('javascript:block()', 'Block');
 	c.innerHTML = out;
 	var tail = inColor? '@e:scr.color=1,scr.html=1': '';
-	r2.cmd ("pxa"+tail, function (d) {
+	r2.cmd ("pxa 1024"+tail, function (d) {
 		var color = inColor? "white": "black";
 		d = clickableOffsets (d);
 		c.innerHTML += "<pre style='color:"+color+"!important'>"+d+"<pre>";
@@ -1066,6 +1066,7 @@ function updateFortune() {
 		document.getElementById('fortune').innerHTML = d;
 	});
 }
+
 function updateInfo() {
 	r2.cmd ("i", function(d) {
 		var lines = d.split(/\n/g);
@@ -1091,7 +1092,9 @@ function updateInfo() {
 }
 
 function updateEntropy() {
-	var height = 100;
+	var eg = document.getElementById('entropy-graph');
+	var box = eg.getBoundingClientRect();
+	var height = (0 | box.height) - 35 - 19;
 	r2.cmd ('p=ej 50 $s @ $M', function(d) {
 		var body = '';
 		var res = JSON.parse(d);
@@ -1114,22 +1117,20 @@ function updateEntropy() {
 			body += y.toString() + ';"><title>';
 			body += addr + ' </title></rect>' ;
 
-			if (i % 24 == 0) {
+			if (i % 8 == 0) {
 				body += '<text transform="matrix(1 0 0 1 ';
-				body += (i * (height-10) / 24).toString();
+				body += (i * inc).toString();
 				body += ' '+(height+15)+')" fill="ff8888" font-family="\'Roboto\'" font-size="9">';
 				body += addr + '</text>';
 			}
 		}
 
-		var eg= document.getElementById('entropy-graph');
 		eg.innerHTML = body;
 		eg.onclick = function(e) {
 			var box = eg.getBoundingClientRect();
 			var pos = e.clientX - box.left;
 			var i = 0 | (pos / (box.width / nbvals));
 			var addr = '0x' + res['entropy'][i]['addr'].toString(16);
-			lastView = "px";
 			seek (addr);
 		}
 	});
