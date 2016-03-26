@@ -1091,6 +1091,7 @@ function updateInfo() {
 }
 
 function updateEntropy() {
+	var height = 100;
 	r2.cmd ('p=ej 50 $s @ $M', function(d) {
 		var body = '';
 		var res = JSON.parse(d);
@@ -1109,19 +1110,28 @@ function updateEntropy() {
 			var addr = '0x' + res['entropy'][i]['addr'].toString(16);
 			body += '<rect x="' + (inc * i).toString();
 			body += '" y="0" width="' + inc.toString();
-			body += '" height="240" style="fill:black;fill-opacity:';
+			body += '" height="'+height+'" style="fill:black;fill-opacity:';
 			body += y.toString() + ';"><title>';
 			body += addr + ' </title></rect>' ;
 
 			if (i % 24 == 0) {
 				body += '<text transform="matrix(1 0 0 1 ';
-				body += (i * 230 / 24).toString();
-				body += ' 249)" fill="888888" font-family="\'Roboto\'" font-size="9">';
+				body += (i * (height-10) / 24).toString();
+				body += ' '+(height+15)+')" fill="ff8888" font-family="\'Roboto\'" font-size="9">';
 				body += addr + '</text>';
 			}
 		}
 
-		document.getElementById('entropy-graph').innerHTML = body;
+		var eg= document.getElementById('entropy-graph');
+		eg.innerHTML = body;
+		eg.onclick = function(e) {
+			var box = eg.getBoundingClientRect();
+			var pos = e.clientX - box.left;
+			var i = 0 | (pos / (box.width / nbvals));
+			var addr = '0x' + res['entropy'][i]['addr'].toString(16);
+			lastView = "px";
+			seek (addr);
+		}
 	});
 }
 
