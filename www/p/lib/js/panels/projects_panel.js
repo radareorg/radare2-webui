@@ -4,7 +4,7 @@ var ProjectsPanel = function () {
 };
 
 ProjectsPanel.prototype.render = function() {
-	$('#projects_tab').html('<div style="color: white;">Open Project:</div><div id="projects" style="color:rgb(127,127,127);"></div><div id="button"><br/><input id="submit" type="submit" value="Save Project" /></div>');
+	$('#projects_tab').html('<div><div style="color: white;">Open Project:</div><div id="projects" style="color:rgb(127,127,127);"></div><div id="button"><br/><input id="submit" type="submit" value="Save Project" /></div></div>');
 	r2.cmdj("Plj", function(projects) {
 	    var data = [];
 	    for (var i in projects) {

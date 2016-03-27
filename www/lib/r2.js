@@ -1,4 +1,4 @@
-/* radare2 Copyleft 2013-2014 pancake */
+/* radare2 Copyleft 2013-2016 pancake */
 
 var r2 = {};
 
@@ -435,7 +435,7 @@ r2.getTextLogger = function(obj) {
     obj.last = +x;
   });
   obj.load = function(cb) {
-    r2.cmd ("Tj " + (obj.last + 1), function(ret) {
+    r2.cmd ('"Tj ' + (obj.last + 1) + '"', function(ret) {
       if (cb) {
         cb (JSON.parse (ret));
       }
@@ -446,7 +446,7 @@ r2.getTextLogger = function(obj) {
     r2.cmd ("T-", cb); //+obj.last, cb);
   }
   obj.send = function(msg, cb) {
-    r2.cmd ("T " + msg, cb);
+    r2.cmd ('"T ' + msg + '"', cb);
   }
   obj.refresh = function(cb) {
     obj.load (function(ret) {

@@ -10,7 +10,7 @@ gulp.task('common', function() {
 		.pipe(concat('r2core.js'))
 		.pipe(gulp.dest('dist/'));
 
-	gulp.src('../lib/*.css')
+	gulp.src('../lib/css/*.css')
 		.pipe(cleanCSS())
 		.pipe(concat('r2core.css'))
 		.pipe(gulp.dest('dist/'));
@@ -37,7 +37,7 @@ gulp.task('js', function() {
 
 gulp.task('css', function() {
 
-	gulp.src(['./lib/css/jquery-ui.css', './lib/css/tree.jquery.css'])
+	gulp.src(['./lib/css/jquery-ui.css', './lib/css/tree.jquery.css', './lib/css/index.css'])
 		.pipe(cleanCSS())
 		.pipe(concat('dependencies.css'))
 		.pipe(gulp.dest('dist/'));
