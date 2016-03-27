@@ -51,9 +51,8 @@ TypesPanel.prototype.insertData = function(k, v, array) {
 
 TypesPanel.prototype.generateContent = function() {
 	var ref = this;
-	r2.cmd("t", function(result) {
+	r2.cmd("tk", function(result) {
 		var strings = result.split("\n");
-
 		for(var i in strings) {
 			var s = strings[i].split("=");
 
@@ -68,7 +67,7 @@ TypesPanel.prototype.generateContent = function() {
 			}
 
 			ref.insertData(k, v);					 
-	}
+		}
 	});	
 }
 
