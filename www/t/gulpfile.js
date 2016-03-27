@@ -7,12 +7,12 @@ var gulp = require('gulp'),
 	concat = require('gulp-concat');
 
 gulp.task('default', ['filter'], function() {
-	gulp.src(['js/tiled.js', '../lib/r2.js', 'js/main.js'])
+	gulp.src(['js/tiled.js', '../lib/r2.js', 'js/main.js', 'vendors/material-design-lite/material.min.js'])
 		.pipe(uglify())
 		.pipe(concat('app.js'))
 		.pipe(gulp.dest('dist/'));
 
-	gulp.src('css/*.css')
+	gulp.src(['css/*.css', 'cache/*.css', 'vendors/material-design-lite/material.min.css'])
 		.pipe(cleanCSS())
 		.pipe(concat('stylesheet.css'))
 		.pipe(gulp.dest('dist/'));
