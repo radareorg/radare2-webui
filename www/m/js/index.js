@@ -1,6 +1,14 @@
 var update = function() {/* nop */}
 var inColor = true;
-var lastView = 'pd';
+var lastView = panelDisasm;
+
+function E(x) {
+	return document.getElementById(x);
+}
+
+function encode(r) {
+	return r.replace(/[\x26\x0A\<>'"]/g, function(r){ return "&#"+r.charCodeAt(0)+";"})
+}
 
 function uiButton(href,label,type) {
 if (type=='active') {
@@ -12,10 +20,12 @@ if (type=='active') {
 function clickableOffsets(x) {
 	x = x.replace (/0x([a-zA-Z0-9]*)/g,
 		"<a href='javascript:seek(\"0x$1\")'>0x$1</a>");
-	x = x.replace (/sym\.([\.a-zA-Z0-9]*)/g,
+	x = x.replace (/sym\.([\.a-zA-Z0-9_]*)/g,
 		"<a href='javascript:seek(\"sym.$1\")'>sym.$1</a>");
-	x = x.replace (/fcn\.([\.a-zA-Z0-9]*)/g,
+	x = x.replace (/fcn\.([\.a-zA-Z0-9_]*)/g,
 		"<a href='javascript:seek(\"fcn.$1\")'>fcn.$1</a>");
+	x = x.replace (/str\.([\.a-zA-Z0-9_]*)/g,
+		"<a href='javascript:seek(\"str.$1\")'>str.$1</a>");
 	return x;
 }
 
@@ -86,11 +96,7 @@ function seek(x) {
 	}
 	if (addr && addr.trim() != "") {
 		r2.cmd("s "+addr);
-		if (lastView == 'px') {
-			panelHexdump();
-		} else {
-			panelDisasm();
-		}
+		lastView ();
 		document.getElementById('content').scrollTop = 0;
 		update();
 	}
@@ -135,6 +141,12 @@ function delFlagspace(fs) {
 	if (!fs) return;
 	r2.cmd ("fs-"+fs, function() {
 		flagspaces();
+	});
+}
+
+function delAllFlags() {
+	r2.cmd ("f-*", function() {
+		panelFlags();
 	});
 }
 
@@ -313,7 +325,7 @@ function uiSwitch(d) {
 }
 
 function uiBlock(d) {
-	var out = '<br /><div class="mdl-card__supporting-text mdl-shadow--2dp mdl-color-text--blue-grey-50 mdl-cell" style="display:inline-block;margin:5px;color:black !important;background-color:white !important">';
+	var out = '<div class="mdl-card__supporting-text mdl-shadow--2dp mdl-color-text--blue-grey-50 mdl-cell" style="display:inline-block;margin:5px;color:black !important;background-color:white !important">';
 	out += '<h3 style="color:black">'+d.name+'</h3>';
 	for (var i in d.blocks) {
 		var D = d.blocks[i];
@@ -331,6 +343,7 @@ function panelSettings() {
 	var c = document.getElementById("content");
 
 	c.style.backgroundColor = '#f0f0f0';
+	out += "<div style='margin:10px'>";
 	out += uiBlock({ name: 'Platform', blocks: [
 	     { name: "Arch", buttons: [
 			{ name: "x86", js: 'configArch', default:true },
@@ -446,8 +459,7 @@ function panelSettings() {
 		    ]
 		}
 		]});
-
-
+	out += "</div>";
 	c.innerHTML = out;
 }
 
@@ -455,20 +467,24 @@ function printHeaderPanel(title, cmd, grep) {
 	update = panelFunctions;
 	document.getElementById('title').innerHTML = title;
 	var c = document.getElementById("content");
-	c.style.backgroundColor = '#f0f0f0';
-	c.innerHTML = "<br />";
-	c.innerHTML += uiButton('javascript:panelHeaders()', 'Headers');
-	c.innerHTML += uiButton('javascript:panelSymbols()', 'Symbols');
-	c.innerHTML += uiButton('javascript:panelImports()', 'Imports');
-	c.innerHTML += uiButton('javascript:panelRelocs()', 'Relocs');
-	c.innerHTML += uiButton('javascript:panelSections()', 'Sections');
-	c.innerHTML += uiButton('javascript:panelSdb()', 'Sdb');
+	c.style.backgroundColor = '#202020';
+	var out = "<div style='position:fixed;margin:0.5em'>";
+	out += uiButton('javascript:panelHeaders()', 'Headers');
+	out += uiButton('javascript:panelSymbols()', 'Symbols');
+	out += uiButton('javascript:panelImports()', 'Imports');
+	out += uiButton('javascript:panelRelocs()', 'Relocs');
+	out += uiButton('javascript:panelSections()', 'Sections');
+	out += uiButton('javascript:panelSdb()', 'Sdb');
+	out += "</div><br /><br /><br /><br />";
+	c.innerHTML = out;
+
 	if (grep) {
 		cmd += "~" + grep;
 	}
 	r2.cmd (cmd, function (d) {
-		var color = inColor? "white": "black";
-		c.innerHTML += "<pre style='font-family:Console,Courier New,monospace' style='color:"+color+" !important'>"+d+"<pre>";
+		var color = "#f0f0f0";
+		d = clickableOffsets (d);
+		c.innerHTML += "<pre style='margin:1.2em;font-family:Console,Courier New,monospace;color:"+color+" !important'>"+d+"<pre>";
 	});
 }
 
@@ -476,7 +492,7 @@ function panelSdb() {
 	printHeaderPanel ('SDB', 'k bin/cur/***');
 }
 function panelSections() {
-	printHeaderPanel ('Imports', 'iSq');
+	printHeaderPanel ('Sections', 'iSq');
 }
 function panelImports() {
 	printHeaderPanel ('Imports', 'isq', ' imp.');
@@ -491,7 +507,7 @@ function panelSymbols() {
 }
 
 function panelHeaders() {
-	printHeaderPanel ('Headers', 'i');
+	printHeaderPanel ('Headers', 'ie;i');
 }
 
 function panelFunctions() {
@@ -528,11 +544,14 @@ function panelFunctions() {
 	});
 }
 
+var last_console_output = '';
+
 function runCommand(text) {
 	if (!text)
 		text = document.getElementById('input').value;
 	r2.cmd (text, function (d) {
-		document.getElementById('output').innerHTML = '\n'+d;
+		last_console_output = '\n' + d;
+		document.getElementById('output').innerHTML = last_console_output;
 	});
 }
 
@@ -565,7 +584,7 @@ function panelConsole() {
 	c.innerHTML = "<br />";
 	if (inColor) {
 		c.style.backgroundColor = "#202020";
-		c.innerHTML += "<input style='position:absolute;padding-left:10px;top:3.5em;height:1.8em;color:white' onkeypress='consoleKey()' class='mdl-card--expand mdl-textfield__input' id='input'/>";
+		c.innerHTML += "<input style='position:fixed;padding-left:10px;top:4em;height:1.8em;color:white' onkeypress='consoleKey()' class='mdl-card--expand mdl-textfield__input' id='input'/>";
 		//c.innerHTML += uiButton('javascript:runCommand()', 'Run');
 		c.innerHTML += "<div id='output' class='pre' style='color:white !important'><div>";
 	} else {
@@ -574,6 +593,7 @@ function panelConsole() {
 		c.innerHTML += uiButton('javascript:runCommand()', 'Run');
 		c.innerHTML += "<div id='output' class='pre' style='color:black!important'><div>";
 	}
+	document.getElementById('output').innerHTML = last_console_output;
 }
 
 function searchKey(e) {
@@ -686,7 +706,7 @@ function panelSearch() {
 	var c = document.getElementById("content");
 	c.style.backgroundColor = "#f0f0f0";
 	var out = "<br />";
-	out += "<input style='z-index:9999;background-color:white !important;position:absolute;padding-left:10px;top:3.5em;height:1.8em;color:white' onkeypress='searchKey()' class='mdl-card--expand mdl-textfield__input' id='search_input'/>";
+	out += "<input style='background-color:white !important;padding-left:10px;top:3.5em;height:1.8em;color:white' onkeypress='searchKey()' class='mdl-card--expand mdl-textfield__input' id='search_input'/>";
 	out+='<br />';
 	out+=uiButton('javascript:runSearch()', 'Hex');
 	out+=uiButton('javascript:runSearchString()', 'String');
@@ -747,6 +767,7 @@ function panelFlags() {
 	c.style.backgroundColor = "#f0f0f0";
 	c.innerHTML = "<br />";
 	c.innerHTML += uiButton('javascript:flagspaces()', 'Spaces');
+	c.innerHTML += uiButton('javascript:delAllFlags()', 'DeleteAll');
 	c.innerHTML += "<br /><br />";
 	r2.cmd ("f", function (d) {
 		var lines = d.split(/\n/); //clickableOffsets (d).split (/\n/);
@@ -802,34 +823,35 @@ function down() {
 function panelHexdump() {
 	document.getElementById('content').scrollTop = 0;
 	update = panelHexdump;
-	lastView = 'px';
+	lastView = panelHexdump;
 	var c = document.getElementById("content");
 	document.getElementById('title').innerHTML = 'Hexdump';
 	if (inColor) {
 		c.style.backgroundColor = "#202020";
 	}
-	var out = "<br />";
-	out += uiRoundButton('javascript:up()', 'keyboard_arrow_up');
-	out += uiRoundButton('javascript:down()', 'keyboard_arrow_down');
-	out += '&nbsp;';
+	var out = "<div style='position:fixed;margin:0.5em'>";
 	out += uiButton('javascript:comment()', 'Comment');
 	out += uiButton('javascript:write()', 'Write');
 	out += uiButton('javascript:flag()', 'Flag');
 	out += uiButton('javascript:flagsize()', 'Size');
 	out += uiButton('javascript:block()', 'Block');
+	out += "</div><br /><br /><br />"
 	c.innerHTML = out;
 	var tail = inColor? '@e:scr.color=1,scr.html=1': '';
-	r2.cmd ("pxa 1024"+tail, function (d) {
+	r2.cmd ("pxa"+tail, function (d) {
 		var color = inColor? "white": "black";
 		d = clickableOffsets (d);
-		c.innerHTML += "<pre style='color:"+color+"!important'>"+d+"<pre>";
+		var pre = "<div><center>" + uiRoundButton('javascript:up()', 'keyboard_arrow_up');
+		pre += uiRoundButton('javascript:down()', 'keyboard_arrow_down') + "</center></div>";
+		var pos = "<div><center>" + uiRoundButton('javascript:down()', 'keyboard_arrow_down') + "</center></div>";
+		c.innerHTML += pre+"<pre style='color:"+color+"!important'>"+d+"<pre>"+pos;
 	});
 }
 
-function uiRoundButton(a, b) {
+function uiRoundButton(a, b, c) {
 	var out = '';
-	out += '<button onclick='+a+' class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect">';
-	out += '<i class="material-icons">'+b+'</i>';
+	out += '<button onclick='+a+' class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect" '+c+'>';
+	out += '<i class="material-icons" style="opacity:1">'+b+'</i>';
 	out += '</button>';
 	return out;
 }
@@ -843,15 +865,18 @@ function panelDisasm() {
 	if (inColor) {
 		c.style.backgroundColor = "#202020";
 	}
-	var out = "<br />";
+	var out = "<div style='position:fixed;margin:0.5em'>";
+/*
 	out += uiRoundButton('javascript:up()', 'keyboard_arrow_up');
 	out += uiRoundButton('javascript:down()', 'keyboard_arrow_down');
 	out += '&nbsp;';
-	out += uiButton('javascript:analyze()', 'Analyze');
-	out += uiButton('javascript:comment()', 'Comment');
+*/
+	out += uiButton('javascript:analyze()', 'ANLZ');
+	out += uiButton('javascript:comment()', 'CMNT');
 	out += uiButton('javascript:info()', 'Info');
-	out += uiButton('javascript:rename()', 'Rename');
-	out += uiButton('javascript:write()', 'Write');
+	out += uiButton('javascript:rename()', 'RNME');
+	out += uiButton('javascript:write()', 'Wrte');
+	out += "</div><br /><br /><br />";
 	c.innerHTML = out;
 	c.style['font-size'] = '12px';
 	c.style.overflow = 'scroll';
@@ -861,7 +886,9 @@ function panelDisasm() {
 	}
 	r2.cmd ("pd 128"+tail, function (d) {
 		var dis = clickableOffsets (d);
+		c.innerHTML += "<center>"+ uiRoundButton('javascript:up()', 'keyboard_arrow_up') + uiRoundButton('javascript:down()', 'keyboard_arrow_down') +"</center>";
 		c.innerHTML += "<pre style='font-family:Console,Courier New,monospace;color:grey'>"+dis+"<pre>";
+		c.innerHTML += "<center>"+ uiRoundButton('javascript:down()', 'keyboard_arrow_down') +"</center><br /><br />";
 	});
 }
 
@@ -888,7 +915,7 @@ function setbp() {
 	r2.cmd ("db $$", update);
 }
 function setreg() {
-	var expr = prompt ("comment");
+	var expr = prompt ("register=value");
 	if (expr != '') {
 		if (nativeDebugger) {
 			r2.cmd ("dr "+expr+";.dr*", update);
@@ -910,7 +937,7 @@ function panelDebug() {
 	if (inColor) {
 		c.style.backgroundColor = "#202020";
 	}
-	var out = "<br />";
+	var out = "<div style='position:fixed;margin:0.5em'>";
 	out += uiRoundButton('javascript:up()', 'keyboard_arrow_up');
 	out += uiRoundButton('javascript:down()', 'keyboard_arrow_down');
 	out += '&nbsp;';
@@ -919,6 +946,7 @@ function panelDebug() {
 	out += uiButton('javascript:cont()', 'Cont');
 	out += uiButton('javascript:setbp()', 'BP');
 	out += uiButton('javascript:setreg()', 'REG');
+	out += "</div><br /><br /><br /><br />";
 	c.innerHTML = out;
 	var tail = '';
 	if (inColor) {
@@ -932,7 +960,7 @@ function panelDebug() {
 	}
         r2.cmd ("f cur;."+rcmd+"*;sr sp;px 64", function (d) {
                 var dis = clickableOffsets (d);
-                c.innerHTML += "<pre style='font-family:Console,Courier New,monospace;color:grey'>"+dis+"<pre>";
+                c.innerHTML += "<pre style='margin:10px;font-family:Console,Courier New,monospace;color:grey'>"+dis+"<pre>";
         });
 	r2.cmd (rcmd+"=;s cur;f-cur;pd 128"+tail, function (d) {
 		var dis = clickableOffsets (d);
@@ -1153,6 +1181,33 @@ function panelHelp() {
 	alert ("TODO");
 }
 
+function analyzeButton() {
+	function cb(x) {
+		updateFortune();
+		updateInfo();
+		updateEntropy();
+	}
+	if (E('anal_calls').checked) {
+		r2.cmd ("e anal.calls=true;aac", cb);
+	} else {
+		r2.cmd ("e anal.calls=false");
+	}
+	if (E('anal_prelude').checked) {
+		r2.cmd ("aap", cb);
+	}
+	if (E('anal_emu').checked) {
+		r2.cmd ("e asm.emu=1;aae;e asm.emu=0", cb);
+	} else {
+		r2.cmd ("e asm.emu=false");
+	}
+	if (E('anal_autoname').checked) {
+		r2.cmd ("aan", cb);
+	}
+	if (E('anal_symbols').checked) {
+		r2.cmd ("aa", cb); // aaa or aaaa
+	}
+}
+
 var twice = false;
 function ready() {
 	if (twice) {
@@ -1164,6 +1219,7 @@ function ready() {
 	updateEntropy();
 
 	/* left menu */
+	onClick('analyze_button', analyzeButton);
 	onClick('menu_headers', panelHeaders);
 	onClick('menu_disasm', panelDisasm);
 	onClick('menu_debug', panelDebug);
@@ -1172,6 +1228,7 @@ function ready() {
 	onClick('menu_flags', panelFlags);
 	onClick('menu_search', panelSearch);
 	onClick('menu_comments', panelComments);
+	onClick('menu_console', panelConsole);
 	onClick('menu_script', panelScript);
 	onClick('menu_help', panelHelp);
 
@@ -1182,7 +1239,7 @@ function ready() {
 
 	/* right menu */
 	onClick('menu_seek', seek);
-	onClick('menu_console', panelConsole);
+	//onClick('menu_console', panelConsole);
 	onClick('menu_settings', panelSettings);
 	onClick('menu_about', panelAbout);
 	onClick('menu_mail', function() {
