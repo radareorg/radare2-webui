@@ -1,3 +1,5 @@
+VERSION=0.10.2
+
 all: root enyo material tiles panel
 	$(MAKE) run
 
@@ -21,6 +23,13 @@ panel:
 
 clean:
 	$(MAKE) -C www/enyo clean
+
+dist:
+	rm -rf radare2-webui-$(VERSION)
+	git clone . radare2-webui-$(VERSION)
+	rm -rf radare2-webui-$(VERSION)/.git
+	tar cJvf radare2-webui-$(VERSION).tar.xz radare2-webui-$(VERSION)
+	rm -rf radare2-webui-$(VERSION)
 
 mrproper:
 	git clean -xdf
