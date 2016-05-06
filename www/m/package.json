@@ -6,7 +6,6 @@
   "bugs": {
     "url": "https://github.com/radare/radare2-webui"
   },
-  "dependencies": {},
   "description": "Material Lite interface for radare2",
   "homepage": "https://radare.org",
   "license": "MIT",
