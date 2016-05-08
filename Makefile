@@ -6,6 +6,10 @@ all: root enyo material tiles panel
 run:
 	r2 -q -e http.root=www -e http.ui=enyo -c=H /bin/ls
 
+runm:
+	r2 -q -e http.root=www -e http.ui=m -c=H /bin/ls
+
+
 root:
 	$(MAKE) -C www build
 

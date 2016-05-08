@@ -26,17 +26,30 @@ gulp.task('js', ['filter'], function() {
 });
 
 gulp.task('css', function() {
-	gulp.src(['./css/*.css', 'cache/*.css', 'vendors/material-design-lite/material.min.css'])
+	gulp.src([
+			'./css/*.css',
+			'./vendors/material-design-lite/material.min.css',
+			'./vendors/material-design-icons-iconfont/dist/material-design-icons.css'])
 		.pipe(cleanCSS())
 		.pipe(concat('stylesheet.css'))
 		.pipe(gulp.dest('dist/'));
-	gulp.src('./cache/*.ttf')
-		.pipe(gulp.dest('dist/'));
+
 	gulp.src('./css/images/**')
 		.pipe(gulp.dest('dist/images/'));
 });
 
-gulp.task('default', ['js', 'css'], function() {
+gulp.task('fonts', function() {
+	gulp.src('./fonts.list')
+		.pipe(googleWebFonts({}))
+		.pipe(gulp.dest('dist/fonts'));
+
+	gulp.src(['./vendors/material-design-icons-iconfont/dist/fonts/*'])
+		.pipe(gulp.dest('dist/fonts'));
+})
+
+gulp.task('default', ['js', 'fonts', 'css'], function() {
+	gulp.src('./images/*')
+		.pipe(gulp.dest('dist/images/'))
 	return bower({ cmd: 'install'});
 });
 
