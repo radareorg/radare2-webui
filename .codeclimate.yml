@@ -28,3 +28,4 @@ exclude_paths:
 - "www/enyo/css/enyo/enyo.css"
 - "www/enyo/js/enyo/enyo.js"
 - "www/graph/js-graph-it.js"
+- "*/gulpfile.js"
