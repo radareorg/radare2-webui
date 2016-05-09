@@ -5,3 +5,4 @@ dist/
 *.log
 npm-debug.log*
 *~
+dist.tar.gz
