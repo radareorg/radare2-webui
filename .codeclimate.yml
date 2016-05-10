@@ -6,10 +6,7 @@ engines:
     enabled: true
     config:
       languages:
-      - ruby
       - javascript
-      - python
-      - php
   eslint:
     enabled: true
   fixme:
@@ -17,16 +14,10 @@ engines:
 ratings:
   paths:
   - "**.css"
-  - "**.inc"
   - "**.js"
-  - "**.jsx"
-  - "**.module"
-  - "**.php"
-  - "**.py"
-  - "**.rb"
 exclude_paths:
 - "www/enyo/css/enyo/enyo.css"
 - "www/enyo/js/enyo/enyo.js"
 - "www/enyo/js/enyo/app.js"
 - "www/graph/js-graph-it.js"
-- "*/gulpfile.js"
+- "**/gulpfile.js"
