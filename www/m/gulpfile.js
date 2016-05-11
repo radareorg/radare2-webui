@@ -6,7 +6,14 @@ var gulp = require('gulp'),
 	concat = require('gulp-concat'),
 	bower = require('gulp-bower'),
 	replace = require('gulp-replace'),
-	googleWebFonts = require('gulp-google-webfonts');
+	googleWebFonts = require('gulp-google-webfonts'),
+	jscs = require('gulp-jscs');
+
+gulp.task('jscs', function() {
+	return gulp.src("js/*")
+		.pipe(jscs())
+		.pipe(jscs.reporter());
+});
 
 gulp.task('js', ['filter'], function() {
 	gulp.src('../lib/r2.js')
@@ -47,7 +54,7 @@ gulp.task('fonts', function() {
 		.pipe(gulp.dest('dist/fonts'));
 })
 
-gulp.task('default', ['js', 'fonts', 'css'], function() {
+gulp.task('default', ['jscs', 'js', 'fonts', 'css'], function() {
 	gulp.src('./images/*')
 		.pipe(gulp.dest('dist/images/'))
 	return bower({ cmd: 'install'});

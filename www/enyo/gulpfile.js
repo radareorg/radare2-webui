@@ -21,6 +21,10 @@ gulp.task('js', function() {
 
 	gulp.src('js/*.js')
 		.pipe(uglify())
+		.pipe(concat('r2app.js'))
+		.pipe(gulp.dest('dist/'));
+
+	gulp.src(['js/enyo/enyo.js', 'js/enyo/app.js'])
 		.pipe(concat('enyo_app.js'))
 		.pipe(gulp.dest('dist/'));
 
@@ -37,6 +41,15 @@ gulp.task('css', function() {
 		.pipe(cleanCSS())
 		.pipe(concat('stylesheet.css'))
 		.pipe(gulp.dest('dist/'));
+
+	gulp.src('css/enyo/*.css')
+		.pipe(cleanCSS())
+		.pipe(concat('enyo.css'))
+		.pipe(gulp.dest('dist/'));
+
+
+	gulp.src('css/**/*.png')
+		.pipe(gulp.dest('dist/enyo/'));
 });
 
 gulp.task('default', ['js', 'css', 'common'], function() {

@@ -1,0 +1,23 @@
+---
+engines:
+  csslint:
+    enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - javascript
+  eslint:
+    enabled: true
+  fixme:
+    enabled: true
+ratings:
+  paths:
+  - "**.css"
+  - "**.js"
+exclude_paths:
+- "www/enyo/css/enyo/enyo.css"
+- "www/enyo/js/enyo/enyo.js"
+- "www/enyo/js/enyo/app.js"
+- "www/graph/js-graph-it.js"
+- "**/gulpfile.js"

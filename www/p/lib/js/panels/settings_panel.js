@@ -1,5 +1,5 @@
 // SETTINGS PANEL
-var SettingsPanel = function () {
+var SettingsPanel = function() {
 };
 
 SettingsPanel.prototype.render = function() {
@@ -10,6 +10,6 @@ SettingsPanel.prototype.render = function() {
 	settings += '<div><input value="Randomize colors" type="button" onclick="r2.cmd(\'ecr\');"></div>';
 	var html = settings + colors;
 	$('#settings_tab').html(html);
-	$('#settings_tab').css('color', "rgb(127,127,127);");
+	$('#settings_tab').css('color', 'rgb(127,127,127);');
 	$('input[type=checkbox]').onoff();
 };
