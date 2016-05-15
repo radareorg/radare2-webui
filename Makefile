@@ -39,10 +39,18 @@ clean:
 	$(MAKE) -C www/enyo clean
 	rm -rf dist
 
-dist:
+dist: build
 	tar cJvf radare2-webui-$(VERSION).tar.xz dist
+
+indivualdist:
+	cd dist
+	tar zcvf ../r2-webui-enyo.tar.gz enyo
+	tar zcvf ../r2-webui-m.tar.gz m
+	tar zcvf ../r2-webui-t.tar.gz t
+	tar zcvf ../r2-webui-p.tar.gz p
 
 mrproper:
 	git clean -xdf
 
 .PHONY: enyo all
+.ONESHELL: indivualdist
