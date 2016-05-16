@@ -1,14 +1,24 @@
 VERSION=0.10.2
 
-all: root enyo material tiles panel
+all: build
 	$(MAKE) run
 
-run:
-	r2 -q -e http.root=www -e http.ui=enyo -c=H /bin/ls
+run: runm
+
+runenyo:
+	r2 -q -e http.root=dist -e http.ui=enyo -c=H /bin/ls
 
 runm:
-	r2 -q -e http.root=www -e http.ui=m -c=H /bin/ls
+	r2 -q -e http.root=dist -e http.ui=m -c=H /bin/ls
 
+runt:
+	r2 -q -e http.root=dist -e http.ui=t -c=H /bin/ls
+
+runp:
+	r2 -q -e http.root=dist -e http.ui=p -c=H /bin/ls
+
+
+build: root enyo material tiles panel
 
 root:
 	$(MAKE) -C www build
@@ -27,15 +37,20 @@ panel:
 
 clean:
 	$(MAKE) -C www/enyo clean
+	rm -rf dist
 
-dist:
-	rm -rf radare2-webui-$(VERSION)
-	git clone . radare2-webui-$(VERSION)
-	rm -rf radare2-webui-$(VERSION)/.git
-	tar cJvf radare2-webui-$(VERSION).tar.xz radare2-webui-$(VERSION)
-	rm -rf radare2-webui-$(VERSION)
+dist: build
+	tar cJvf radare2-webui-$(VERSION).tar.xz dist
+
+indivualdist:
+	cd dist
+	tar zcvf ../r2-webui-enyo.tar.gz enyo
+	tar zcvf ../r2-webui-m.tar.gz m
+	tar zcvf ../r2-webui-t.tar.gz t
+	tar zcvf ../r2-webui-p.tar.gz p
 
 mrproper:
 	git clean -xdf
 
 .PHONY: enyo all
+.ONESHELL: indivualdist

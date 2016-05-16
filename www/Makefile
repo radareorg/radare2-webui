@@ -1,3 +1,3 @@
 build:
 	npm install
-	$(shell npm bin)/bower install
+	$(shell npm bin)/gulp
