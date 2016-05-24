@@ -47,9 +47,31 @@ gulp.task('css', function() {
 		.pipe(gulp.dest(DEST));
 });
 
-gulp.task('default', ['js', 'css', 'common'], function() {
+gulp.task('bower', function() {
+	return bower({ cmd: 'install'});
+});
+
+gulp.task('vendors', ['bower'], function() {
+	// Moving neccesary vendors files from bower
+	gulp.src([
+			'vendors/jquery.layout/dist/layout-default-latest.css',
+			'vendors/jointjs/dist/joint.min.css',
+			'vendors/onoff/dist/jquery.onoff.css',
+			'vendors/jquery/dist/jquery.min.js',
+			'vendors/jquery.scrollTo/jquery.scrollTo.min.js',
+			'vendors/jquery.layout/dist/jquery.layout-latest.min.js',
+			'vendors/jquery-ui/ui/minified/jquery-ui.min.js',
+			'vendors/jquery-ui-contextmenu/jquery.ui-contextmenu.min.js',
+			'vendors/onoff/dist/jquery.onoff.min.js',
+			'vendors/lodash/lodash.min.js',
+			'vendors/backbone/backbone-min.js',
+			'vendors/jointjs/dist/joint.min.js',
+			'vendors/jointjs/plugins/layout/DirectedGraph/joint.layout.DirectedGraph.js'
+		 ])
+		.pipe(gulp.dest(DEST+'vendors/'));
+});
+
+gulp.task('default', ['vendors', 'js', 'css', 'common'], function() {
 	gulp.src(['./index.html', '*.png'])
 		.pipe(gulp.dest(DEST));
-
-	return bower({ cmd: 'install'});
 });

@@ -66,7 +66,23 @@ gulp.task('bower', function() {
 	return bower({ cmd: 'install'});
 })
 
-gulp.task('default', ['bower', 'js', 'css', 'common'], function() {
+gulp.task('vendors', ['bower'], function() {
+	// Moving neccesary vendors files from bower
+	gulp.src([
+			'vendors/jquery/jquery.min.js',
+			'vendors/jquery.scrollTo/jquery.scrollTo.min.js',
+			'vendors/jquery-ui/jquery-ui.min.js',
+			'vendors/jquery.layout/dist/jquery.layout-latest.min.js',
+			'vendors/lodash/lodash.min.js',
+			'vendors/backbone/backbone-min.js',
+			'vendors/jointjs/dist/joint.min.css',
+			'vendors/jointjs/dist/joint.min.js',
+			'vendors/jointjs/plugins/layout/DirectedGraph/joint.layout.DirectedGraph.js'
+		])
+		.pipe(gulp.dest(DEST+'vendors/'));
+})
+
+gulp.task('default', ['vendors', 'js', 'css', 'common'], function() {
 	gulp.src('index.html')
 		.pipe(gulp.dest(DEST));
 });
