@@ -36,6 +36,7 @@ material (responsive) interface
 * [gulp-watch](https://www.npmjs.com/package/gulp-watch) (MIT)
 * [gulp-google-webfonts](https://www.npmjs.com/package/gulp-google-webfonts) (GPL-3.0)
 * [gulp-jscs](https://www.npmjs.com/package/gulp-jscs) (MIT)
+* [gulp-livereload](https://www.npmjs.com/package/gulp-livereload) (MIT)
 * [material-design-lite](https://getmdl.io/) (Apache 2.0)
 * [material-design-icons-iconfont](https://github.com/jossef/material-design-icons-iconfont) (MIT)
 
