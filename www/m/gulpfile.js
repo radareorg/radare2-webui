@@ -61,7 +61,7 @@ gulp.task('fonts', ['bower'], function() {
 });
 
 gulp.task('html', function() {
-	gulp.src('./index.html')
+	gulp.src(['./index.html', 'vsplit', 'hsplit'])
 		.pipe(gulp.dest(DEST))
 		.pipe(livereload());
 });
