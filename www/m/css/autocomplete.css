@@ -1,0 +1,36 @@
+.mydropdown {
+	position:relative;
+	display:inline-block;
+}
+
+.mydropdown > .ddcontent {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 12px 16px;
+    width: 160px;
+	margin:0;
+	padding:0;
+	
+}
+
+ul.ddcontent li {
+	display:block;
+	padding:10px;
+	margin:0;
+	border-bottom: 1px solid silver;
+	overflow: hidden;
+}
+
+ul.ddcontent li:hover {
+	background-color: #f0f0f0;
+}
+
+ul.ddcontent li:last-child {
+	border:none;
+}
+
+.mydropdown:hover > .ddcontent {
+    display: block;
+}
