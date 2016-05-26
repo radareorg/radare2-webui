@@ -15,19 +15,25 @@ gulp.task('bower', function() {
 	return bower({ cmd: 'install'});
 });
 
+gulp.task('dependencies', ['bower'], function() {
+	gulp.src(R2+'r2.js')
+		.pipe(uglify())
+		.pipe(concat('r2.js'))
+		.pipe(gulp.dest(DEST));
+
+	gulp.src([
+		'./vendors/material-design-lite/material.min.js'])
+		.pipe(gulp.dest(DEST+'vendors/'));
+});
+
 gulp.task('jscs', function() {
 	return gulp.src("js/*")
 		.pipe(jscs())
 		.pipe(jscs.reporter());
 });
 
-gulp.task('js', ['jscs', 'bower'], function() {
-	gulp.src(R2+'r2.js')
-		.pipe(uglify())
-		.pipe(concat('r2.js'))
-		.pipe(gulp.dest(DEST));
-
-	gulp.src(['./js/*.js', './vendors/material-design-lite/material.min.js'])
+gulp.task('js', ['jscs'], function() {
+	gulp.src('./js/*.js')
 		.pipe(uglify())
 		.pipe(concat('index.js'))
 		.pipe(gulp.dest(DEST))
@@ -66,7 +72,7 @@ gulp.task('html', function() {
 		.pipe(livereload());
 });
 
-gulp.task('default', ['html', 'js', 'fonts', 'css'], function() {
+gulp.task('default', ['html', 'dependencies', 'js', 'fonts', 'css'], function() {
 	gulp.src('./images/*')
 		.pipe(gulp.dest(DEST+'images/'));
 });
