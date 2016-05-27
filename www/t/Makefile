@@ -10,6 +10,9 @@ build: node_modules
 run:
 	r2 -e http.ui=dist -e http.root=$$PWD -qc=H /bin/ls
 
+watch:
+	$(shell npm bin)/gulp watch
+
 clean:
 	rm -rf dist dist.tar.gz
 
