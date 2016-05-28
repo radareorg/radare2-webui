@@ -1,100 +1,198 @@
-;(function() {
-"use strict";
+/**
+ * Autocompletion classe, define a way to build an autocompletion process
+ * with a fixed set of entries.
+ *
+ * @param {String} formId - Literal DOM id #field
+ * @param {String} choicesId - Literal DOM id #dropdown
+ * @param {String} cmd - run into r2 to populate the autocompletion, eg. 'fs *;fj'
+ * @param {integer} minChar - number of charcaters to start autocompletion
+ * @param {integer} maxProp - maximum propositions to offer
+ */
+function Autocompletion(formId, choicesId, cmd, minChar, maxProp) {
+	this.form_ = formId;
+	this.dropdown_ = choicesId;
+	this.cmd_ = cmd;
+	this.minChar_ = minChar || 2;
+	this.maxProp_ = maxProp || 10;
+	this.init_();
+}
 
-	var flags = undefined;
+Autocompletion.prototype.Keys = {
+	UP: 38,
+	DOWN: 40,
+	ENTER: 13
+};
 
-	function populateFlags() {
-		r2.cmdj("fs *;fj", function (f) {
-			flags = f;
-		});
-	}
+Autocompletion.prototype.Nodes = {
+	EMPTY: {pos: -1, offset: 0, length: 0, name: 'No match!'}
+};
 
-	function resetFlags() {
-		for (var i in flags) {
-			flags[i].offset = -1;
+Autocompletion.prototype.init_ = function() {
+	this.form_ = document.getElementById(this.form_);
+	this.dropdown_ = document.getElementById(this.dropdown_);
+
+	var boundKeyUpHandler = this.keyHandler.bind(this);
+	this.form_.addEventListener('keyup', boundKeyUpHandler);
+
+	var _this = this;
+	this.form_.addEventListener('focus', function() {
+		if (_this.prevLength_ >= _this.minChar_) {
+			_this.show();
 		}
-	}
-
-	function getAutocomplete(str, limit) {
-		limit = limit || 10;
-		if (typeof flags == 'undefined')
-			populateFlags();
-		resetFlags();
-
-		var selectedFlags = [];
-
-		for (var i in flags) {
-			if (i > limit) break;
-			flags[i].offset = flags[i].name.indexOf(str, 0);
-			if (flags[i].offset != -1) {
-				selectedFlags.push(flags[i]);
-			}
-		}
-		return selectedFlags;
-	}
-
-	function addNode(root, text, active) {
-		var node = document.createElement("li");
-		if (active) node.style.borderLeft = "2px solid red";
-		node.appendChild(document.createTextNode(text));
-		root.appendChild(node);
-	}
-
-	var activeChoice = 0;
-	var prevLength = 0;
-	var list;
-
-	var UP = 38;
-	var DOWN = 40;
-	var ENTER = 13;
-
-	document.getElementById('search').addEventListener('keyup', function(e) {
-		if (e.keyCode == ENTER) {
-			if (activeChoice != -1 && list.length > activeChoice)
-			{
-				console.log("Going to... "+list[activeChoice].offset);
-				seek("0x"+list[activeChoice].offset.toString(16));
-			}
-		}
-
-		if (e.keyCode == UP && activeChoice > 0) {
-			console.log("UP")
-			activeChoice--;
-			e.preventDefault();
-		}
-
-		if (e.keyCode == DOWN && activeChoice < list.length-1) {
-			console.log("DOWN");
-			activeChoice++;
-			e.preventDefault();
-		}
-
-		var autocomplete = document.getElementById("search_autocomplete");
-		
-		// Cleaning old completion
-		while (autocomplete.firstChild) {
-			autocomplete.removeChild(autocomplete.firstChild);
-		}
-
-		if (this.value.length >= 2) {
-			list = getAutocomplete(this.value);
-			if (prevLength != this.value.length)
-				activeChoice = 0;
-
-			// Add them to dropdown
-			if (list.length == 0) {
-				addNode(autocomplete, "No match...", false);
-			} else {
-				for (var i in list) {
-					// TODO add eventListener (hover) for activeChoice
-					addNode(autocomplete, list[i]['name'], i == activeChoice);
-				}
-			}
-
-			prevLength = this.value.length;
-		} else {
-			addNode(autocomplete, "Autocompletion", false);
-		}
-
 	});
-})();
+
+	this.form_.addEventListener('blur', function() {
+		_this.hide();
+	});
+
+	this.flags_ = undefined;
+	this.activeChoice_ = 0;
+	this.prevLength_ = 0;
+	this.list_;
+	this.completions_;
+
+	this.populate_();
+};
+
+Autocompletion.prototype.populate_ = function() {
+	var _this = this;
+	r2.cmdj(this.cmd_, function(f) {
+		_this.flags_ = f;
+	});
+};
+
+Autocompletion.prototype.process_ = function(str) {
+	var selectedFlags = [];
+
+	var howMany = 0;
+	for (var i = 0 ; i < this.flags_.length ; i++) {
+		var offset = this.flags_[i].name.indexOf(str, 0);
+		if (offset !== -1) {
+			selectedFlags.push({
+				pos: howMany++,
+				offset: offset,
+				length: str.length,
+				name: this.flags_[i].name
+			});
+		}
+
+		if (howMany == this.maxProp_) {
+			return selectedFlags;
+		}
+	}
+	return selectedFlags;
+};
+
+Autocompletion.prototype.addNode_ = function(item, active) {
+	var node = document.createElement('li');
+	if (active) {
+		node.className = 'active';
+	}
+
+	var _this = this;
+
+	node.addEventListener('mouseover', (function(pos) {
+		return function() {
+			_this.setActiveChoice(pos);
+		};
+	})(item.pos));
+
+	node.addEventListener('mousedown', (function(pos) {
+		return function() {
+			_this.setActiveChoice(pos);
+			_this.valid();
+		};
+	})(item.pos));
+
+	var emphasis = document.createElement('strong');
+	emphasis.appendChild(document.createTextNode(item.name.substr(item.offset, item.length)));
+
+	node.appendChild(
+		document.createTextNode(
+			item.name.substr(0, item.offset)));
+	node.appendChild(emphasis);
+	node.appendChild(
+		document.createTextNode(
+			item.name.substr(item.offset + item.length, item.name.length - (item.offset + item.length))));
+	this.dropdown_.appendChild(node);
+};
+
+Autocompletion.prototype.cleanChoices_ = function() {
+	// Cleaning old completion
+	while (this.dropdown_.firstChild) {
+		this.dropdown_.removeChild(this.dropdown_.firstChild);
+	}
+};
+
+Autocompletion.prototype.setActiveChoice = function(newActive) {
+	for (i in this.dropdown_.childNodes) {
+		if (i == newActive) {
+			this.dropdown_.childNodes[i].className = 'active';
+		} else if (i == this.activeChoice_) {
+			this.dropdown_.childNodes[i].className = '';
+		}
+	}
+	this.activeChoice_ = newActive;
+};
+
+Autocompletion.prototype.keyMovement_ = function(key) {
+	if (key == this.Keys.UP && this.activeChoice_ > 0) {
+		console.log('UP');
+		this.setActiveChoice(this.activeChoice_ - 1);
+	}
+
+	if (key == this.Keys.DOWN && this.activeChoice_ < this.dropdown_.childNodes.length - 1) {
+		console.log('DOWN');
+		this.setActiveChoice(this.activeChoice_ + 1);
+	}
+};
+
+Autocompletion.prototype.valid = function() {
+	if (this.activeChoice_ == -1 || this.dropdown_.childNodes.length <= this.activeChoice_) {
+		return;
+	}
+	return seek(this.completions_[this.activeChoice_].name);
+};
+
+Autocompletion.prototype.show = function() {
+	this.dropdown_.style.display = 'block';
+};
+
+Autocompletion.prototype.hide = function() {
+	this.dropdown_.style.display = 'none';
+};
+
+Autocompletion.prototype.keyHandler = function(e) {
+	if (e.keyCode == this.Keys.UP || e.keyCode == this.Keys.DOWN) {
+		return this.keyMovement_(e.keyCode);
+	}
+
+	if (e.keyCode == this.Keys.ENTER) {
+		return this.valid();
+	}
+
+	var value = e.srcElement.value;
+	this.cleanChoices_();
+
+	if (value.length >= 2) {
+		this.show();
+		this.completions_ = this.process_(value);
+		if (this.prevLength_ !== value.length) {
+			this.activeChoice_ = 0;
+		}
+
+		// Add them to dropdown
+		if (this.completions_.length == 0) {
+			this.addNode_(this.Nodes.EMPTY, false);
+		} else {
+			for (var i in this.completions_) {
+				// TODO add eventthis.list_ener (hover) for this.activeChoice_
+				this.addNode_(this.completions_[i], i == this.activeChoice_);
+			}
+		}
+
+		this.prevLength_ = value.length;
+	} else {
+		this.hide();
+	}
+};
