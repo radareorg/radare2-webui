@@ -151,6 +151,7 @@ Autocompletion.prototype.valid = function() {
 	if (this.activeChoice_ == -1 || this.dropdown_.childNodes.length <= this.activeChoice_) {
 		return;
 	}
+	this.form_.blur();
 	return seek(this.completions_[this.activeChoice_].name);
 };
 
@@ -168,6 +169,7 @@ Autocompletion.prototype.keyHandler = function(e) {
 	}
 
 	if (e.keyCode == this.Keys.ENTER) {
+		this.hide();
 		return this.valid();
 	}
 
