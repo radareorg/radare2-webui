@@ -157,6 +157,7 @@ function setNullFlagspace(fs) {
 	});
 }
 
+/* rename to panelFlagSpaces */
 function flagspaces() {
 	var c = document.getElementById('content');
 	document.getElementById('title').innerHTML = 'Flag Spaces';
@@ -467,13 +468,39 @@ function printHeaderPanel(title, cmd, grep) {
 	update = panelFunctions;
 	document.getElementById('title').innerHTML = title;
 	var c = document.getElementById('content');
+	c.style.color= '#202020 !important';
 	c.style.backgroundColor = '#202020';
-	var out = '<div style=\'position:fixed;margin:0.5em\'>';
+	var out = '' ; //
+/*
+out += ''
++' <div class="mdl-tabs mdl-js-tabs">'
++'  <div class="mdl-tabs__tab-bar mds-js-ripple-effect">'
++'    <a href="#tab1-panel" class="mdl-tabs__tab is-active">Headers</a>'
++'    <a href="#tab2-panel" class="mdl-tabs__tab">Symbols</a>'
++'    <a href="#tab3-panel" class="mdl-tabs__tab">Imports</a>'
++'    <a href="#tab4-panel" class="mdl-tabs__tab">Relocs</a>'
++'    <a href="#tab5-panel" class="mdl-tabs__tab">Sections</a>'
++'    <a href="#tab6-panel" class="mdl-tabs__tab">SDB</a>'
++'  </div>'
++'  <div class="mdl-tabs__panel is-active" id="tab1-panel">'
++'    <p>Tab 1 Content</p>'
++'  </div>'
++'  <div class="mdl-tabs__panel" id="tab2-panel">'
++'    <p>Tab 2 Content</p>'
++'  </div>'
++'  <div class="mdl-tabs__panel" id="tab3-panel">'
++'    <p>Tab 3 Content</p>'
++'  </div>'
++'</div>';
+*/
+	out += '<div style=\'position:fixed;margin:0.5em\'>';
+	out += '&nbsp;' + uiRoundButton('javascript:location.href="/m"', 'undo');
 	out += uiButton('javascript:panelHeaders()', 'Headers');
 	out += uiButton('javascript:panelSymbols()', 'Symbols');
 	out += uiButton('javascript:panelImports()', 'Imports');
 	out += uiButton('javascript:panelRelocs()', 'Relocs');
 	out += uiButton('javascript:panelSections()', 'Sections');
+	out += uiButton('javascript:panelStrings()', 'Strings');
 	out += uiButton('javascript:panelSdb()', 'Sdb');
 	out += '</div><br /><br /><br /><br />';
 	c.innerHTML = out;
@@ -493,6 +520,9 @@ function panelSdb() {
 }
 function panelSections() {
 	printHeaderPanel('Sections', 'iSq');
+}
+function panelStrings() {
+	printHeaderPanel('Strings', 'izq');
 }
 function panelImports() {
 	printHeaderPanel('Imports', 'isq', ' imp.');
@@ -1221,6 +1251,7 @@ function ready() {
 	/* left menu */
 	onClick('analyze_button', analyzeButton);
 	onClick('menu_headers', panelHeaders);
+	onClick('info_headers', panelHeaders);
 	onClick('menu_disasm', panelDisasm);
 	onClick('menu_debug', panelDebug);
 	onClick('menu_hexdump', panelHexdump);
@@ -1228,7 +1259,7 @@ function ready() {
 	onClick('menu_flags', panelFlags);
 	onClick('menu_search', panelSearch);
 	onClick('menu_comments', panelComments);
-	onClick('menu_console', panelConsole);
+	//onClick('menu_console', panelConsole);
 	onClick('menu_script', panelScript);
 	onClick('menu_help', panelHelp);
 
@@ -1245,6 +1276,9 @@ function ready() {
 	onClick('menu_mail', function() {
 		window.location = 'mailto:pancake@nopcode.org';
 	});
+
+	// Set autocompletion
+	new Autocompletion('search', 'search_autocomplete', 'fs *;fj');
 }
 window.onload = ready;
 

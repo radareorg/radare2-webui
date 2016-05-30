@@ -39,6 +39,7 @@
 
     <link rel="stylesheet" href="./stylesheet.css">
     <link rel="stylesheet" href="./fonts/fonts.css">
+
     <style>
     #view-source {
       position: fixed;
@@ -61,11 +62,15 @@
             <label class="mdl-button mdl-js-button mdl-button--icon" for="search">
               <i class="material-icons">search</i>
             </label>
-            <div class="mdl-textfield__expandable-holder">
-              <input class="mdl-textfield__input" type="text" id="search" />
+            <div class="mdl-textfield__expandable-holder mydropdown">
+              <input class="mdl-textfield__input" type="text" id="search" autocomplete="off" />
               <label class="mdl-textfield__label" for="search">Enter your query...</label>
+              <ul class="ddcontent" id="search_autocomplete">
+                <li>Autocompletion...</li>
+              </ul>
             </div>
           </div>
+
           <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="hdrbtn">
             <i class="material-icons">more_vert</i>
           </button>
@@ -129,10 +134,11 @@
       <!-- <main id="content"> -->
         <div class="mdl-grid demo-content">
           <div class="demo-graphs mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--8-col">
-	    <h3>Info</h3>
 	    <div id="info"> </div>
+            <br />
+            <a id='info_headers' class="mdl-buton mdl-js-buttom mdl-js-ripple-effect" style="cursor:pointer">read more...</a>
 	  <h3>Entropy</h3>
-            <svg fill="currentColor" viewBox="0 0 500 120" id="entropy-graph">
+            <svg fill="currentColor" viewBox="0 0 500 80" id="entropy-graph">
             </svg>
           </div>
           <div class="demo-cards mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-grid mdl-grid--no-spacing">
@@ -269,7 +275,6 @@
       </svg>
     <script type="application/javascript" src="./r2.js"></script>
     <script type="application/javascript" src="./vendors/material.min.js"></script>
-    <script type="application/javascript" src="./vendors/auto-complete.min.js"></script>
     <script type="application/javascript" src="./index.js"></script>
   </body>
 </html>
