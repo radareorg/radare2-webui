@@ -173,7 +173,7 @@ Autocompletion.prototype.keyHandler = function(e) {
 		return this.valid();
 	}
 
-	var value = e.srcElement.value;
+	var value = e.target.value;
 	this.cleanChoices_();
 
 	if (value.length >= 2) {
