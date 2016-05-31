@@ -1276,6 +1276,9 @@ function ready() {
 	onClick('menu_mail', function() {
 		window.location = 'mailto:pancake@nopcode.org';
 	});
+
+	// Set autocompletion
+	new Autocompletion('search', 'search_autocomplete', 'fs *;fj');
 }
 window.onload = ready;
 
