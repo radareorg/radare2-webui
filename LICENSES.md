@@ -39,6 +39,7 @@ material (responsive) interface
 * [gulp-livereload](https://www.npmjs.com/package/gulp-livereload) (MIT)
 * [material-design-lite](https://getmdl.io/) (Apache 2.0)
 * [material-design-icons-iconfont](https://github.com/jossef/material-design-icons-iconfont) (MIT)
+* [jQuery](https://jquery.com/) (MIT)
 
 panels (desktop) interface
 -----------

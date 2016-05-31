@@ -17,6 +17,7 @@
   ],
   "dependencies": {
     "material-design-lite": "^1.1.3",
-    "material-design-icons-iconfont": "^2.0.4"
+    "material-design-icons-iconfont": "^2.0.4",
+    "jquery": "^2.2.4"
   }
 }

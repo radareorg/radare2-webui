@@ -22,6 +22,7 @@ gulp.task('dependencies', ['bower'], function() {
 		.pipe(gulp.dest(DEST));
 
 	gulp.src([
+		'./vendors/jquery/dist/jquery.min.js',
 		'./vendors/material-design-lite/material.min.js'])
 		.pipe(gulp.dest(DEST+'vendors/'));
 });
