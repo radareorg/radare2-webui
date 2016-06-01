@@ -1279,6 +1279,12 @@ function ready() {
 
 	// Set autocompletion
 	new Autocompletion('search', 'search_autocomplete', 'fs *;fj');
+
+	// Close the drawer on click with small screens
+	document.querySelector('.mdl-layout__drawer').addEventListener('click', function () {
+		document.querySelector('.mdl-layout__obfuscator').classList.remove('is-visible');
+		this.classList.remove('is-visible');
+	}, false);
 }
 window.onload = ready;
 
