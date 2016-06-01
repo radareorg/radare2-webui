@@ -252,8 +252,9 @@ ul {
   list-style-type: none;
 }
 
-.pre {
-    font-family: Console, Courier New, monospace;
+.pre, pre {
+    font-family: "DejaVu Sans Mono", Console, Courier New, monospace;
+    color: grey;
     white-space: pre;
 }
 
@@ -275,7 +276,7 @@ td {
   margin-top: 16px;
   margin-bottom: 16px;
   background-color: white;
-  font-family: Console, Courier New, monospace;
+  font-family: "DejaVu Sans Mono", Console, Courier New, monospace;
   white-space: pre;
   display: inline-block;
 }

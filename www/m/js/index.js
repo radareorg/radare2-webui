@@ -511,7 +511,7 @@ out += ''
 	r2.cmd(cmd, function(d) {
 		var color = '#f0f0f0';
 		d = clickableOffsets(d);
-		c.innerHTML += '<pre style=\'margin:1.2em;font-family:Console,Courier New,monospace;color:' + color + ' !important\'>' + d + '<pre>';
+		c.innerHTML += '<pre style=\'margin:1.2em;color:' + color + ' !important\'>' + d + '<pre>';
 	});
 }
 
@@ -917,7 +917,7 @@ function panelDisasm() {
 	r2.cmd('pd 128' + tail, function(d) {
 		var dis = clickableOffsets(d);
 		c.innerHTML += '<center>' + uiRoundButton('javascript:up()', 'keyboard_arrow_up') + uiRoundButton('javascript:down()', 'keyboard_arrow_down') + '</center>';
-		c.innerHTML += '<pre style=\'font-family:Console,Courier New,monospace;color:grey\'>' + dis + '<pre>';
+		c.innerHTML += '<pre style=\'color:grey\'>' + dis + '<pre>';
 		c.innerHTML += '<center>' + uiRoundButton('javascript:down()', 'keyboard_arrow_down') + '</center><br /><br />';
 	});
 }
@@ -990,11 +990,11 @@ function panelDebug() {
 	}
 	r2.cmd('f cur;.' + rcmd + '*;sr sp;px 64', function(d) {
 		var dis = clickableOffsets(d);
-		c.innerHTML += '<pre style=\'margin:10px;font-family:Console,Courier New,monospace;color:grey\'>' + dis + '<pre>';
+		c.innerHTML += '<pre style=\'margin:10px;color:grey\'>' + dis + '<pre>';
 	});
 	r2.cmd(rcmd + '=;s cur;f-cur;pd 128' + tail, function(d) {
 		var dis = clickableOffsets(d);
-		c.innerHTML += '<pre style=\'font-family:Console,Courier New,monospace;color:grey\'>' + dis + '<pre>';
+		c.innerHTML += '<pre style=\'color:grey\'>' + dis + '<pre>';
 	});
 }
 
@@ -1033,7 +1033,7 @@ function info() {
 	out += uiButton('javascript:decompile()', 'Decompile');
 	c.innerHTML = out;
 	r2.cmd('afi', function(d) {
-		c.innerHTML += '<pre style=\'font-family:Console,Courier,monospace;color:' + color + '\'>' + d + '<pre>';
+		c.innerHTML += '<pre style=\'color:' + color + '\'>' + d + '<pre>';
 	});
 }
 
@@ -1046,7 +1046,7 @@ function blocks() {
 	c.innerHTML += '&nbsp;<a href="javascript:panelDisasm()" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--accent mdl-color-text--accent-contrast">&lt; INFO</a> <h3 color=white></h3>';
 	var tail = inColor ? '@e:scr.color=1,scr.html=1' : '';
 	r2.cmd('pdr' + tail, function(d) {
-		c.innerHTML += '<pre style=\'font-family:Console,Courier,monospace;color:' + color + '\'>' + d + '<pre>';
+		c.innerHTML += '<pre style=\'color:' + color + '\'>' + d + '<pre>';
 	});
 }
 
@@ -1060,7 +1060,7 @@ function pdtext() {
 	var tail = inColor ? '@e:scr.color=1,scr.html=1,asm.lineswidth=0' : '@e:asm.lineswidth=0';
 	r2.cmd('e scr.color=1;s entry0;s $S;pD $SS;e scr.color=0', function(d) {
 		d = clickableOffsets(d);
-		c.innerHTML += '<pre style=\'font-family:Console,Courier,monospace;color:' + color + '\'>' + d + '<pre>';
+		c.innerHTML += '<pre style=\'color:' + color + '\'>' + d + '<pre>';
 	});
 }
 
@@ -1073,7 +1073,7 @@ function pdf() {
 	c.innerHTML += '&nbsp;<a href="javascript:panelDisasm()" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--accent mdl-color-text--accent-contrast">&lt; INFO</a> <h3 color=white></h3>';
 	var tail = inColor ? '@e:scr.color=1,scr.html=1,asm.lineswidth=0' : '@e:asm.lineswidth=0';
 	r2.cmd('pdf' + tail, function(d) {
-		c.innerHTML += '<pre style=\'font-family:Console,Courier,monospace;color:' + color + '\'>' + d + '<pre>';
+		c.innerHTML += '<pre style=\'color:' + color + '\'>' + d + '<pre>';
 	});
 }
 
@@ -1086,7 +1086,7 @@ function decompile() {
 	c.innerHTML += '&nbsp;<a href="javascript:panelDisasm()" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--accent mdl-color-text--accent-contrast">&lt; INFO</a> <h3 color=white></h3>';
 	var tail = inColor ? '@e:scr.color=1,scr.html=1' : '';
 	r2.cmd('pdc' + tail, function(d) {
-		c.innerHTML += '<pre style=\'font-family:Console,Courier,monospace;color:' + color + '\'>' + d + '<pre>';
+		c.innerHTML += '<pre style=\'color:' + color + '\'>' + d + '<pre>';
 	});
 }
 
@@ -1099,7 +1099,7 @@ function graph() {
 	var tail = inColor ? '@e:scr.color=1,scr.html=1' : '';
 	r2.cmd('agf' + tail, function(d) {
 		d = clickableOffsets(d);
-		c.innerHTML += '<pre style=\'font-family:Console,Courier New,monospace;color:' + color + '\'>' + d + '<pre>';
+		c.innerHTML += '<pre style=\'color:' + color + '\'>' + d + '<pre>';
 	});
 }
 
