@@ -10,6 +10,28 @@ var prev_curoff = 0;
 var prev_lastoff = 0;
 var hascmd = false;
 
+function isFirefoxOS() {
+	if (!locationbar.visible) {
+		if (navigator.userAgent.indexOf('Firefox') > -1 && navigator.userAgent.indexOf('Mobile') > -1) {
+			return ('mozApps' in navigator);
+		}
+	}
+	return false;
+}
+
+// Valid options: sync, async or sasync
+//r2.asyncMode = 'sasync';
+r2.asyncMode = 'sync';
+
+r2.err = null; // callback to be executed when connection fails
+
+if (isFirefoxOS()) {
+	/* Requires CORS or SystemXHR */
+	r2.root = 'http://cloud.radare.org';
+} else {
+	r2.root = '';
+}
+
 // async helper
 function asyncLoop(iterations, func, callback) {
 	var index = 0;
@@ -70,7 +92,9 @@ r2.root = ''; // prefix path
 /* helpers */
 function dump(obj) {
 	var x = '';
-	for (var a in obj) x += a + '\n';
+	for (var a in obj) {
+		x += a + '\n';
+	}
 	if (typeof ('alert') != 'undefined') {
 		alert(x);
 	} else {
@@ -98,31 +122,74 @@ r2.argMap = [];
 
 function objtostr(obj) {
 	var str = '';
-	for (var a in obj)
+	for (var a in obj) {
 		str += a + ': ' + obj[a] + ',\n';
+	}
 	return str;
 }
 
-function Ajax(method, uri, body, fn) {
-	if (typeof (XMLHttpRequest) == 'undefined')
+var ajax_in_process = false;
+
+function Ajax(method, uri, body, fn, err) {
+	if (typeof (XMLHttpRequest) == 'undefined') {
 		return false;
-	var x = new XMLHttpRequest();
-	if (!x)
+	}
+	if (r2.asyncMode == 'fake') {
+		if (fn) {
+			fn('{}');
+		}
+		return true;
+	}
+	if (r2.asyncMode == 'sasync') {
+		console.log('async waiting');
+		if (ajax_in_process) {
+			setTimeout(function() {
+					Ajax(method, uri, body, fn);
+				}, 100);
+			return false;
+		}
+	}
+
+	var x = undefined;
+	if (isFirefoxOS()) {
+		var x = new XMLHttpRequest({mozSystem: true});
+	} else {
+		var x = new XMLHttpRequest();
+	}
+	if (!x) {
 		return false;
-	x.open(method, uri, false);
+	}
+	ajax_in_process = true;
+	if (r2.asyncMode == 'sync') {
+		x.open(method, uri, false);
+	} else {
+		x.open(method, uri, true);
+	}
 	x.setRequestHeader('Accept', 'text/plain');
-	x.setRequestHeader('Accept', 'text/html');
+	//x.setRequestHeader ('Accept', 'text/html');
 	x.setRequestHeader('Content-Type', 'application/x-ww-form-urlencoded; charset=UTF-8');
 	x.onreadystatechange = function() {
+		ajax_in_process = false;
 		if (x.status == 200) {
 			if (fn) {
 				fn(x.responseText);
+			} else {
+				console.error('missing ajax callback');
 			}
 		} else {
+			(err || r2.err)('connection refused');
 			console.error('ajax ' + x.status);
 		}
 	};
-	x.send(body);
+
+	try {
+		x.send(body);
+	} catch (e) {
+		if (e.name == 'NetworkError') {
+			(err || r2.err)('connection error');
+		}
+	}
+
 	return true;
 }
 
@@ -358,7 +425,7 @@ r2.cmds = function(cmds, cb) {
 	r2.cmd(cmd, lala);
 };
 
-function _internal_cmd(c, cb) {
+function _internal_cmd(c, cb, err) {
 	if (typeof (r2cmd) != 'undefined') {
 		hascmd = r2cmd;
 	}
@@ -366,21 +433,21 @@ function _internal_cmd(c, cb) {
 		// TODO: use setTimeout for async?
 		if (typeof (r2plugin) != 'undefined') {
 			// duktape
-			cb(r2cmd(c));
+			return cb(r2cmd(c));
 		} else {
 			// node
 			return hascmd(c, cb);
 		}
 	} else {
 		Ajax('GET', r2.root + '/cmd/' + encodeURI(c), '', function(x) {
-			if (cb) {
-				cb(x);
-			}
-		});
+				if (cb) {
+					cb(x);
+				}
+			}, err);
 	}
 }
 
-r2.cmd = function(c, cb) {
+r2.cmd = function(c, cb, err) {
 	if (Array.isArray(c)) {
 		var res = [];
 		var idx = 0;
@@ -390,13 +457,13 @@ r2.cmd = function(c, cb) {
 				res[idx] = result.replace(/\n$/, '');
 				idx++;
 				loop.next();
-			});
+			}, err);
 		}, function() {
 				// all iterations done
 				cb(res);
 			});
 	} else {
-		_internal_cmd(c, cb);
+		_internal_cmd(c, cb, err);
 	}
 };
 
@@ -475,9 +542,11 @@ r2.getTextLogger = function(obj) {
 			obj.refresh(function() {
 				//obj.clear ();
 			});
-			if (r2ui.selected_panel === 'Logs')
+			if (r2ui.selected_panel === 'Logs') {
 				setTimeout(to, n * 1000);
-			else console.log('Not in logs :(');
+			} else {
+				console.log('Not in logs :(');
+			}
 			return true;
 		}
 		obj.interval = setTimeout(to, n * 1000);

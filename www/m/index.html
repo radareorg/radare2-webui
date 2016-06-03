@@ -273,7 +273,32 @@
           </g>
         </defs>
       </svg>
+
+    <dialog id="networkerr" class="mdl-dialog">
+      <div class="mdl-dialog__content">
+        <p class="mdl-typography--text-center">
+          <i class="material-icons" style="font-size:54px;">error_outline</i>
+        </p>
+        <p>
+          A network error has occured
+        </p>
+        <p class="next-attempt">
+          <em>This error isn't recoverable.</em>
+        </p>
+      </div>
+      <div class="mdl-dialog__actions mdl-dialog__actions--full-width">
+        <div class="first-attempt">
+          <button type="button" class="mdl-button close">Ok</button>
+          <button type="button" class="mdl-button retry">Try again</button>
+        </div>
+        <div class="next-attempt">
+          <button type="button" class="mdl-button ok">OK</button>
+        </div>
+      </div>
+    </dialog>
+
     <script type="application/javascript" src="./r2.js"></script>
+    <script type="application/javascript" src="./vendors/dialog-polyfill.js"></script>
     <script type="application/javascript" src="./vendors/jquery.min.js"></script>
     <script type="application/javascript" src="./vendors/material.min.js"></script>
     <script type="application/javascript" src="./index.js"></script>
