@@ -22,7 +22,9 @@ gulp.task('dependencies', ['bower'], function() {
 		.pipe(gulp.dest(DEST));
 
 	gulp.src([
-		'./vendors/material-design-lite/material.min.js'])
+		'./vendors/jquery/dist/jquery.min.js',
+		'./vendors/material-design-lite/material.min.js',
+		'./vendors/dialog-polyfill/dialog-polyfill.js'])
 		.pipe(gulp.dest(DEST+'vendors/'));
 });
 
@@ -43,6 +45,7 @@ gulp.task('js', ['jscs'], function() {
 gulp.task('css', ['bower'], function() {
 	gulp.src([
 			'./css/*.css',
+			'./vendors/dialog-polyfill/dialog-polyfill.css',
 			'./vendors/material-design-lite/material.min.css',
 			'./vendors/material-design-icons-iconfont/dist/material-design-icons.css'])
 		.pipe(cleanCSS())
