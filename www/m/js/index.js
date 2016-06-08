@@ -190,27 +190,37 @@ function flagspaces() {
 }
 
 function analyzeSymbols() {
+	statusMessage('Analyzing symbols...');
 	r2.cmd('aa',function() {
+		statusMessage('done');
 		update();
 	});
 }
 function analyzeRefs() {
+	statusMessage('Analyzing references...');
 	r2.cmd('aar',function() {
+		statusMessage('done');
 		update();
 	});
 }
 function analyzeCalls() {
+	statusMessage('Analyzing calls...');
 	r2.cmd('aac',function() {
+		statusMessage('done');
 		update();
 	});
 }
 function analyzeFunction() {
+	statusMessage('Analyzing function...');
 	r2.cmd('af',function() {
+		statusMessage('done');
 		update();
 	});
 }
 function analyzeNames() {
+	statusMessage('Analyzing names...');
 	r2.cmd('.afna @@ fcn.*',function() {
+		statusMessage('done');
 		update();
 	});
 }

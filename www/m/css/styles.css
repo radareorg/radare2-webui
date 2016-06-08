@@ -290,3 +290,17 @@ select {
   padding-right: 16px;
   border: 10px;
 }
+
+.statusbar {
+  z-index:100;
+  position: absolute;
+  width: 100%;
+  bottom: 0px;
+  height: 20px;
+  padding-left:16px;
+  background-color: #f0f0f0;
+}
+
+.statusbar:hover {
+  cursor: pointer;
+}
