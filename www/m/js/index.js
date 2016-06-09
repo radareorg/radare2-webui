@@ -478,30 +478,30 @@ function printHeaderPanel(title, cmd, grep) {
 	update = panelFunctions;
 	document.getElementById('title').innerHTML = title;
 	var c = document.getElementById('content');
-	c.style.color= '#202020 !important';
+	c.style.color = '#202020 !important';
 	c.style.backgroundColor = '#202020';
 	var out = '' ; //
-/*
-out += ''
-+' <div class="mdl-tabs mdl-js-tabs">'
-+'  <div class="mdl-tabs__tab-bar mds-js-ripple-effect">'
-+'    <a href="#tab1-panel" class="mdl-tabs__tab is-active">Headers</a>'
-+'    <a href="#tab2-panel" class="mdl-tabs__tab">Symbols</a>'
-+'    <a href="#tab3-panel" class="mdl-tabs__tab">Imports</a>'
-+'    <a href="#tab4-panel" class="mdl-tabs__tab">Relocs</a>'
-+'    <a href="#tab5-panel" class="mdl-tabs__tab">Sections</a>'
-+'    <a href="#tab6-panel" class="mdl-tabs__tab">SDB</a>'
-+'  </div>'
-+'  <div class="mdl-tabs__panel is-active" id="tab1-panel">'
-+'    <p>Tab 1 Content</p>'
-+'  </div>'
-+'  <div class="mdl-tabs__panel" id="tab2-panel">'
-+'    <p>Tab 2 Content</p>'
-+'  </div>'
-+'  <div class="mdl-tabs__panel" id="tab3-panel">'
-+'    <p>Tab 3 Content</p>'
-+'  </div>'
-+'</div>';
+	/*
+	out += ''
+	+' <div class="mdl-tabs mdl-js-tabs">'
+	+'  <div class="mdl-tabs__tab-bar mds-js-ripple-effect">'
+	+'    <a href="#tab1-panel" class="mdl-tabs__tab is-active">Headers</a>'
+	+'    <a href="#tab2-panel" class="mdl-tabs__tab">Symbols</a>'
+	+'    <a href="#tab3-panel" class="mdl-tabs__tab">Imports</a>'
+	+'    <a href="#tab4-panel" class="mdl-tabs__tab">Relocs</a>'
+	+'    <a href="#tab5-panel" class="mdl-tabs__tab">Sections</a>'
+	+'    <a href="#tab6-panel" class="mdl-tabs__tab">SDB</a>'
+	+'  </div>'
+	+'  <div class="mdl-tabs__panel is-active" id="tab1-panel">'
+	+'    <p>Tab 1 Content</p>'
+	+'  </div>'
+	+'  <div class="mdl-tabs__panel" id="tab2-panel">'
+	+'    <p>Tab 2 Content</p>'
+	+'  </div>'
+	+'  <div class="mdl-tabs__panel" id="tab3-panel">'
+	+'    <p>Tab 3 Content</p>'
+	+'  </div>'
+	+'</div>';
 */
 	out += '<div style=\'position:fixed;margin:0.5em\'>';
 	out += '&nbsp;' + uiRoundButton('javascript:location.href="/m"', 'undo');
@@ -567,21 +567,22 @@ function panelFunctions() {
 	r2.cmd('afl', function(d) {
 		//var dis = clickableOffsets (d);
 		//c.innerHTML += "<pre style='font-family:Console,Courier New,monospace' style='color:white !important'>"+dis+"<pre>";
+
+		var table = new Table(
+			['+Address', 'Name', '+Size', '+CC'],
+			[false, true, false, false],
+			'functionTable');
+
 		var lines = d.split(/\n/); //clickableOffsets (d).split (/\n/);
-		var body = uiTableBegin(['+Address', 'Name', '+Size', '+CC']);
 		for (var i in lines) {
 			var line = lines[i].split(/ +/);
-			if (line.length >= 3)
-			body += uiTableRow([
-			'+' + line[0],
-			'+' + line[3],
-			'+' + line[1],
-			line[2]
-			]);
+			if (line.length >= 3) {
+				table.addRow([line[0], line[3], line[1], line[2]]);
+			}
 		}
-		body += uiTableEnd();
-		c.innerHTML += body;
+		table.insertInto(c);
 	});
+
 }
 
 var last_console_output = '';
@@ -756,48 +757,6 @@ function panelSearch() {
 	out += '<br /><br />';
 	out += '<div id=\'search_output\' class=\'pre\' style=\'color:black!important\'><div>';
 	c.innerHTML = out;
-}
-
-function uiTableBegin(cols) {
-	var out = '';
-	out += '<table style="margin-left:10px" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">';
-	//out += '<table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable">';
-
-	out += '  <thead> <tr>';
-
-	var type;
-	for (var i in cols) {
-		var col = cols[i];
-		if (col[0] == '+') {
-			col = col.substring(1);
-			type = '';
-		} else {
-			type = ' class="mdl-data-table__cell--non-numeric"';
-		}
-		out += '<th' + type + '>' + col + '</th>';
-	}
-	out += '</tr> </thead> <tbody>';
-	return out;
-}
-
-function uiTableRow(cols) {
-	var out = '<tr>';
-	for (var i in cols) {
-		var col = cols[i];
-		if (!col) continue;
-		if (col[0] == '+') {
-			col = clickableOffsets(col.substring(1));
-			type = '';
-		} else {
-			type = ' class="mdl-data-table__cell--non-numeric"';
-		}
-		out += '<td' + type + '>' + col + '</td>';
-	}
-	return out + '</tr>';
-}
-
-function uiTableEnd() {
-	return '</tbody> </table>';
 }
 
 function panelFlags() {

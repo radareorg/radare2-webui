@@ -37,10 +37,12 @@ material (responsive) interface
 * [gulp-google-webfonts](https://www.npmjs.com/package/gulp-google-webfonts) (GPL-3.0)
 * [gulp-jscs](https://www.npmjs.com/package/gulp-jscs) (MIT)
 * [gulp-livereload](https://www.npmjs.com/package/gulp-livereload) (MIT)
+* [gulp-replace](https://www.npmjs.com/package/gulp-replace) (MIT)
 * [material-design-lite](https://getmdl.io/) (Apache 2.0)
 * [material-design-icons-iconfont](https://github.com/jossef/material-design-icons-iconfont) (MIT)
 * [jQuery](https://jquery.com/) (MIT)
 * [dialog-polyfill](https://github.com/GoogleChrome/dialog-polyfill) (BSD)
+* [DataTables](https://datatables.net/) (MIT)
 
 panels (desktop) interface
 -----------
