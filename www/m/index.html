@@ -38,7 +38,12 @@
     <meta name="msapplication-TileColor" content="#3372DF">
 
     <link rel="stylesheet" href="./stylesheet.css">
-    <link rel="stylesheet" href="./fonts/fonts.css">
+    
+    <link rel="stylesheet" href="./vendors/material.min.css">
+    <link rel="stylesheet" href="./vendors/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="./vendors/material-design-icons.css">
+    <link rel="stylesheet" href="./vendors/dialog-polyfill.css">
+    <link rel="stylesheet" href="./vendors/fonts/fonts.css">
 
     <style>
     #view-source {
@@ -49,6 +54,12 @@
       margin-right: 40px;
       margin-bottom: 40px;
       z-index: 900;
+    }
+
+    /* HotFix, rewrite jQuery-DataTable style */
+    table.dataTable {
+      width:auto;
+      margin:10px;
     }
     </style>
   </head>
@@ -303,6 +314,7 @@
     <script type="application/javascript" src="./r2.js"></script>
     <script type="application/javascript" src="./vendors/dialog-polyfill.js"></script>
     <script type="application/javascript" src="./vendors/jquery.min.js"></script>
+    <script type="application/javascript" src="./vendors/jquery.dataTables.min.js"></script>
     <script type="application/javascript" src="./vendors/material.min.js"></script>
     <script type="application/javascript" src="./index.js"></script>
   </body>
