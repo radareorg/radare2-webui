@@ -293,7 +293,6 @@ select {
 }
 
 .statusbar {
-  height:28px;
   padding:0 !important;
   font-family: "DejaVu Sans Mono", Console, Courier New, monospace;
   z-index:100;
@@ -303,7 +302,7 @@ select {
   cursor: pointer;
 }
 
-.statusbar.bigger {
+.statusbar.bigger > div {
   height:40vh;
 }
 

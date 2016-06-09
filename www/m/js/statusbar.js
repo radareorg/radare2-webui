@@ -15,7 +15,7 @@ function statusMessage(x, t) {
 	}
 	if (t !== undefined) {
 		statusTimeout = setTimeout(function() {
-			statusMessage('');
+			statusMessage('&nbsp;');
 		}, t * 1000);
 	}
 	if (x.trim()) {
@@ -28,12 +28,10 @@ function statusToggle() {
 	statusBig = !statusBig;
 	if (statusBig) {
 		statusbar.parentNode.classList.add('bigger');
-		console.log('toggle >big');
-
 		statusbar.innerHTML = statusLog.join('<br />');
 	} else {
 		statusbar.parentNode.classList.remove('bigger');
-		statusbar.innerHTML = '';
+		statusbar.innerHTML = '&nbsp;';
 	}
 }
 
