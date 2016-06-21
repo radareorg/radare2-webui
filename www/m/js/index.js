@@ -107,14 +107,14 @@ function analyze() {
 		panelDisasm();
 	});
 }
-
 function uiCheckList(grp, id, label) {
 	return '<li> <label for="' + grp + '" class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect"> <input type="checkbox" id="' + id + '" class="mdl-checkbox__input" /><span class="mdl-checkbox__label">' + label + '</span> </label> </li>';
 }
 
 function notes() {
-	var c = document.getElementById('content');
-	document.getElementById('title').innerHTML = 'Notes';
+	var widget = widgetContainer.getWidget('Notes');
+	var dom = widgetContainer.getWidgetDOMWrapper(widget);
+
 	var out = '<br />' + uiButton('javascript:panelComments()', '&lt; Comments');
 	out += '<br /><br /><textarea rows=32 style="width:100%"></textarea>';
 	c.innerHTML = out;
@@ -159,8 +159,10 @@ function setNullFlagspace(fs) {
 
 /* rename to panelFlagSpaces */
 function flagspaces() {
-	var c = document.getElementById('content');
-	document.getElementById('title').innerHTML = 'Flag Spaces';
+
+	var widget = widgetContainer.getWidget('Flag Spaces');
+	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
 	c.innerHTML = '<br />&nbsp;' + uiRoundButton('javascript:panelFlags()', 'undo');
 	c.innerHTML += '&nbsp;' + uiButton('javascript:setNullFlagspace()', 'Deselect');
 	c.innerHTML += '&nbsp;' + uiButton('javascript:setFlagspace()', 'Add');
@@ -350,8 +352,9 @@ function uiBlock(d) {
 function panelSettings() {
 	update = panelSettings;
 	var out = '';
-	document.getElementById('title').innerHTML = 'Settings';
-	var c = document.getElementById('content');
+
+	var widget = widgetContainer.getWidget('Settings');
+	var c = widgetContainer.getWidgetDOMWrapper(widget);
 
 	c.style.backgroundColor = '#f0f0f0';
 	out += '<div style=\'margin:10px\'>';
@@ -476,8 +479,14 @@ function panelSettings() {
 
 function printHeaderPanel(title, cmd, grep) {
 	update = panelFunctions;
-	document.getElementById('title').innerHTML = title;
-	var c = document.getElementById('content');
+
+	var widget = widgetContainer.getWidget(title);
+	var dom = widgetContainer.getWidgetDOMWrapper(widget);
+
+	var c = document.createElement('div');
+	dom.innerHTML = '';
+	dom.appendChild(c);
+
 	c.style.color = '#202020 !important';
 	c.style.backgroundColor = '#202020';
 	var out = '' ; //
@@ -552,8 +561,10 @@ function panelHeaders() {
 
 function panelFunctions() {
 	update = panelFunctions;
-	document.getElementById('title').innerHTML = 'Functions';
-	var c = document.getElementById('content');
+
+	var widget = widgetContainer.getWidget('Functions');
+	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
 	c.style.backgroundColor = '#f0f0f0';
 	var body = '<br />';
 	body += uiButton('javascript:analyzeSymbols()', 'Symbols');
@@ -620,8 +631,10 @@ function vSplit() {
 
 function panelConsole() {
 	update = panelConsole;
-	document.getElementById('title').innerHTML = 'Console';
-	var c = document.getElementById('content');
+
+	var widget = widgetContainer.getWidget('Console');
+	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
 	c.innerHTML = '<br />';
 	if (inColor) {
 		c.style.backgroundColor = '#202020';
@@ -725,8 +738,10 @@ function toggleScriptOutput() {
 
 function panelScript() {
 	update = panelScript;
-	document.getElementById('title').innerHTML = 'Script';
-	var c = document.getElementById('content');
+
+	var widget = widgetContainer.getWidget('Script');
+	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
 	c.style.backgroundColor = '#f0f0f0';
 	var localScript = localStorage.getItem('script');
 	var out = '<br />' + uiButton('javascript:runScript()', 'Run');
@@ -743,8 +758,10 @@ function panelScript() {
 
 function panelSearch() {
 	update = panelSearch;
-	document.getElementById('title').innerHTML = 'Search';
-	var c = document.getElementById('content');
+
+	var widget = widgetContainer.getWidget('Search');
+	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
 	c.style.backgroundColor = '#f0f0f0';
 	var out = '<br />';
 	out += '<input style=\'background-color:white !important;padding-left:10px;top:3.5em;height:1.8em;color:white\' onkeypress=\'searchKey()\' class=\'mdl-card--expand mdl-textfield__input\' id=\'search_input\'/>';
@@ -761,8 +778,10 @@ function panelSearch() {
 
 function panelFlags() {
 	update = panelFlags;
-	document.getElementById('title').innerHTML = 'Flags';
-	var c = document.getElementById('content');
+
+	var widget = widgetContainer.getWidget('Flags');
+	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
 	c.style.backgroundColor = '#f0f0f0';
 	c.innerHTML = '<br />';
 	c.innerHTML += uiButton('javascript:flagspaces()', 'Spaces');
@@ -787,8 +806,10 @@ function panelFlags() {
 
 function panelComments() {
 	update = panelComments;
-	document.getElementById('title').innerHTML = 'Comments';
-	var c = document.getElementById('content');
+
+	var widget = widgetContainer.getWidget('Comments');
+	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
 	c.style.backgroundColor = '#f0f0f0';
 	c.innerHTML = '<br />';
 	c.innerHTML += uiButton('javascript:notes()', 'Notes');
@@ -820,11 +841,12 @@ function down() {
 }
 
 function panelHexdump() {
-	document.getElementById('content').scrollTop = 0;
 	update = panelHexdump;
 	lastView = panelHexdump;
-	var c = document.getElementById('content');
-	document.getElementById('title').innerHTML = 'Hexdump';
+
+	var widget = widgetContainer.getWidget('Hexdump');
+	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
 	if (inColor) {
 		c.style.backgroundColor = '#202020';
 	}
@@ -856,38 +878,41 @@ function uiRoundButton(a, b, c) {
 }
 
 function panelDisasm() {
-	document.getElementById('content').scrollTop = 0;
 	update = panelDisasm;
 	lastView = panelDisasm;
-	var c = document.getElementById('content');
-	document.getElementById('title').innerHTML = 'Disassembly';
+
+	var widget = widgetContainer.getWidget('Disassembly');
+	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
 	if (inColor) {
 		c.style.backgroundColor = '#202020';
 	}
 	var out = '<div style=\'position:fixed;margin:0.5em\'>';
-	/*
-	    	out += uiRoundButton('javascript:up()', 'keyboard_arrow_up');
-	    	out += uiRoundButton('javascript:down()', 'keyboard_arrow_down');
-	    	out += '&nbsp;';
-*/
+	out += uiRoundButton('javascript:up()', 'keyboard_arrow_up');
+	out += uiRoundButton('javascript:down()', 'keyboard_arrow_down');
+	out += '&nbsp;';
 	out += uiButton('javascript:analyze()', 'ANLZ');
 	out += uiButton('javascript:comment()', 'CMNT');
 	out += uiButton('javascript:info()', 'Info');
 	out += uiButton('javascript:rename()', 'RNME');
 	out += uiButton('javascript:write()', 'Wrte');
 	out += '</div><br /><br /><br />';
+
 	c.innerHTML = out;
 	c.style['font-size'] = '12px';
-	c.style.overflow = 'scroll';
 	var tail = '';
 	if (inColor) {
 		tail = '@e:scr.color=1,scr.html=1';
 	}
+
 	r2.cmd('pd 128' + tail, function(d) {
 		var dis = clickableOffsets(d);
-		c.innerHTML += '<center>' + uiRoundButton('javascript:up()', 'keyboard_arrow_up') + uiRoundButton('javascript:down()', 'keyboard_arrow_down') + '</center>';
-		c.innerHTML += '<pre style=\'color:grey\'>' + dis + '<pre>';
-		c.innerHTML += '<center>' + uiRoundButton('javascript:down()', 'keyboard_arrow_down') + '</center><br /><br />';
+		ret = '';
+		ret += '<center>' + uiRoundButton('javascript:up()', 'keyboard_arrow_up') + uiRoundButton('javascript:down()', 'keyboard_arrow_down') + '</center>';
+		ret += '<pre style=\'color:grey\'>' + dis + '<pre>';
+		ret += '<center>' + uiRoundButton('javascript:down()', 'keyboard_arrow_down') + '</center><br /><br />';
+
+		c.innerHTML += ret;
 	});
 }
 
@@ -928,11 +953,13 @@ function panelDebug() {
 	r2.cmd('e cfg.debug', function(x) {
 		nativeDebugger = (x.trim() == 'true');
 	});
-	document.getElementById('content').scrollTop = 0;
+
 	update = panelDebug;
 	lastView = panelDebug;
-	var c = document.getElementById('content');
-	document.getElementById('title').innerHTML = 'Debugger';
+
+	var widget = widgetContainer.getWidget('Debugger');
+	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
 	if (inColor) {
 		c.style.backgroundColor = '#202020';
 	}
@@ -989,9 +1016,10 @@ function rename() {
 	}
 }
 function info() {
-	var c = document.getElementById('content');
+	var widget = widgetContainer.getWidget('Info');
+	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
 	var color = inColor ? 'white' : 'black';
-	document.getElementById('title').innerHTML = 'Info';
 	var out = '<br />'; //Version: "+d;
 	out += uiRoundButton('javascript:panelDisasm()', 'undo');
 	out += '&nbsp;';
@@ -1007,8 +1035,9 @@ function info() {
 }
 
 function blocks() {
-	document.getElementById('title').innerHTML = 'Blocks';
-	var c = document.getElementById('content');
+	var widget = widgetContainer.getWidget('Blocks');
+	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
 	c.style['overflow'] = 'none';
 	var color = inColor ? 'white' : 'black';
 	c.innerHTML = '<br />';
@@ -1020,8 +1049,9 @@ function blocks() {
 }
 
 function pdtext() {
-	document.getElementById('title').innerHTML = 'Function';
-	var c = document.getElementById('content');
+	var widget = widgetContainer.getWidget('Function');
+	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
 	c.style['overflow'] = 'none';
 	var color = inColor ? 'white' : 'black';
 	c.innerHTML = '<br />';
@@ -1034,8 +1064,9 @@ function pdtext() {
 }
 
 function pdf() {
-	document.getElementById('title').innerHTML = 'Function';
-	var c = document.getElementById('content');
+	var widget = widgetContainer.getWidget('Function');
+	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
 	c.style['overflow'] = 'none';
 	var color = inColor ? 'white' : 'black';
 	c.innerHTML = '<br />';
@@ -1047,8 +1078,9 @@ function pdf() {
 }
 
 function decompile() {
-	document.getElementById('title').innerHTML = 'Decompile';
-	var c = document.getElementById('content');
+	var widget = widgetContainer.getWidget('Decompile');
+	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
 	c.style['overflow'] = 'none';
 	var color = inColor ? 'white' : 'black';
 	c.innerHTML = '<br />';
@@ -1060,8 +1092,9 @@ function decompile() {
 }
 
 function graph() {
-	document.getElementById('title').innerHTML = 'Graph';
-	var c = document.getElementById('content');
+	var widget = widgetContainer.getWidget('Graph');
+	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
 	c.style['overflow'] = 'auto';
 	var color = inColor ? 'white' : 'black';
 	c.innerHTML = '<br />&nbsp;<a href="javascript:panelDisasm()" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--accent mdl-color-text--accent-contrast">&lt; INFO</a>';
@@ -1208,6 +1241,7 @@ function analyzeButton() {
 }
 
 var twice = false;
+var widgetContainer = undefined;
 function ready() {
 	if (twice) {
 		return;
@@ -1254,6 +1288,13 @@ function ready() {
 		document.querySelector('.mdl-layout__obfuscator').classList.remove('is-visible');
 		this.classList.remove('is-visible');
 	}, false);
+
+	// Define Widget container
+	widgetContainer = new ContainerZone('content', 'ruler', 'title');
+
+	// Defining default situation
+	var overviewWidget = new Widget('Overview', 'overviewWidget');
+	widgetContainer.add(overviewWidget);
 }
 window.onload = ready;
 
