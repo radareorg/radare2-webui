@@ -317,3 +317,6 @@ select {
   padding:3px;
 }
 
+.clickable {
+  cursor: pointer;
+}
