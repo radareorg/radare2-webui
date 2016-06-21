@@ -37,7 +37,6 @@ function statusToggle() {
 
 function statusInitialize() {
 	var statusbar = document.getElementById('statusbar');
-	console.log(statusbar.parentNode);
 	statusbar.parentNode.addEventListener('click', function() {
 		statusToggle();
 	});
