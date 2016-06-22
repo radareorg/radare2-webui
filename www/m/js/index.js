@@ -837,7 +837,7 @@ function panelHexdump() {
 	out += '</div><br /><br /><br />';
 	c.innerHTML = out;
 	var tail = inColor ? '@e:scr.color=1,scr.html=1' : '';
-	r2.cmd('pxa' + tail, function(d) {
+	r2.cmd('pxa 4096' + tail, function(d) {
 		var color = inColor ? 'white' : 'black';
 		d = clickableOffsets(d);
 		var pre = '<div><center>' + uiRoundButton('javascript:up()', 'keyboard_arrow_up');
