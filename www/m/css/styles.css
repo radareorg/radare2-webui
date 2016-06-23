@@ -293,49 +293,48 @@ select {
 }
 
 .statusbar {
-  padding:0 !important;
   position:absolute;
-  width:100%;
-  bottom: 0px;
-  background-color: #c0c0c0;
-  font-family: "DejaVu Sans Mono", Console, Courier New, monospace;
   z-index:100;
+  display:block;
+  bottom:0;
+  right:0;
+  left:240px;
+
+  padding:0 !important;
+
+  background-color: #303030;
+  font-family: "DejaVu Sans Mono", Console, Courier New, monospace;
   height: 2em;
-  bottom: 0px;
-}
 
-.statusbar:hover {
-  cursor: pointer;
-  bottom: 0px;
-}
-
-.statusbar.half > div {
-  position:absolute;
-  background-color: #303030;
-  height: 20em;
-  bottom: 0px;
-}
-
-.statusbar.full > div {
-  position:absolute;
-  height: 90vh;
-  background-color: #303030;
-  bottom: 0px;
-}
-
-@media screen and (min-width: 1024px) {
-  .statusbar {
-    margin-left: 240px;
-    bottom: 0px;
-  }
+  overflow-y: auto;
 }
 
 #statusbar {
-  width:100%;
-  padding:3px;
-  margin:0px;
-  border:0px;
-  bottom: 0px;
+  line-height:2em;
+}
+
+#content {
+  margin-bottom:2em;
+}
+
+#content.sbIsHalf {
+  margin-bottom:30vh;
+}
+
+#content.sbIsFull {
+  margin-bottom:90vh;
+}
+
+.statusbar.small {
+  cursor: pointer;
+}
+
+.statusbar.half {
+  height: 30vh;
+}
+
+.statusbar.full {
+  height: 90vh;
 }
 
 .clickable {
