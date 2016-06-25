@@ -12,7 +12,7 @@ var statusMode = Mode.LINE;
 var statusTimeout = null;
 
 function getStatusbarBody() {
-	var msg = '<div class>';
+	var msg = '<div>';
 	msg += '<a href="javascript:statusToggle()">[v]</a>&nbsp;';
 	msg += '<a href="javascript:statusFullscreen()">[^]</a>&nbsp;';
 	msg += '<a href="javascript:statusFullscreen()">[$]</a>';
@@ -44,47 +44,55 @@ function statusMessage(x, t) {
 
 function statusToggle() {
 	var statusbar = document.getElementById('statusbar');
+	var container = document.getElementById('content');
 	if (statusMode == Mode.HALF) {
 		statusMode = Mode.LINE;
-		statusbar.style.overflow = 'hidden';
 		statusbar.innerHTML = '&nbsp;';
 		try {
 			statusbar.parentNode.classList.remove('half');
 			statusbar.parentNode.classList.remove('full');
+
+			container.classList.remove('sbIsHalf');
+			container.classList.remove('sbIsFull');
 		} catch (e) {
 		}
 	} else {
 		statusbar.innerHTML = getStatusbarBody();
-		statusbar.style.overflow = 'scroll';
 		statusMode = Mode.HALF;
 		try {
 			statusbar.parentNode.classList.remove('full');
+			container.classList.remove('sbIsFull');
+
 		} catch (e) {
 		}
 		statusbar.parentNode.classList.add('half');
+		container.classList.add('sbIsHalf');
 	}
 }
 
 function statusFullscreen() {
 	var statusbar = document.getElementById('statusbar');
+	var container = document.getElementById('content');
 	if (statusMode == Mode.FULL) {
-		statusbar.style.overflow = 'scroll';
 		statusMode = Mode.HALF;
 		try {
 			statusbar.parentNode.classList.remove('full');
+			container.classList.remove('sbIsFull');
 		} catch (e) {
 		}
 		statusbar.parentNode.classList.add('half');
+		container.classList.add('sbIsHalf');
 	} else {
 		statusMode = Mode.FULL;
-		statusbar.style.overflow = 'scroll';
 		statusbar.innerHTML = getStatusbarBody();
 		try {
 			statusbar.parentNode.classList.remove('half');
+			container.classList.remove('sbIsHalf');
 		} catch (e) {
 			/* do nothing */
 		}
 		statusbar.parentNode.classList.add('full');
+		container.classList.add('sbIsFull');
 	}
 }
 
@@ -100,3 +108,4 @@ function statusInitialize() {
 }
 
 statusInitialize();
+
