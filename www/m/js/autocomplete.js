@@ -152,6 +152,7 @@ Autocompletion.prototype.valid = function() {
 		return;
 	}
 	this.form_.blur();
+	this.prepareView();
 	return seek(this.completions_[this.activeChoice_].name);
 };
 
@@ -197,4 +198,18 @@ Autocompletion.prototype.keyHandler = function(e) {
 	} else {
 		this.hide();
 	}
+};
+
+Autocompletion.prototype.setPrepareView = function(callback) {
+	this.preparationCallback = callback;
+};
+
+/**
+ * Prepare view to show the result
+ */
+Autocompletion.prototype.prepareView = function() {
+	if (typeof this.preparationCallback === 'undefined') {
+		return;
+	}
+	this.preparationCallback();
 };

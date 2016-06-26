@@ -36,7 +36,7 @@ gulp.task('jscs', function() {
 });
 
 gulp.task('js', ['jscs'], function() {
-	gulp.src('./js/*.js')
+	gulp.src(['./js/*.js', './js/widgets/*.js'])
 		//.pipe(uglify())
 		.pipe(concat('index.js'))
 		.pipe(gulp.dest(DEST))
@@ -98,5 +98,5 @@ gulp.task('watch', ['default'] , function() {
 	livereload.listen();
 	gulp.watch('./*.html', ['html']);
 	gulp.watch('./css/*.css', ['css']);
-	gulp.watch('./js/*.js', ['js']);
+	gulp.watch(['./js/*.js', './js/**/*.js'], ['js']);
 });

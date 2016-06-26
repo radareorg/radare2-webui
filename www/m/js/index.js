@@ -151,7 +151,7 @@ function delAllFlags() {
 }
 
 function setNullFlagspace(fs) {
-	var update = fs ? panelFlags : flagspaces;
+	updates.registerMethod(widgetContainer.getFocus(), fs ? panelFlags : flagspaces);
 	r2.cmd('fs *', function() {
 		flagspaces();
 	});
@@ -162,6 +162,8 @@ function flagspaces() {
 
 	var widget = widgetContainer.getWidget('Flag Spaces');
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
+	updates.registerMethod(widget.getOffset(), flagspaces);
 
 	c.innerHTML = '<br />&nbsp;' + uiRoundButton('javascript:panelFlags()', 'undo');
 	c.innerHTML += '&nbsp;' + uiButton('javascript:setNullFlagspace()', 'Deselect');
@@ -350,11 +352,12 @@ function uiBlock(d) {
 }
 
 function panelSettings() {
-	update = panelSettings;
 	var out = '';
 
 	var widget = widgetContainer.getWidget('Settings');
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
+	updates.registerMethod(widget.getOffset(), panelSettings);
 
 	c.style.backgroundColor = '#f0f0f0';
 	out += '<div style=\'margin:10px\'>';
@@ -478,10 +481,12 @@ function panelSettings() {
 }
 
 function printHeaderPanel(title, cmd, grep) {
-	update = panelFunctions;
-
 	var widget = widgetContainer.getWidget(title);
+	widget.setDark();
 	var dom = widgetContainer.getWidgetDOMWrapper(widget);
+
+	// TODO, warning? panelFunction // printHeaderPanel (not a complete widget)
+	updates.registerMethod(widget.getOffset(), panelFunctions);
 
 	var c = document.createElement('div');
 	dom.innerHTML = '';
@@ -560,10 +565,11 @@ function panelHeaders() {
 }
 
 function panelFunctions() {
-	update = panelFunctions;
-
 	var widget = widgetContainer.getWidget('Functions');
+	widget.setDark();
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
+	updates.registerMethod(widget.getOffset(), panelFunctions);
 
 	c.style.backgroundColor = '#f0f0f0';
 	var body = '<br />';
@@ -630,10 +636,10 @@ function vSplit() {
 }
 
 function panelConsole() {
-	update = panelConsole;
-
 	var widget = widgetContainer.getWidget('Console');
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
+	updates.registerMethod(widget.getOffset(), panelConsole);
 
 	c.innerHTML = '<br />';
 	if (inColor) {
@@ -737,10 +743,10 @@ function toggleScriptOutput() {
 }
 
 function panelScript() {
-	update = panelScript;
-
 	var widget = widgetContainer.getWidget('Script');
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
+	updates.registerMethod(widget.getOffset(), panelScript);
 
 	c.style.backgroundColor = '#f0f0f0';
 	var localScript = localStorage.getItem('script');
@@ -757,10 +763,10 @@ function panelScript() {
 }
 
 function panelSearch() {
-	update = panelSearch;
-
 	var widget = widgetContainer.getWidget('Search');
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
+	updates.registerMethod(widget.getOffset(), panelSearch);
 
 	c.style.backgroundColor = '#f0f0f0';
 	var out = '<br />';
@@ -777,10 +783,10 @@ function panelSearch() {
 }
 
 function panelFlags() {
-	update = panelFlags;
-
 	var widget = widgetContainer.getWidget('Flags');
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
+	updates.registerMethod(widget.getOffset(), panelFlags);
 
 	c.style.backgroundColor = '#f0f0f0';
 	c.innerHTML = '<br />';
@@ -805,10 +811,10 @@ function panelFlags() {
 }
 
 function panelComments() {
-	update = panelComments;
-
 	var widget = widgetContainer.getWidget('Comments');
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
+	updates.registerMethod(widget.getOffset(), panelComments);
 
 	c.style.backgroundColor = '#f0f0f0';
 	c.innerHTML = '<br />';
@@ -841,11 +847,11 @@ function down() {
 }
 
 function panelHexdump() {
-	update = panelHexdump;
-	lastView = panelHexdump;
-
 	var widget = widgetContainer.getWidget('Hexdump');
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
+	updates.registerMethod(widget.getOffset(), panelHexdump);
+	lastViews.registerMethod(widget.getOffset(), panelHexdump);
 
 	if (inColor) {
 		c.style.backgroundColor = '#202020';
@@ -878,11 +884,11 @@ function uiRoundButton(a, b, c) {
 }
 
 function panelDisasm() {
-	update = panelDisasm;
-	lastView = panelDisasm;
-
 	var widget = widgetContainer.getWidget('Disassembly');
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
+	updates.registerMethod(widget.getOffset(), panelDisasm);
+	lastViews.registerMethod(widget.getOffset(), panelDisasm);
 
 	if (inColor) {
 		c.style.backgroundColor = '#202020';
@@ -954,11 +960,11 @@ function panelDebug() {
 		nativeDebugger = (x.trim() == 'true');
 	});
 
-	update = panelDebug;
-	lastView = panelDebug;
-
 	var widget = widgetContainer.getWidget('Debugger');
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
+
+	updates.registerMethod(widget.getOffset(), panelDebug);
+	lastViews.registerMethod(widget.getOffset(), panelDebug);
 
 	if (inColor) {
 		c.style.backgroundColor = '#202020';
@@ -1017,6 +1023,7 @@ function rename() {
 }
 function info() {
 	var widget = widgetContainer.getWidget('Info');
+	widget.setDark();
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
 
 	var color = inColor ? 'white' : 'black';
@@ -1093,6 +1100,7 @@ function decompile() {
 
 function graph() {
 	var widget = widgetContainer.getWidget('Graph');
+	widget.setDark();
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
 
 	c.style['overflow'] = 'auto';
@@ -1207,8 +1215,6 @@ function onClick(a, b) {
 	}
 }
 
-updateInfo();
-
 function panelHelp() {
 	alert('TODO');
 }
@@ -1242,17 +1248,38 @@ function analyzeButton() {
 
 var twice = false;
 var widgetContainer = undefined;
+var updates = undefined;
+var lastViews = undefined;
 function ready() {
 	if (twice) {
 		return;
 	}
 	twice = true;
-	updateFortune();
-	updateInfo();
-	updateEntropy();
+
+
+	updates = new UpdateManager();
+	lastViews = new UpdateManager();
+
+	// Define Widget container
+	widgetContainer = new ContainerZone('content', 'ruler', 'title');
+	widgetContainer.fallbackWidget(panelDisasm);
+	widgetContainer.addFocusListener(updates);
+	widgetContainer.addFocusListener(lastViews);
+
+	update = function() {
+		updates.apply();
+	};
+
+	lastView = function() {
+		lastViews.apply();
+	};
+
+	// Defining default situation
+	panelOverview();
 
 	/* left menu */
 	onClick('analyze_button', analyzeButton);
+	onClick('menu_overview', panelOverview);
 	onClick('menu_headers', panelHeaders);
 	onClick('info_headers', panelHeaders);
 	onClick('menu_disasm', panelDisasm);
@@ -1281,20 +1308,20 @@ function ready() {
 	});
 
 	// Set autocompletion
-	new Autocompletion('search', 'search_autocomplete', 'fs *;fj');
+	var autocompletion = new Autocompletion('search', 'search_autocomplete', 'fs *;fj');
+	autocompletion.setPrepareView(function() {
+		// If not splitted we split the view
+		if (!widgetContainer.isSplitted()) {
+			widgetContainer.split(widgetContainer.Layout.VERTICAL);
+		}
+		panelDisasm();
+	});
 
 	// Close the drawer on click with small screens
 	document.querySelector('.mdl-layout__drawer').addEventListener('click', function () {
 		document.querySelector('.mdl-layout__obfuscator').classList.remove('is-visible');
 		this.classList.remove('is-visible');
 	}, false);
-
-	// Define Widget container
-	widgetContainer = new ContainerZone('content', 'ruler', 'title');
-
-	// Defining default situation
-	var overviewWidget = new Widget('Overview', 'overviewWidget');
-	widgetContainer.add(overviewWidget);
 }
 window.onload = ready;
 

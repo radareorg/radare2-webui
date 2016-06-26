@@ -6,7 +6,7 @@
 
 .rwidget {
 	height:100%;
-	overflow:scroll;
+	overflow:auto;
 	box-sizing: border-box;
 }
 
