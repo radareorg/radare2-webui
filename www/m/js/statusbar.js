@@ -44,7 +44,7 @@ function statusMessage(x, t) {
 
 function statusToggle() {
 	var statusbar = document.getElementById('statusbar');
-	var container = document.getElementById('content');
+	var container = document.getElementById('container');
 	if (statusMode == Mode.HALF) {
 		statusMode = Mode.LINE;
 		statusbar.innerHTML = '&nbsp;';
@@ -72,7 +72,7 @@ function statusToggle() {
 
 function statusFullscreen() {
 	var statusbar = document.getElementById('statusbar');
-	var container = document.getElementById('content');
+	var container = document.getElementById('container');
 	if (statusMode == Mode.FULL) {
 		statusMode = Mode.HALF;
 		try {

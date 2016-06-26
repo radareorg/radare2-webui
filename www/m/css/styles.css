@@ -313,15 +313,15 @@ select {
   line-height:2em;
 }
 
-#content {
+#container {
   margin-bottom:2em;
 }
 
-#content.sbIsHalf {
+#container.sbIsHalf {
   margin-bottom:30vh;
 }
 
-#content.sbIsFull {
+#container.sbIsFull {
   margin-bottom:90vh;
 }
 
