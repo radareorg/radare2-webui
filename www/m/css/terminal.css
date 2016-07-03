@@ -1,0 +1,34 @@
+.terminal {
+	left: 5;
+	right: 5;
+	width:100%;
+	border-radius: 10px;
+	background-color:black;
+	font-family: monospace;
+	color:white;
+}
+
+.terminal_output {
+	border-radius: 10px;
+	overflow:scroll;
+	width: 100%;
+	font-family: monospace;
+	color: white;
+	white-space: pre-wrap;
+	padding-bottom: 1em;
+}
+
+.terminal_prompt {
+	overflow:hidden;
+}
+
+.terminal_input {
+	border: none;
+	position:fixed;
+	bottom: 2em;
+	color: white;
+	background: black;
+	width:100%;
+	overflow:hidden;
+	font-family: monospace;
+}

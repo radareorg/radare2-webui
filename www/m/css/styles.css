@@ -282,30 +282,29 @@ td {
   display: inline-block;
 }
 
-select {
-  -webkit-appearance:none;
-  height: 2.3em;
-  margin: 0.3em;
-  background-color: #3199FF;
-  padding-left: 16px;
-  padding-right: 16px;
-  border: 10px;
+
+.statusbar_title {
+  position:fixed;
+  bottom: 0px;
+  height: 1.4em;
+  width:100%;
+  text-align:left;
 }
 
 .statusbar {
   position:absolute;
+  border-top: 2px solid green;
   z-index:100;
   display:block;
   bottom:0;
   right:0;
-  left:240px;
+  left:0px;
 
   padding:0 !important;
 
   background-color: #303030;
   font-family: "DejaVu Sans Mono", Console, Courier New, monospace;
   height: 2em;
-
   overflow-y: auto;
 }
 
@@ -318,11 +317,11 @@ select {
 }
 
 #container.sbIsHalf {
-  margin-bottom:30vh;
+  margin-bottom:50vh;
 }
 
 #container.sbIsFull {
-  margin-bottom:90vh;
+  margin-bottom:120vh;
 }
 
 .statusbar.small {
@@ -330,13 +329,17 @@ select {
 }
 
 .statusbar.half {
-  height: 30vh;
+  height: 40vh;
 }
 
 .statusbar.full {
-  height: 90vh;
+  height: 100vh;
 }
 
 .clickable {
   cursor: pointer;
+}
+
+.hoverable:hover {
+  z-index: 999999;
 }
