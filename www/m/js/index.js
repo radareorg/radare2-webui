@@ -265,7 +265,9 @@ function configATT() {
 }
 
 function panelAbout() {
-	alert('radare2 material webui\n by --pancake @ 2015');
+	r2.cmd('?V', function(version) {
+		alert('radare2 material webui by --pancake @ 2015-2016\n\n'+version.trim());
+	});
 }
 
 function configColorDefault() {
@@ -1132,7 +1134,34 @@ Array.prototype.forEach.call(document.querySelectorAll('.mdl-card__media'), func
 function updateFortune() {
 	r2.cmd('fo', function(d) {
 		document.getElementById('fortune').innerHTML = d;
+		readFortune();
 	});
+}
+
+// say a message
+function speak(text, callback) {
+    var u = new SpeechSynthesisUtterance();
+    u.text = text;
+    u.lang = 'en-US';
+ 
+    u.onend = function () {
+        if (callback) {
+            callback();
+        }
+    };
+ 
+    u.onerror = function (e) {
+        if (callback) {
+            callback(e);
+        }
+    };
+ 
+    speechSynthesis.speak(u);
+}
+
+function readFortune() {
+	var f = document.getElementById('fortune').innerHTML;
+	speak (f);
 }
 
 function updateInfo() {
@@ -1256,7 +1285,6 @@ function ready() {
 	}
 	twice = true;
 
-
 	updates = new UpdateManager();
 	lastViews = new UpdateManager();
 
@@ -1323,6 +1351,7 @@ function ready() {
 		this.classList.remove('is-visible');
 	}, false);
 }
+
 window.onload = ready;
 
 document.addEventListener('DOMContentLoaded', ready, false);
@@ -1350,3 +1379,12 @@ document.body.onkeypress = function(e) {
 		}
 	}
 };
+
+/* global keybindings are dangerous */
+/*
+document.body.onkeypress = function(e){
+	if (e.keyCode == ':'.charCodeAt(0)) {
+		statusConsole();
+	}
+}
+*/
