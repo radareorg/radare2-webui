@@ -293,7 +293,7 @@ td {
 
 .statusbar {
   position:absolute;
-  border-top: 2px solid green;
+  border-top: 5px solid green;
   z-index:100;
   display:block;
   bottom:0;
@@ -317,11 +317,11 @@ td {
 }
 
 #container.sbIsHalf {
-  margin-bottom:50vh;
+  margin-bottom:30vh;
 }
 
 #container.sbIsFull {
-  margin-bottom:120vh;
+  margin-bottom:90vh;
 }
 
 .statusbar.small {
@@ -329,7 +329,7 @@ td {
 }
 
 .statusbar.half {
-  height: 40vh;
+  height: 30vh;
 }
 
 .statusbar.full {
@@ -342,4 +342,25 @@ td {
 
 .hoverable:hover {
   z-index: 999999;
+}
+
+.toproundbutton {
+	z-index: 2000 !important;
+	font-weight:bold !important;
+	position:fixed !important;
+	bottom:15px !important;
+opacity:1;
+	right: 15px;
+	color: white !important;
+	background-color:#30a030!important;
+}
+
+mdl-select {
+  -webkit-appearance:none;
+  height: 2.3em;
+  margin: 0.3em;
+  background-color: #3199FF;
+  padding-left: 16px;
+  padding-right: 16px;
+  border: 10px;
 }

@@ -43,7 +43,15 @@ function setStatusbarBody() {
 		doc.id = 'tab_logs';
 		var msg = statusLog.join('<br />');
 		doc.appendChild (parser.parseFromString(msg, "text/xml").documentElement);
-		return doc; //break;
+		var statusbar = document.getElementById('statusbar_body');
+		try {
+		statusbar.parentNode.insertBefore (doc, statusbar);
+		} catch (e ){
+		//	statusbar.appendChild(doc);
+		}
+		console.log(statusbar);
+		// return doc; //break;
+		return;
 	case Tab.CONSOLE:
 		var doc = document.createElement('div');
 		doc.id = 'tab_terminal';
@@ -55,6 +63,7 @@ function setStatusbarBody() {
 		break;
 	}
 	if (doc !== undefined) {
+		/* initialize terminal if needed */
 		var statusbar = document.getElementById('statusbar');
 		var terminal = document.getElementById('terminal');
 		if (!terminal) {
@@ -97,7 +106,6 @@ function statusToggle() {
 		try {
 			statusbar.parentNode.classList.remove('half');
 			statusbar.parentNode.classList.remove('full');
-
 			container.classList.remove('sbIsHalf');
 			container.classList.remove('sbIsFull');
 		} catch (e) {
@@ -116,7 +124,61 @@ function statusToggle() {
 	}
 }
 
+function statusNext() {
+	var statusbar = document.getElementById('statusbar');
+	var container = document.getElementById('container');
+	switch (statusMode) {
+	case Mode.LINE:
+		statusMode = Mode.HALF;
+		try {
+			statusbar.parentNode.classList.remove('full');
+			container.classList.remove('sbIsFull');
+		} catch (e) {
+		}
+		statusbar.parentNode.classList.add('half');
+		container.classList.add('sbIsHalf');
+		break;
+	case Mode.HALF:
+		statusMode = Mode.FULL;
+		statusbar.parentNode.classList.add('full');
+		container.classList.add('sbIsFull');
+		/* do not clear the terminal */
+		return;
+		break;
+	case Mode.FULL:
+		statusMode = Mode.LINE;
+		statusTab = Tab.LOGS;
+		statusbar.innerHTML = '';
+		try {
+			var statusbar = document.getElementById('statusbar');
+			var container = document.getElementById('container');
+			statusbar.parentNode.classList.remove('half');
+			statusbar.parentNode.classList.remove('full');
+			container.classList.remove('sbIsHalf');
+			container.classList.remove('sbIsFull');
+		} catch (e) {
+		}
+		break;
+	}
+	setStatusbarBody();
+}
+
 function statusConsole() {
+	var statusbar = document.getElementById('statusbar');
+	var container = document.getElementById('container');
+	if (statusMode === Mode.LINE) {
+		statusMode = Mode.HALF;
+		try {
+			statusbar.parentNode.classList.remove('full');
+			container.classList.remove('sbIsFull');
+		} catch (e) {
+		}
+		try {
+			statusbar.parentNode.classList.add('half');
+			container.classList.add('sbIsHalf');
+		} catch (e) {
+		}
+	}
 	if (statusTab == Tab.CONSOLE) {
 		statusTab = Tab.LOGS;
 
@@ -160,6 +222,7 @@ function addButton(label, callback) {
 }
 
 function initializeStatusbarTitle() {
+return;
 	var title = document.getElementById('statusbar_title');
 	var div = document.createElement('div');
 	title.class = 'statusbar_title';
@@ -220,9 +283,9 @@ function terminal_ready() {
 	}
 	input.focus();
 	input.onkeypress = function(e){
-	    if (e.keyCode == 13) {
-		submit(input.value);
-	    }
+		if (e.keyCode == 13) {
+			submit(input.value);
+		}
 	}
 }
 
