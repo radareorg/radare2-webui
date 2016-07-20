@@ -1,0 +1,156 @@
+.hexdump {
+	position:absolute;
+	left:0;
+	right:0;
+	background-color: rgb(32, 32, 32);
+	color: white;
+	overflow: hidden !important;
+}
+
+.hexControls {
+	position:absolute;
+	top:0;
+	height:50px;
+	width:100%;
+	border-bottom:1px dotted white;
+	background:white;
+	color:black;
+}
+
+.hexControls ul.controlList {
+	margin:0;
+	padding:0;
+	list-style-type: none;
+}
+
+.hexControls ul.controlList li {
+	padding:0;
+	display:inline-block;
+	width:22%;
+	height:40px;
+	padding-top:10px;
+	margin-left:3%;
+}
+
+.hexContent {
+	position:absolute;
+	bottom:0;
+	top:50px;
+	width:100%;
+
+	font-family: "DejaVu Sans Mono", Console, Courier New, monospace;
+	overflow:auto;
+}
+
+ul.offset, ul.hexpairs, ul.ascii  {
+	margin:0;
+	padding:0;
+	display: inline-block;
+	list-style-type: none;
+}
+
+ul.offset {
+	width:120px;
+	text-align:right;
+	margin-right:10px;
+}
+
+ul.hexpairs {
+	text-align:center;
+	min-width:400px;
+}
+
+ul.ascii {
+	margin-left:10px;
+}
+
+ul.hexpairs li input, ul.ascii li input {
+	border:1px dashed white;
+	background:rgba(255,255,255,0.33) !important;
+	color:white !important;
+	font-size:inherit;
+	font-family:inherit;
+	width:18px;
+	text-align:center;
+}
+
+ul.offset li, ul.hexpairs li, ul.ascii li  {
+	display:inline;
+	line-height: inherit;
+	border:1px solid transparent;
+}
+
+ul.hexpairs li.modified, ul.ascii li.modified  {
+	background-color: rgba(255,255,255,0.4);
+}
+
+ul.hexpairs li.selected {
+	border-bottom:2px solid rgba(255,255,255,0.8);
+}
+
+ul.hexpairs li.active, ul.ascii li.active {
+	border:1px dotted white;
+}
+
+ul.hexpairs.pairs li:nth-child(2n)::after {
+	content: ' ';
+}
+
+ul.hexpairs.words li:nth-child(n)::after {
+	content: ' ';
+}
+
+nav.context-menu {
+	display: none;
+	position: absolute;
+	z-index: 10;
+	background: rgb(255,255,255);
+	margin: 0;
+	padding: 0;
+	border: none;
+	border-radius: 2px;
+	box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+nav.context-menu.active {
+	display: block;
+}
+
+nav.context-menu ul {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+
+nav.context-menu ul li {
+	display:block;
+	line-height:22px;
+	padding:5px 20px;
+	border-bottom:1px solid #E0E0E0;
+}
+
+
+nav.context-menu ul > li > ul {
+	display: none;
+	z-index: 10;
+	position: absolute;
+	background:white;
+	border-radius: 2px;
+	box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+nav.context-menu ul > li > ul > li {
+	line-height:18px;
+	font-size:85%;
+	padding:2px 10px;
+}
+
+nav.context-menu ul > li.subactive > ul {
+	display: block;
+	width:180px;
+}
+
+nav.context-menu ul li:hover, nav.context-menu ul > li.subactive > ul > li:hover {
+	background-color:#CCCCCC;
+	cursor:pointer;
+}

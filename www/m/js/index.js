@@ -848,35 +848,6 @@ function down() {
 	update();
 }
 
-function panelHexdump() {
-	var widget = widgetContainer.getWidget('Hexdump');
-	var c = widgetContainer.getWidgetDOMWrapper(widget);
-
-	updates.registerMethod(widget.getOffset(), panelHexdump);
-	lastViews.registerMethod(widget.getOffset(), panelHexdump);
-
-	if (inColor) {
-		c.style.backgroundColor = '#202020';
-	}
-	var out = '<div style=\'position:fixed;margin:0.5em\'>';
-	out += uiButton('javascript:comment()', 'Comment');
-	out += uiButton('javascript:write()', 'Write');
-	out += uiButton('javascript:flag()', 'Flag');
-	out += uiButton('javascript:flagsize()', 'Size');
-	out += uiButton('javascript:block()', 'Block');
-	out += '</div><br /><br /><br />';
-	c.innerHTML = out;
-	var tail = inColor ? '@e:scr.color=1,scr.html=1' : '';
-	r2.cmd('pxa 4096' + tail, function(d) {
-		var color = inColor ? 'white' : 'black';
-		d = clickableOffsets(d);
-		var pre = '<div><center>' + uiRoundButton('javascript:up()', 'keyboard_arrow_up');
-		pre += uiRoundButton('javascript:down()', 'keyboard_arrow_down') + '</center></div>';
-		var pos = '<div><center>' + uiRoundButton('javascript:down()', 'keyboard_arrow_down') + '</center></div>';
-		c.innerHTML += pre + '<pre style=\'color:' + color + '!important\'>' + d + '<pre>' + pos;
-	});
-}
-
 function uiRoundButton(a, b, c) {
 	var out = '';
 	out += '<button onclick=' + a + ' class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect" ' + c + '>';

@@ -25,7 +25,8 @@ gulp.task('dependencies', ['bower'], function() {
 		'./vendors/jquery/dist/jquery.min.js',
 		'./vendors/material-design-lite/material.min.js',
 		'./vendors/dialog-polyfill/dialog-polyfill.js',
-		'./vendors/datatables.net/js/jquery.dataTables.min.js'])
+		'./vendors/datatables.net/js/jquery.dataTables.min.js',
+		'./vendors/file-saver/FileSaver.min.js'])
 		.pipe(gulp.dest(DEST + 'vendors/'));
 });
 
@@ -36,9 +37,12 @@ gulp.task('jscs', function() {
 });
 
 gulp.task('js', ['jscs'], function() {
-	gulp.src(['./js/*.js', './js/widgets/*.js'])
+	gulp.src(['./js/*.js', './js/**/*.js'])
 		//.pipe(uglify())
 		.pipe(concat('index.js'))
+		.pipe(gulp.dest(DEST))
+		.pipe(livereload());
+	gulp.src(['./workers/*.js'])
 		.pipe(gulp.dest(DEST))
 		.pipe(livereload());
 });
@@ -98,5 +102,5 @@ gulp.task('watch', ['default'] , function() {
 	livereload.listen();
 	gulp.watch('./*.html', ['html']);
 	gulp.watch('./css/*.css', ['css']);
-	gulp.watch(['./js/*.js', './js/**/*.js'], ['js']);
+	gulp.watch(['./js/*.js', './js/**/*.js', './workers/*.js'], ['js']);
 });
