@@ -43,6 +43,7 @@ material (responsive) interface
 * [jQuery](https://jquery.com/) (MIT)
 * [dialog-polyfill](https://github.com/GoogleChrome/dialog-polyfill) (BSD)
 * [DataTables](https://datatables.net/) (MIT)
+* [FileSaver](https://github.com/eligrey/FileSaver.js) (MIT)
 
 panels (desktop) interface
 -----------

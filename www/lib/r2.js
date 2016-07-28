@@ -11,7 +11,7 @@ var prev_lastoff = 0;
 var hascmd = false;
 
 function isFirefoxOS() {
-	if (!locationbar.visible) {
+	if (typeof locationbar !== 'undefined' && !locationbar.visible) {
 		if (navigator.userAgent.indexOf('Firefox') > -1 && navigator.userAgent.indexOf('Mobile') > -1) {
 			return ('mozApps' in navigator);
 		}
