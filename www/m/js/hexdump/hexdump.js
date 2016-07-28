@@ -128,6 +128,15 @@ Hexdump.prototype.changeWritable = function() {
  * TODO: save DOM/Events when quitting widget to reload it faster
  */
 Hexdump.prototype.resetContainer = function(container) {
+	var r2Offset;
+	r2.cmd('s', function(offset) {
+		r2Offset = parseInt(offset, 16);
+	});
+
+	if (r2Offset !== this.initialOffset) {
+		this.refreshInitialOffset();
+	}
+
 	if (typeof this.nav !== 'undefined') {
 		this.nav.reset();
 	}

@@ -4,23 +4,29 @@
 Hexdump.prototype.drawContextualMenu = function() {
 	var _this = this;
 
-	var exportOp = function(range, command, ext) {
+	var exportOp = function(name, range, command, ext) {
 		var output;
 		r2.cmd(command + ' ' + (range.to - range.from) + ' @' + range.from, function(d) {
 			output = d;
 		});
 
-		var blob = new Blob([output], {type: 'text/plain'});
-		var fileName;
-		r2.cmdj('ij', function(d) {
-			fileName = basename(d.core.file);
+		var dialog = _this.createExportDialog('Export as ' + name + ':', output, function() {
+			var blob = new Blob([output], {type: 'text/plain'});
+			var fileName;
+			r2.cmdj('ij', function(d) {
+				fileName = basename(d.core.file);
+			});
+			fileName += '_0x' + range.from.toString(16) + '-0x' + range.to.toString(16) + '.' + ext;
+			saveAs(blob, fileName);
 		});
-		fileName += '_0x' + range.from.toString(16) + '-0x' + range.to.toString(16) + '.' + ext;
-		saveAs(blob, fileName);
+
+		document.body.appendChild(dialog);
+		componentHandler.upgradeDom();
+		dialog.showModal();
 	};
 
 	var exportAs = [
-		{ name: 'Assembly', fct: function(evt, range) { return exportOp(range, 'pca', 'asm'); } },
+		{ name: 'Assembly', fct: function(evt, range) { return exportOp('ASM', range, 'pca', 'asm'); } },
 		{ name: 'Binary', fct: function(evt, range) {
 			var bytes = new Uint8Array(_this.nav.getBytes(range));
 			var blob = new Blob([bytes], {type: 'application/octet-stream'});
@@ -31,16 +37,16 @@ Hexdump.prototype.drawContextualMenu = function() {
 			fileName += '_0x' + range.from.toString(16) + '-0x' + range.to.toString(16) + '.bin';
 			saveAs(blob, fileName);
 		} },
-		{ name: 'C', fct: function(evt, range) { return exportOp(range, 'pc', 'c'); } },
-		{ name: 'C half-words (2 bytes)', fct: function(evt, range) { return exportOp(range, 'pch', 'c'); } },
-		{ name: 'C words (4 bytes)', fct: function(evt, range) { return exportOp(range, 'pcw', 'c'); } },
-		{ name: 'C dwords (8 bytes)', fct: function(evt, range) { return exportOp(range, 'pcd', 'c'); } },
-		{ name: 'JavaScript', fct: function(evt, range) { return exportOp(range, 'pcJ', 'js'); } },
-		{ name: 'JSON', fct: function(evt, range) { return exportOp(range, 'pcj', 'json'); } },
-		{ name: 'Python', fct: function(evt, range) { return exportOp(range, 'pcp', 'py'); } },
-		{ name: 'R2 commands', fct: function(evt, range) { return exportOp(range, 'pc*', 'r2'); } },
-		{ name: 'Shellscript', fct: function(evt, range) { return exportOp(range, 'pcS', 'txt'); } },
-		{ name: 'String', fct: function(evt, range) { return exportOp(range, 'pcs', 'txt'); } }
+		{ name: 'C', fct: function(evt, range) { return exportOp('C', range, 'pc', 'c'); } },
+		{ name: 'C half-words (2 bytes)', fct: function(evt, range) { return exportOp('C', range, 'pch', 'c'); } },
+		{ name: 'C words (4 bytes)', fct: function(evt, range) { return exportOp('C', range, 'pcw', 'c'); } },
+		{ name: 'C dwords (8 bytes)', fct: function(evt, range) { return exportOp('C', range, 'pcd', 'c'); } },
+		{ name: 'JavaScript', fct: function(evt, range) { return exportOp('JS', range, 'pcJ', 'js'); } },
+		{ name: 'JSON', fct: function(evt, range) { return exportOp('JSON', range, 'pcj', 'json'); } },
+		{ name: 'Python', fct: function(evt, range) { return exportOp('Python', range, 'pcp', 'py'); } },
+		{ name: 'R2 commands', fct: function(evt, range) { return exportOp('R2 cmd', range, 'pc*', 'r2'); } },
+		{ name: 'Shell script', fct: function(evt, range) { return exportOp('Shell script', range, 'pcS', 'txt'); } },
+		{ name: 'String', fct: function(evt, range) { return exportOp('string', range, 'pcs', 'txt'); } }
 	];
 	var applyOp = function(range, operande) {
 		var val = prompt('Value (valid hexpair):');
@@ -208,6 +214,61 @@ Hexdump.prototype.drawContextualMenu = function() {
 	document.addEventListener('click', function() {
 		closeMenu();
 	});
+};
+
+/**
+ * Return the export dialog built
+ * Don't forget to normalize the output by calling MDL processing
+ */
+Hexdump.prototype.createExportDialog = function(label, output, save) {
+	var dialog = document.createElement('dialog');
+	dialog.className = 'mdl-dialog';
+
+	if (!dialog.showModal) {
+		dialogPolyfill.registerDialog(dialog);
+	}
+
+	/*	CONTENT  */
+	var content = document.createElement('div');
+	content.className = 'mdl-dialog__content';
+	dialog.appendChild(content);
+
+	var desc = document.createTextNode(label);
+	content.appendChild(desc);
+
+	var textarea = document.createElement('textarea');
+	textarea.style.width = '100%';
+	textarea.style.height = '220px';
+	content.appendChild(textarea);
+	textarea.value = output;
+
+	/*  ACTIONS  */
+	var actions = document.createElement('div');
+	actions.className = 'mdl-dialog__actions';
+	dialog.appendChild(actions);
+
+	var saveButton = document.createElement('button');
+	saveButton.className = 'mdl-button';
+	saveButton.innerHTML = 'Save';
+	saveButton.addEventListener('click', function() {
+		dialog.close();
+		dialog.parentNode.removeChild(dialog);
+		save();
+	});
+	actions.appendChild(saveButton);
+
+	var closeButton = document.createElement('button');
+	closeButton.className = 'mdl-button';
+	closeButton.innerHTML = 'Close';
+	closeButton.addEventListener('click', function() {
+		dialog.close();
+		dialog.parentNode.removeChild(dialog);
+	});
+	actions.appendChild(closeButton);
+
+
+
+	return dialog;
 };
 
 /**

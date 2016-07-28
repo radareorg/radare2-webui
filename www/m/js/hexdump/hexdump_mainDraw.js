@@ -27,7 +27,11 @@ Hexdump.prototype.drawContent = function(dom, callback) {
 		if (typeof _this.currentSelection === 'undefined' ||
 			typeof _this.currentSelection.from === 'undefined' ||
 			typeof _this.currentSelection.to === 'undefined') {
-			return; // Uncomplete selection
+			// If undefined, we chose to have one-byte selection
+			_this.currentSelection = {
+				from: evt.target.offset,
+				to: evt.target.offset
+			};
 		}
 		evt.preventDefault();
 		var menu = document.getElementById('contextmenu');
@@ -257,8 +261,25 @@ Hexdump.prototype.drawPairs_ = function(hexpairs, asciis, pairs, chars, modifica
 	};
 
 	var collectHexpair = function(target) {
+		if (target.busy) {
+			return; // Event has been already triggered elsewhere
+		}
+		// Don't need to set to false, in each case we remove the node
+		target.busy = true;
+
 		// Keep the first 2 valid hex characters
-		var value = target.value.match(/([a-fA-F0-9]{2})/)[0];
+		var regex = target.value.match(/$([a-fA-F0-9]{2})^/);
+		if (regex === null) {
+			if (typeof target.parentNode === 'undefined') {
+				// Solving event conflict
+				return;
+			}
+			alert('Wrong format, expected: [a-fA-F0-9]{2}');
+			target.parentNode.innerHTML = target.initValue;
+			return;
+		}
+
+		var value = regex[0];
 		target = target.parentNode;
 		var initial = _this.nav.reportChange(target.offset, value);
 
@@ -271,7 +292,6 @@ Hexdump.prototype.drawPairs_ = function(hexpairs, asciis, pairs, chars, modifica
 			_this.colorizeByte(target.assoc, value);
 			_this.onChangeCallback(target.offset, initial, value);
 		}
-		target.contentEditable = false;
 
 		target.removeEventListener('keydown', editableHexEvent.keydown);
 		target.removeEventListener('blur', editableHexEvent.blur);
@@ -292,7 +312,6 @@ Hexdump.prototype.drawPairs_ = function(hexpairs, asciis, pairs, chars, modifica
 			_this.colorizeByte(target.assoc, value);
 			_this.onChangeCallback(target.assoc.offset, target.assoc.innerHTML, hex);
 		}
-		target.contentEditable = false;
 
 		target.removeEventListener('keydown', editableAsciiEvent.keydown);
 		target.removeEventListener('blur', editableAsciiEvent.blur);
@@ -357,10 +376,13 @@ Hexdump.prototype.drawPairs_ = function(hexpairs, asciis, pairs, chars, modifica
 				}
 				evt.preventDefault();
 				var form = document.createElement('input');
+				form.maxLength = 2;
+				form.initValue = evt.target.innerHTML;
 				form.value = evt.target.innerHTML;
 				form.pattern = '[a-fA-F0-9]{2}';
 				evt.target.innerHTML = '';
 				evt.target.appendChild(form);
+				form.busy = false; // Race-flag
 				form.addEventListener('keydown', editableHexEvent.keydown);
 				form.addEventListener('blur', editableHexEvent.blur);
 				form.focus();
@@ -372,6 +394,7 @@ Hexdump.prototype.drawPairs_ = function(hexpairs, asciis, pairs, chars, modifica
 				}
 				evt.preventDefault();
 				var form = document.createElement('input');
+				form.maxLength = 1;
 				form.value = evt.target.innerHTML;
 				form.pattern = '(.){1}';
 				evt.target.innerHTML = '';
