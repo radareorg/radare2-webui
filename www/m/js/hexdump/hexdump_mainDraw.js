@@ -1,19 +1,4 @@
 /**
- * Helper for dynamic callback at first drawing
- * Allows to place the scroll on current chunk.
- */
-Hexdump.prototype.getFirstElement = function() {
-	return this.firstElement;
-};
-
-/**
- * Helper to delay drawing
- */
-Hexdump.prototype.getCurChunk = function() {
-	return this.curChunk;
-};
-
-/**
  * Draw 3 chunks on specified DOM node
  */
 Hexdump.prototype.drawContent = function(dom, callback) {
@@ -158,7 +143,7 @@ Hexdump.prototype.drawChunk = function(chunk, where) {
 /**
  * Trigerred by scrolling, determine and add content at the right place
  */
-Hexdump.prototype.infiniteDrawingContent = function(where, pos) {
+Hexdump.prototype.infiniteDrawingContent = function(where, pos, endCallback) {
 	var _this = this;
 	this.nav.get(where, function(chunk) {
 		if (where === _this.Dir.BEFORE) {
@@ -192,7 +177,7 @@ Hexdump.prototype.infiniteDrawingContent = function(where, pos) {
 		_this.content.scrollTop = pos;
 		_this.colorizeFlag(true);
 
-		_this.pauseScrollEvent = false;
+		endCallback(_this.isTopMax); // pauseScrollEvent = false
 	});
 };
 

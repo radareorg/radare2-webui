@@ -2,31 +2,11 @@ var update = function() {/* nop */};
 var inColor = true;
 var lastView = panelDisasm;
 
-function E(x) {
-	return document.getElementById(x);
-}
-
-function encode(r) {
-	return r.replace(/[\x26\x0A\<>'"]/g, function(r) { return '&#' + r.charCodeAt(0) + ';';});
-}
-
 function uiButton(href, label, type) {
 	if (type == 'active') {
 		return '&nbsp;<a href="' + href.replace(/"/g,'\'') + '" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--accent mdl-color-text--accent-contrast" style="background-color:#f04040 !important">' + label + '</a>';
 	}
 	return '&nbsp;<a href="' + href.replace(/"/g,'\'') + '" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--accent mdl-color-text--accent-contrast">' + label + '</a>';
-}
-
-function clickableOffsets(x) {
-	x = x.replace(/0x([a-zA-Z0-9]*)/g,
-	'<a href=\'javascript:seek("0x$1")\'>0x$1</a>');
-	x = x.replace(/sym\.([\.a-zA-Z0-9_]*)/g,
-	'<a href=\'javascript:seek("sym.$1")\'>sym.$1</a>');
-	x = x.replace(/fcn\.([\.a-zA-Z0-9_]*)/g,
-	'<a href=\'javascript:seek("fcn.$1")\'>fcn.$1</a>');
-	x = x.replace(/str\.([\.a-zA-Z0-9_]*)/g,
-	'<a href=\'javascript:seek("str.$1")\'>str.$1</a>');
-	return x;
 }
 
 function write() {
@@ -625,16 +605,6 @@ function consoleKey(e) {
 			inp.value = '';
 		}
 	}
-}
-
-function singlePanel() {
-	window.top.location.href = '/m/';
-}
-function hSplit() {
-	location.href = '/m/hsplit';
-}
-function vSplit() {
-	location.href = '/m/vsplit';
 }
 
 function panelConsole() {

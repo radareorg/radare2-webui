@@ -2,8 +2,11 @@
  * howManyLines = how many lines per chunk
  * Careful at boundaries [0..end]
  */
+HexPairNavigator.prototype = new BlockNavigator();
+HexPairNavigator.prototype.constructor = HexPairNavigator;
 function HexPairNavigator(howManyLines, startOffset) {
 	this.howManyBytes = howManyLines * 16;
+	this.gap = this.howManyBytes;
 	this.currentOffset = startOffset;
 
 	// Define a double-linked list to navigate through chunks
@@ -12,180 +15,7 @@ function HexPairNavigator(howManyLines, startOffset) {
 	this.providerWorker = new Worker('hexchunkProvider.js');
 	this.providerWorker.postMessage(this.howManyBytes);
 
-	var _this = this;
-	this.providerWorker.onmessage = function(e) {
-		if (e.data.dir === _this.Dir.CURRENT) {
-			if (typeof _this.curChunk.data.callback !== 'undefined') {
-				for (var i = 0 ; i < _this.curChunk.data.callback.length ; i++) {
-					_this.curChunk.data.callback[i](e.data);
-				}
-			}
-			_this.curChunk.data = e.data;
-			_this.curChunk.data.status = _this.Status.COMPLETED;
-		} else {
-			var dir = (e.data.dir === _this.Dir.BEFORE) ? 'prev' : 'next';
-
-			var item = _this.curChunk;
-			while (typeof item[dir] !== 'undefined') {
-				item = item[dir];
-				if (item.data.offset === e.data.offset) {
-					break;
-				}
-			}
-
-			if (item === _this.curChunk) {
-				console.log('Error, history corrupted');
-				return;
-			}
-
-			if (typeof item.data.callback !== 'undefined') {
-				for (var i = 0 ; i < item.data.callback.length ; i++) {
-					item.data.callback[i](e.data);
-				}
-			}
-
-			item.data = e.data;
-			item.data.status = _this.Status.COMPLETED;
-		}
-	};
-};
-
-HexPairNavigator.prototype.Dir = {
-	BEFORE: -1,
-	CURRENT: 0,
-	AFTER: 1
-};
-
-HexPairNavigator.prototype.Status = {
-	LAUNCHED: 0,
-	COMPLETED: 1
-};
-
-HexPairNavigator.prototype.reset = function() {
-	this.curChunk = undefined;
-};
-
-HexPairNavigator.prototype.get = function(which, callback, force) {
-	var dir = (which === this.Dir.BEFORE) ? 'prev' : 'next';
-
-	var item;
-	if (which === this.Dir.CURRENT) {
-		item = this.curChunk;
-	} else {
-		if (typeof this.curChunk === 'undefined') {
-			item = undefined;
-		} else {
-			item = this.curChunk[dir];
-		}
-	}
-
-	// If there is a miss (when we start)
-	if (typeof item === 'undefined') {
-		if (which === this.Dir.CURRENT) {
-			req = {
-				dir: this.Dir.CURRENT,
-				offset: this.currentOffset,
-				status: this.Status.LAUNCHED,
-				callback: []
-			};
-			this.curChunk = {
-				data: req,
-				prev: undefined,
-				next: undefined
-			};
-			item = this.curChunk;
-			this.providerWorker.postMessage(req);
-		} else {
-			req = {
-				dir: which,
-				offset: this.currentOffset + (which * this.howManyBytes),
-				status: this.Status.LAUNCHED,
-				callback: []
-			};
-			this.curChunk[dir] = {
-				data: req,
-				prev: (which === this.Dir.AFTER) ? this.curChunk : undefined,
-				next: (which === this.Dir.BEFORE) ? this.curChunk : undefined
-			};
-			item = this.curChunk[dir];
-			this.providerWorker.postMessage(req);
-		}
-	} else if (force === true) {
-		item.data.status = this.Status.LAUNCHED;
-		this.providerWorker.postMessage(item.data);
-	}
-
-	// We infer the data is here
-	if (item.data.status !== this.Status.LAUNCHED) {
-		return callback(item.data);
-	} else { // Data isn't here, we deffer our callback
-		if (typeof item.data.callback === 'undefined') {
-			item.data.callback = [];
-		}
-		item.data.callback.push(callback);
-		return;
-	}
-};
-
-HexPairNavigator.prototype.go = function(where) {
-	var goNext = (where === this.Dir.AFTER);
-	var dir = (goNext) ? 'next' : 'prev';
-	var howMany = this.howManyBytes;
-
-	if (typeof this.curChunk[dir] !== 'undefined') {
-		this.curChunk = this.curChunk[dir];
-		this.currentOffset = this.curChunk.data.offset;
-		// Should check (or not?) for negative offset
-	} else {
-		this.currentOffset = this.currentOffset + where * this.howManyBytes;
-		if (this.currentOffset < 0) {
-			this.currentOffset = 0;
-		}
-
-		var req = {
-			dir: where,
-			offset: this.currentOffset,
-			status: this.Status.LAUNCHED,
-			callback: []
-		};
-
-		var newChunk = {
-			data: req,
-			prev: (goNext) ? this.curChunk : undefined,
-			next: (!goNext) ? this.curChunk : undefined
-		};
-
-		this.curChunk[dir] = newChunk;
-		this.curChunk = newChunk;
-
-		this.providerWorker.postMessage(req);
-	}
-
-	// We anticipate one
-	/*
-	if (typeof this.curChunk[dir] === 'undefined') {
-		var offset = this.currentOffset + where * this.howManyBytes;
-		if (offset < 0) {
-			offset = 0;
-		}
-
-		var req = {
-			dir: where,
-			offset: offset,
-			status: this.Status.LAUNCHED
-		};
-
-		var newChunk = {
-			data: req,
-			prev: (goNext) ? this.curChunk : undefined,
-			next: (!goNext) ? this.curChunk : undefined
-		};
-
-		this.curChunk[dir] = newChunk;
-		this.curChunk = newChunk;
-
-		this.providerWorker.postMessage(req);
-	}*/
+	this.init();
 };
 
 /**
@@ -286,12 +116,6 @@ HexPairNavigator.prototype.getFlags = function(minSize, callback) {
 		flags = flags.concat(chunk.flags);
 		actuator();
 	});
-};
-
-HexPairNavigator.prototype.isInside_ = function(chunk, offset) {
-	var start = chunk.offset;
-	var end = start + this.howManyBytes;
-	return (start <= offset && end >= offset);
 };
 
 HexPairNavigator.prototype.getBytes = function(range) {

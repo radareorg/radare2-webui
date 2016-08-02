@@ -1,4 +1,4 @@
-function panelDisasm() {
+/*function panelDisasm() {
 	var widget = widgetContainer.getWidget('Disassembly');
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
 
@@ -27,7 +27,6 @@ function panelDisasm() {
 	}
 
 	r2.cmd('pd 128' + tail, function(d) {
-		console.log(d);
 		var dis = clickableOffsets(d);
 		ret = '';
 		ret += '<center>' + uiRoundButton('javascript:up()', 'keyboard_arrow_up') + uiRoundButton('javascript:down()', 'keyboard_arrow_down') + '</center>';
@@ -36,4 +35,30 @@ function panelDisasm() {
 
 		c.innerHTML += ret;
 	});
+}*/
+
+var disasm;
+
+function panelDisasm() {
+	var widget = widgetContainer.getWidget('Disassembly');
+	var c = widgetContainer.getWidgetDOMWrapper(widget);
+	c.classList.add('disasmPanel');
+
+	if (typeof disasm === 'undefined') {
+		disasm = new Disasm(c, 24);
+	} else {
+		disasm.resetContainer(c);
+	}
+
+	disasm.draw();
+
+	var recall = function() {
+		disasm.refreshInitialOffset();
+		disasm.resetContainer(c);
+		disasm.draw();
+	};
+
+	// Disasm is "seekable", we need to define behavior before and after drawing
+	updates.registerMethod(widget.getOffset(), function() {});
+	lastViews.registerMethod(widget.getOffset(), recall);
 }
