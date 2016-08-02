@@ -4,12 +4,12 @@
  * lineHeight should be specified in pixels
  */
 function Hexdump(containerElement, lineHeight, isBigEndian) {
-	this.container = containerElement;
+	this.container = new FlexContainer(containerElement, 'hex');
 	this.lineHeight = lineHeight;
 	this.bigEndian = isBigEndian;
 	this.hexLength = this.Sizes.PAIRS;
 	this.init();
-	this.resetContainer(this.container);
+	this.resetContainer(containerElement);
 
 	this.showFlags = true;
 	this.beingSelected = false;
@@ -128,38 +128,23 @@ Hexdump.prototype.changeWritable = function() {
  * TODO: save DOM/Events when quitting widget to reload it faster
  */
 Hexdump.prototype.resetContainer = function(container) {
-	var r2Offset;
-	r2.cmd('s', function(offset) {
-		r2Offset = parseInt(offset, 16);
-	});
-
-	if (r2Offset !== this.initialOffset) {
-		this.refreshInitialOffset();
-	}
+	this.refreshInitialOffset();
 
 	if (typeof this.nav !== 'undefined') {
 		this.nav.reset();
 	}
 
-	this.container = container;
-	this.container.innerHTML = '';
+	this.container.replug(container);
 
-	this.controls = document.createElement('div');
-	this.controls.classList.add('hexControls');
-	this.content = document.createElement('div');
-	this.content.classList.add('hexContent');
+	// TODO: cache, faster
+	this.container.reset();
 
-	var offsets = document.createElement('div');
-	var hexpairs = document.createElement('div');
-	var ascii = document.createElement('div');
-
-	this.content.appendChild(offsets);
-	this.content.appendChild(hexpairs);
-	this.content.appendChild(ascii);
-
-	this.container.appendChild(this.controls);
-	this.container.appendChild(this.content);
-
+	this.container.drawBody(function(element) {
+		element.appendChild(document.createElement('div')); // offsets
+		element.appendChild(document.createElement('div')); // hexpairs
+		element.appendChild(document.createElement('div')); // ascii
+	});
+	this.content = this.container.getBody();
 	this.defineInfiniteParams();
 };
 
@@ -212,8 +197,8 @@ Hexdump.prototype.getCurrentSelection = function() {
  */
 Hexdump.prototype.draw = function() {
 	var _this = this;
-	this.drawControls(this.container.children[0]);
-	this.drawContent(this.container.children[1], function() {
+	this.drawControls(this.container.getControls());
+	this.drawContent(this.container.getBody(), function() {
 		_this.colorizeFlag();
 	});
 };
