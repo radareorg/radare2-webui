@@ -42,7 +42,7 @@ gulp.task('js', ['jscs'], function() {
 		.pipe(concat('index.js'))
 		.pipe(gulp.dest(DEST))
 		.pipe(livereload());
-	gulp.src(['./workers/*.js'])
+	gulp.src(['./workers/*.js', './js/tools.js'])
 		.pipe(gulp.dest(DEST))
 		.pipe(livereload());
 });

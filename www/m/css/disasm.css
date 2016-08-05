@@ -1,0 +1,18 @@
+.disasmPanel {
+	position:absolute;
+	left:0;
+	right:0;
+	background-color: rgb(32, 32, 32);
+	color: white;
+	overflow: hidden !important;
+}
+
+.disasm.flex-controls {
+	border-bottom:1px dotted white;
+	background:white;
+	color:black;
+}
+
+.disasm.flex-body {
+	font-family: "DejaVu Sans Mono", Console, Courier New, monospace;
+}

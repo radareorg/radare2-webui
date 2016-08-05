@@ -3,13 +3,15 @@
  * Container should be currently sized for the purpose
  * lineHeight should be specified in pixels
  */
+Hexdump.prototype = new RadareInfiniteBlock();
+Hexdump.prototype.constructor = Hexdump;
 function Hexdump(containerElement, lineHeight, isBigEndian) {
-	this.container = containerElement;
+	this.container = new FlexContainer(containerElement, 'hex');
 	this.lineHeight = lineHeight;
 	this.bigEndian = isBigEndian;
 	this.hexLength = this.Sizes.PAIRS;
 	this.init();
-	this.resetContainer(this.container);
+	this.resetContainer(containerElement);
 
 	this.showFlags = true;
 	this.beingSelected = false;
@@ -35,15 +37,6 @@ function Hexdump(containerElement, lineHeight, isBigEndian) {
 Hexdump.prototype.infineHeightProvisioning = 2;
 
 /**
- * Define where we should process
- */
-Hexdump.prototype.Dir = {
-	BEFORE: -1,
-	CURRENT: 0,
-	AFTER: 1
-};
-
-/**
  * Size in number of bytes to make a word
  */
 Hexdump.prototype.Sizes = {
@@ -57,16 +50,6 @@ Hexdump.prototype.Sizes = {
  */
 Hexdump.prototype.setOnChangeCallback = function(callback) {
 	this.onChangeCallback = callback;
-};
-
-/**
- * Load the *new* initial offset from the "s" value
- */
-Hexdump.prototype.refreshInitialOffset = function() {
-	var _this = this;
-	r2.cmd('s', function(offset) {
-		_this.initialOffset = parseInt(offset, 16);
-	});
 };
 
 /**
@@ -89,7 +72,6 @@ Hexdump.prototype.init = function() {
 		this.colors[key] = 'rgb(' + this.colors[key][0] + ',' + this.colors[key][1] + ',' + this.colors[key][2] + ')';;
 	}
 
-	this.pauseScrollEvent = false;
 	this.selectionMode = !this.writable;
 
 	window.addEventListener('mousedown', function(evt) {
@@ -99,7 +81,7 @@ Hexdump.prototype.init = function() {
 		_this.cleanSelection();
 	});
 
-	this.drawContextualMenu();
+	// this.drawContextualMenu();
 	this.changeWritable();
 };
 
@@ -128,79 +110,24 @@ Hexdump.prototype.changeWritable = function() {
  * TODO: save DOM/Events when quitting widget to reload it faster
  */
 Hexdump.prototype.resetContainer = function(container) {
-	var r2Offset;
-	r2.cmd('s', function(offset) {
-		r2Offset = parseInt(offset, 16);
-	});
-
-	if (r2Offset !== this.initialOffset) {
-		this.refreshInitialOffset();
-	}
+	this.refreshInitialOffset();
 
 	if (typeof this.nav !== 'undefined') {
 		this.nav.reset();
 	}
 
-	this.container = container;
-	this.container.innerHTML = '';
+	this.container.replug(container);
 
-	this.controls = document.createElement('div');
-	this.controls.classList.add('hexControls');
-	this.content = document.createElement('div');
-	this.content.classList.add('hexContent');
+	// TODO: cache, faster
+	this.container.reset();
 
-	var offsets = document.createElement('div');
-	var hexpairs = document.createElement('div');
-	var ascii = document.createElement('div');
-
-	this.content.appendChild(offsets);
-	this.content.appendChild(hexpairs);
-	this.content.appendChild(ascii);
-
-	this.container.appendChild(this.controls);
-	this.container.appendChild(this.content);
-
-	this.defineInfiniteParams();
-};
-
-/**
- * Gather data and set event to configure infinite scrolling
- */
-Hexdump.prototype.defineInfiniteParams = function() {
-	var height = (this.content.offsetHeight === 0) ? 800 : this.content.offsetHeight;
-	this.howManyLines = Math.floor((height / this.lineHeight) * this.infineHeightProvisioning);
-
-	this.prevPrevScroll = 0;
-	this.prevScroll = 0;
-
-	var _this = this;
-	this.content.addEventListener('scroll', function(e) {
-		if (_this.pauseScrollEvent) {
-			return;
-		}
-
-		var height = e.target.scrollHeight - e.target.offsetHeight;
-		var p = e.target.scrollTop  / height;
-
-		if (!_this.isTopMax && p < 0.25 && _this.prevScroll > p) {
-			_this.pauseScrollEvent = true;
-			_this.nav.go(_this.nav.Dir.BEFORE);
-			var pos = Math.floor(((0.25 + (p - 0.25)) + 0.33) * height);
-			_this.infiniteDrawingContent(_this.Dir.BEFORE, pos);
-		}
-		if (p > 0.75 && _this.prevScroll < p) {
-			_this.pauseScrollEvent = true;
-			_this.nav.go(_this.nav.Dir.AFTER);
-			var pos = Math.floor(((0.75 + (p - 0.75)) - 0.33) * height);
-			_this.infiniteDrawingContent(_this.Dir.AFTER, pos);
-		}
-
-		_this.prevPrevScroll = _this.prevScroll;
-		_this.prevScroll = p;
+	this.container.drawBody(function(element) {
+		element.appendChild(document.createElement('div')); // offsets
+		element.appendChild(document.createElement('div')); // hexpairs
+		element.appendChild(document.createElement('div')); // ascii
 	});
-
-	this.nav = new HexPairNavigator(this.howManyLines, this.initialOffset);
-	this.nav.updateModifications();
+	this.content = this.container.getBody();
+	this.defineInfiniteParams();
 };
 
 Hexdump.prototype.getCurrentSelection = function() {
@@ -208,12 +135,21 @@ Hexdump.prototype.getCurrentSelection = function() {
 };
 
 /**
+ * Gather data and set event to configure infinite scrolling
+ */
+Hexdump.prototype.defineInfiniteParams = function() {
+	RadareInfiniteBlock.prototype.defineInfiniteParams.call(this);
+	this.nav = new HexPairNavigator(this.howManyLines, this.initialOffset);
+	this.nav.updateModifications();
+};
+
+/**
  * Sequence to draw the whole UI
  */
 Hexdump.prototype.draw = function() {
 	var _this = this;
-	this.drawControls(this.container.children[0]);
-	this.drawContent(this.container.children[1], function() {
+	this.drawControls(this.container.getControls());
+	this.drawContent(this.container.getBody(), function() {
 		_this.colorizeFlag();
 	});
 };

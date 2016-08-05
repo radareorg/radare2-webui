@@ -2,31 +2,11 @@ var update = function() {/* nop */};
 var inColor = true;
 var lastView = panelDisasm;
 
-function E(x) {
-	return document.getElementById(x);
-}
-
-function encode(r) {
-	return r.replace(/[\x26\x0A\<>'"]/g, function(r) { return '&#' + r.charCodeAt(0) + ';';});
-}
-
 function uiButton(href, label, type) {
 	if (type == 'active') {
 		return '&nbsp;<a href="' + href.replace(/"/g,'\'') + '" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--accent mdl-color-text--accent-contrast" style="background-color:#f04040 !important">' + label + '</a>';
 	}
 	return '&nbsp;<a href="' + href.replace(/"/g,'\'') + '" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--accent mdl-color-text--accent-contrast">' + label + '</a>';
-}
-
-function clickableOffsets(x) {
-	x = x.replace(/0x([a-zA-Z0-9]*)/g,
-	'<a href=\'javascript:seek("0x$1")\'>0x$1</a>');
-	x = x.replace(/sym\.([\.a-zA-Z0-9_]*)/g,
-	'<a href=\'javascript:seek("sym.$1")\'>sym.$1</a>');
-	x = x.replace(/fcn\.([\.a-zA-Z0-9_]*)/g,
-	'<a href=\'javascript:seek("fcn.$1")\'>fcn.$1</a>');
-	x = x.replace(/str\.([\.a-zA-Z0-9_]*)/g,
-	'<a href=\'javascript:seek("str.$1")\'>str.$1</a>');
-	return x;
 }
 
 function write() {
@@ -627,16 +607,6 @@ function consoleKey(e) {
 	}
 }
 
-function singlePanel() {
-	window.top.location.href = '/m/';
-}
-function hSplit() {
-	location.href = '/m/hsplit';
-}
-function vSplit() {
-	location.href = '/m/vsplit';
-}
-
 function panelConsole() {
 	var widget = widgetContainer.getWidget('Console');
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
@@ -854,45 +824,6 @@ function uiRoundButton(a, b, c) {
 	out += '<i class="material-icons" style="opacity:1">' + b + '</i>';
 	out += '</button>';
 	return out;
-}
-
-function panelDisasm() {
-	var widget = widgetContainer.getWidget('Disassembly');
-	var c = widgetContainer.getWidgetDOMWrapper(widget);
-
-	updates.registerMethod(widget.getOffset(), panelDisasm);
-	lastViews.registerMethod(widget.getOffset(), panelDisasm);
-
-	if (inColor) {
-		c.style.backgroundColor = '#202020';
-	}
-	var out = '<div style=\'position:fixed;margin:0.5em\'>';
-	out += uiRoundButton('javascript:up()', 'keyboard_arrow_up');
-	out += uiRoundButton('javascript:down()', 'keyboard_arrow_down');
-	out += '&nbsp;';
-	out += uiButton('javascript:analyze()', 'ANLZ');
-	out += uiButton('javascript:comment()', 'CMNT');
-	out += uiButton('javascript:info()', 'Info');
-	out += uiButton('javascript:rename()', 'RNME');
-	out += uiButton('javascript:write()', 'Wrte');
-	out += '</div><br /><br /><br />';
-
-	c.innerHTML = out;
-	c.style['font-size'] = '12px';
-	var tail = '';
-	if (inColor) {
-		tail = '@e:scr.color=1,scr.html=1';
-	}
-
-	r2.cmd('pd 128' + tail, function(d) {
-		var dis = clickableOffsets(d);
-		ret = '';
-		ret += '<center>' + uiRoundButton('javascript:up()', 'keyboard_arrow_up') + uiRoundButton('javascript:down()', 'keyboard_arrow_down') + '</center>';
-		ret += '<pre style=\'color:grey\'>' + dis + '<pre>';
-		ret += '<center>' + uiRoundButton('javascript:down()', 'keyboard_arrow_down') + '</center><br /><br />';
-
-		c.innerHTML += ret;
-	});
 }
 
 var nativeDebugger = false;

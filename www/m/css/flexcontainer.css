@@ -1,0 +1,14 @@
+.flex-controls {
+	position:absolute;
+	top:0;
+	height:50px;
+	width:100%;
+}
+
+.flex-body {
+	position:absolute;
+	bottom:0;
+	top:50px;
+	width:100%;
+	overflow:auto;
+}

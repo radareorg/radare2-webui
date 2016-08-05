@@ -69,6 +69,7 @@ self.onmessage = function(e) {
 		configurationDone = true;
 	} else {
 		// Sending the data from r2 (arg is start offset)
+		// TODO: handle "substract" if partial required (first)
 		var chunk = getChunk(howManyBytes, e.data.offset);
 		chunk.dir = e.data.dir;
 

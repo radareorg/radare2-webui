@@ -7,23 +7,19 @@
 	overflow: hidden !important;
 }
 
-.hexControls {
-	position:absolute;
-	top:0;
-	height:50px;
-	width:100%;
+.hex.flex-controls {
 	border-bottom:1px dotted white;
 	background:white;
 	color:black;
 }
 
-.hexControls ul.controlList {
+.hex.flex-controls ul.controlList {
 	margin:0;
 	padding:0;
 	list-style-type: none;
 }
 
-.hexControls ul.controlList li {
+.hex.flex-controls ul.controlList li {
 	padding:0;
 	display:inline-block;
 	width:22%;
@@ -32,14 +28,8 @@
 	margin-left:3%;
 }
 
-.hexContent {
-	position:absolute;
-	bottom:0;
-	top:50px;
-	width:100%;
-
+.hex.flex-body {
 	font-family: "DejaVu Sans Mono", Console, Courier New, monospace;
-	overflow:auto;
 }
 
 ul.offset, ul.hexpairs, ul.ascii  {
