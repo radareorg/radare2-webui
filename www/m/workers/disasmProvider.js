@@ -2,52 +2,54 @@
 importScripts('/m/r2.js');
 importScripts('/m/tools.js');
 
-var howManyLines;
-var configurationDone = false;
+function extractOffset(str) {
+	// comment line
+	if (str.indexOf(';') !== -1) {
+		return null;
+	}
+	var withoutHMTL = str.replace(/<[^>]*>/g, '');
+	var res = withoutHMTL.match(/(0x[a-fA-F0-9]+)/);
+	if (res === null) {
+		return null;
+	}
+	return res[1];
+};
 
 function getChunk(where, howManyLines) {
 	var raw;
 
-	console.log('pd ' + howManyLines + '@e:scr.color=1,scr.html=1 @' + where);
 	// Line retrieved from the current offset
-	r2.cmd('pd ' + howManyLines + '@e:scr.color=1,scr.html=1 @' + where, function(d) {
-		raw = '<pre style="color:grey" id="block' + where + '">' + clickableOffsets(d) + '</pre>';
+	r2.cmd('pD ' + howManyLines + '@e:scr.color=1,scr.html=1 @' + where, function(d) {
+		raw = d;
 	});
 
-	return raw;
+	var lines = raw.split('\n');
+	for (var i = 0 ; i < lines.length ; i++) {
+		var offset = extractOffset(lines[i]);
+		if (offset !== null) {
+			lines[i] = '<span id=\'' + parseInt(offset, 16) + '\'>' + lines[i] + '</span>';
+		}
+	}
+
+	var withContext = lines.join('\n');
+
+	return '<pre style="border-bottom:1px dashed white;" title="'+where+'" id="block' + where + '">' + clickableOffsets(withContext) + '</pre>';
 }
 
 self.onmessage = function(e) {
-	if (!configurationDone) {
-		// Providing block size (how many lines to retrieve)
-		howManyLines = e.data;
-		configurationDone = true;
+	if (e.data.offset < 0) {
+		self.postMessage({
+			offset: 0,
+			data: 'before 0x00'
+		});
 	} else {
-		if (e.data.offset < 0) {
-			self.postMessage({
-				dir: e.data.dir,
-				offset: 0,
-				domId: null,
-				raw: 'before 0x00'
-			});
-		} else {
-			var length = howManyLines;
-			if (typeof e.data.substract !== 'undefined') {
-				// 1 line = 2
-				// length is accepted as number of line
-				length -= e.data.substract / 2;
-			}
+		var chunk = {
+			offset: e.data.offset,
+			size: e.data.size,
+			data: getChunk(e.data.offset, e.data.size)
+		};
 
-			console.log(e.data.offset);
-			var chunk = {
-				dir: e.data.dir,
-				offset: e.data.offset,
-				domId: 'block' + e.data.offset,
-				raw: getChunk(e.data.offset, length)
-			};
-
-			// Sending the data from r2
-			self.postMessage(chunk);
-		}
+		// Sending the data from r2
+		self.postMessage(chunk);
 	}
 };

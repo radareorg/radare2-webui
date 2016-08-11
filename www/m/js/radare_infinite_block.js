@@ -39,14 +39,14 @@ RadareInfiniteBlock.prototype.refreshInitialOffset = function() {
 /**
  * Gather data and set event to configure infinite scrolling
  */
-RadareInfiniteBlock.prototype.defineInfiniteParams = function() {
+RadareInfiniteBlock.prototype.defineInfiniteParams = function(trigger) {
 	var height = (this.container.getBody().offsetHeight === 0) ? 800 : this.container.getBody().offsetHeight;
 	this.howManyLines = Math.floor((height / this.lineHeight) * this.infineHeightProvisioning);
 
 	var infiniteScrolling = new InfiniteScrolling(
 		this.container.getBody(),
 		3, /* before, current, after */
-		0.25 /* when there less than 1/4 visible */
+		(typeof trigger !== 'undefined') ? trigger : 0.20 /* when there less than 1/5 visible */
 	);
 
 	var _this = this;

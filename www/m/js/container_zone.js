@@ -72,7 +72,6 @@ ContainerZone.prototype.initRuler = function() {
 	this.ruler.addEventListener('mousedown', initDrag);
 };
 
-
 ContainerZone.prototype.setFocus = function(focus) {
 	this.focus_ = focus;
 	for (var i = 0 ; i < this.focusListeners.length ; i++) {
@@ -145,7 +144,7 @@ ContainerZone.prototype.merge = function() {
 		}
 	}
 
-	this.setFocus(0)
+	this.setFocus(0);
 	this.currentLayout = this.Layout.FULL;
 	this.drawTitle();
 };
@@ -173,6 +172,17 @@ ContainerZone.prototype.split = function(layout) {
 	// We want to set the focus on the space
 	this.setFocus(1);
 	this.drawTitle();
+};
+
+/**
+ * Tell if the widget is currently displayed (careful to case sensitivity)
+ */
+ContainerZone.prototype.getCurrentlyDrawn = function() {
+	var list = [];
+	for (var i = 0 ; i < this.populatedWidgets.length ; i++) {
+		list.push(this.populatedWidgets[i].name);
+	}
+	return list;
 };
 
 ContainerZone.prototype.add = function(widget) {

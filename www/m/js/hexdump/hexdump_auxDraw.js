@@ -116,7 +116,7 @@ Hexdump.prototype.drawContextualMenu = function() {
 	];
 
 	var menu = document.createElement('nav');
-	menu.id = 'contextmenu';
+	menu.id = 'contextmenuHex';
 	menu.classList.add('context-menu');
 
 	var ul = document.createElement('ul');
@@ -265,8 +265,6 @@ Hexdump.prototype.createExportDialog = function(label, output, save) {
 		dialog.parentNode.removeChild(dialog);
 	});
 	actions.appendChild(closeButton);
-
-
 
 	return dialog;
 };

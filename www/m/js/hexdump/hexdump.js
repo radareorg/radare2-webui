@@ -81,7 +81,7 @@ Hexdump.prototype.init = function() {
 		_this.cleanSelection();
 	});
 
-	// this.drawContextualMenu();
+	this.drawContextualMenu();
 	this.changeWritable();
 };
 
