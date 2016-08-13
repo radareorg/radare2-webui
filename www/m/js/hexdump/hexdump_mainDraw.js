@@ -19,7 +19,7 @@ Hexdump.prototype.drawContent = function(dom, callback) {
 			};
 		}
 		evt.preventDefault();
-		var menu = document.getElementById('contextmenu');
+		var menu = document.getElementById('contextmenuHex');
 
 		if (_this.contextMenuOpen) {
 			menu.classList.remove('active');
@@ -59,7 +59,7 @@ Hexdump.prototype.drawContent = function(dom, callback) {
  */
 Hexdump.prototype.drawChunk = function(chunk, where) {
 	if (chunk.offset === 0 && chunk.hex.length === 0) {
-		return;
+		return this.firstElement;
 	}
 
 	var _this = this;

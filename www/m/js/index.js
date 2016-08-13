@@ -68,7 +68,7 @@ function flagsize() {
 	}
 }
 
-function seek(x) {
+var seekAction = new ActionListener(function(x) {
 	if (x === undefined) {
 		var addr = prompt('address');
 	} else {
@@ -80,7 +80,11 @@ function seek(x) {
 		document.getElementById('content').scrollTop = 0;
 		update();
 	}
-}
+});
+
+var seek = function(x) {
+	return seekAction.apply(x);
+};
 
 function analyze() {
 	r2.cmd('af', function() {

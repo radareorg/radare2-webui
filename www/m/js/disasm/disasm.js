@@ -3,14 +3,29 @@ Disasm.prototype.constructor = Disasm;
 function Disasm(containerElement, lineHeight) {
 	this.container = new FlexContainer(containerElement, 'disasm');
 	this.lineHeight = lineHeight;
+	this.refreshInitialOffset();
 	this.init();
-	this.resetContainer(containerElement);
+
+	this.offsetHistory = [this.initialOffset];
+	this.indexOffsetHistory = 0;
+
+	var _this = this;
+	seekAction.registerLocalAction('Disassembly', function(offset) {
+		var gap = (_this.offsetHistory.length - 1) - _this.indexOffsetHistory;
+		for (var i = 0 ; i < gap ; i++) {
+			_this.offsetHistory.pop();
+		}
+		_this.offsetHistory.push(offset);
+		_this.indexOffsetHistory = _this.offsetHistory.length - 1;
+		_this.nav.refreshCurrentOffset();
+		_this.draw();
+	});
 }
 
 /**
  * How many screen we want to retrieve in one round-trip with r2
  */
-Disasm.prototype.infineHeightProvisioning = 2;
+Disasm.prototype.infineHeightProvisioning = 3;
 
 /**
  * Fetch and initialize data
@@ -18,115 +33,426 @@ Disasm.prototype.infineHeightProvisioning = 2;
 Disasm.prototype.init = function() {
 	var _this = this;
 
-	this.refreshInitialOffset();
 	this.drawContextualMenu();
+	this.drawAnalysisDialog();
+	// 5% (default is 20%) : dynamic sized content, re-drawn
+	this.defineInfiniteParams(0.05);
+
+	this.container.pause('Crunching some data...');
+	this.nav.crunchingData(function() {
+		_this.container.resume();
+	});
 };
 
 Disasm.prototype.resetContainer = function(container) {
-	this.refreshInitialOffset();
-
-
-	if (typeof this.nav !== 'undefined') {
-		this.nav.reset();
-	}
-
-	this.container.replug(container);
-
 	// TODO: cache, faster
+	this.container.replug(container);
 	this.container.reset();
-
-	this.defineInfiniteParams();
-
-	var _this = this;
-	this.container.drawBody(function(element) {
-		_this.drawContent(element);
-	});
+	this.refreshInitialOffset();
+	this.defineInfiniteParams(0.05);
 };
 
 /**
  * Gather data and set event to configure infinite scrolling
  */
-Disasm.prototype.defineInfiniteParams = function() {
-	RadareInfiniteBlock.prototype.defineInfiniteParams.call(this);
+Disasm.prototype.defineInfiniteParams = function(trigger) {
+	RadareInfiniteBlock.prototype.defineInfiniteParams.call(this, trigger);
 	this.nav = new DisasmNavigator(this.howManyLines, this.initialOffset);
 };
 
-Disasm.prototype.draw = function() {
+Disasm.prototype.draw = function(callback) {
+	var _this = this;
 	this.drawControls(this.container.getControls());
-	this.drawContent(this.container.getBody());
+	this.container.drawBody(function(element) {
+		_this.drawContent(element, function() {
+			_this.replaceScrollPosition(_this.nav.currentOffset);
+			if (typeof callback !== 'undefined') {
+				callback();
+			}
+		});
+	});
 };
 
-Disasm.prototype.drawContextualMenu = function() {
-	// none
+
+/**
+ * Will trigger analysis from checked analysis method
+ * of the analysis dialog (<=> analysisMethod by offset)
+ */
+Disasm.prototype.processChosenAnalysis = function(endCallback) {
+	for (var i = 0 ; i < this.analysisMethods.length ; i++) {
+		this.analysisMethods[i].action(this.analysisMethods[i].active);
+	}
+
+	/* TODO, adapt to overview panel context
+		updateFortune();
+		updateInfo();
+		updateEntropy();
+	*/
+
+	// Reprocessing
+	this.nav.crunchingData(function() {
+		// Done
+	});
+
+	// After, we refresh the current display
+	this.draw(endCallback);
+};
+
+Disasm.prototype.drawAnalysisDialog = function() {
+	this.analysisMethods = [{
+		name: 'Analyze symbols',
+		ugly: 'symbols',
+		active: false,
+		action: function(active) {
+			if (!active) {
+				return;
+			}
+			r2.cmd('aa');
+		}
+	},{
+		name: 'Analyse calls',
+		ugly: 'calls',
+		active: false,
+		action: function(active) {
+			if (active) {
+				r2.cmd('e anal.calls=true;aac');
+			} else {
+				r2.cmd('e anal.calls=false');
+			}
+		}
+	},{
+		name: 'Emulate code',
+		ugly: 'code',
+		active: false,
+		action: function(active) {
+			if (active) {
+				r2.cmd('e asm.emu=1;aae;e asm.emu=0');
+			} else {
+				r2.cmd('e asm.emu=false');
+			}
+		}
+	},{
+		name: 'Find preludes',
+		ugly: 'preludes',
+		active: false,
+		action: function(active) {
+			if (!active) {
+				return;
+			}
+			r2.cmd('aap');
+		}
+	},{
+		name: 'Autoname functions',
+		ugly: 'fcts',
+		active: false,
+		action: function(active) {
+			if (!active) {
+				return;
+			}
+			r2.cmd('aan');
+		}
+	}];
+
+	var _this = this;
+	this.analysisDialog = document.createElement('dialog');
+	this.analysisDialog.className = 'mdl-dialog';
+
+	if (!this.analysisDialog.showModal) {
+		dialogPolyfill.registerDialog(this.analysisDialog);
+	}
+
+	var content = document.createElement('div');
+	content.className = 'mdl-dialog__content';
+	this.analysisDialog.appendChild(content);
+
+	var title = document.createElement('p');
+	title.appendChild(document.createTextNode('Pick some analysis method'));
+	title.className = 'mdl-typography--text-center';
+	content.appendChild(title);
+
+	var methods = document.createElement('ul');
+	methods.className = 'mdl-card__supporting-text';
+	this.analysisDialog.appendChild(methods);
+
+	for (var i = 0 ; i < this.analysisMethods.length ; i++) {
+		var li = document.createElement('li');
+		methods.appendChild(li);
+
+		var wrappingLabel = document.createElement('label');
+		wrappingLabel.for = this.analysisMethods[i].ugly;
+		wrappingLabel.className = 'mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect';
+		li.appendChild(wrappingLabel);
+
+		var input = document.createElement('input');
+		input.type = 'checkbox';
+		input.offset = i;
+		input.id = this.analysisMethods[i].ugly;
+		input.checked = this.analysisMethods[i].active;
+		input.className = 'mdl-checkbox__input';
+		wrappingLabel.appendChild(input);
+
+		input.addEventListener('change', function(evt) {
+			_this.analysisMethods[evt.target.offset].active = evt.target.checked;
+		});
+
+		var name = document.createElement('span');
+		name.className = 'mdl-checkbox__label';
+		name.appendChild(document.createTextNode(this.analysisMethods[i].name));
+		wrappingLabel.appendChild(name);
+	}
+
+	var actions = document.createElement('div');
+	actions.className = 'mdl-dialog__actions';
+	this.analysisDialog.appendChild(actions);
+
+	var closeButton = document.createElement('button');
+	closeButton.className = 'mdl-button';
+	closeButton.innerHTML = 'Close';
+	closeButton.addEventListener('click', function() {
+		_this.analysisDialog.close();
+	});
+	actions.appendChild(closeButton);
+
+	var proceedButton = document.createElement('button');
+	proceedButton.className = 'mdl-button';
+	proceedButton.innerHTML = 'Proceed';
+	proceedButton.addEventListener('click', function() {
+		_this.processChosenAnalysis(function() {
+			_this.analysisDialog.close();
+		});
+	});
+	actions.appendChild(proceedButton);
+
+	document.body.appendChild(this.analysisDialog);
+	componentHandler.upgradeDom();
+};
+
+Disasm.prototype.extractOffset_ = function(str) {
+	return parseInt(str.slice(5));
+};
+
+Disasm.prototype.getCurrentOffset = function() {
+	return this.currentOffset;
+};
+
+Disasm.prototype.oncontextmenu = function(evt, offset) {
+	// check with aoj first, if 'val' field exists: open
+	var isUndefined;
+	r2.cmdj('aoj @' + offset, function(info) {
+		isUndefined = typeof info[0].val === 'undefined';
+	});
+
+	if (!isUndefined) {
+		var menu = document.getElementById('contextmenuDisasm');
+		evt.preventDefault();
+
+		if (this.contextMenuOpen) {
+			menu.classList.remove('active');
+		} else {
+			this.currentOffset = offset;
+			menu.classList.add('active');
+			menu.style.left = evt.clientX + 'px';
+			menu.style.top = evt.clientY + 'px';
+		}
+
+		this.contextMenuOpen = !this.contextMenuOpen;
+	} else {
+		console.log('NOT opening ctxt menu');
+	}
+};
+
+Disasm.prototype.getPresentBlock = function() {
+	var blocks = [];
+	var bodyChildren = this.container.getBody();
+	for (var i = 0 ; i < bodyChildren.length ; i++) {
+		blocks.push(this.extractOffset_(bodyChildren[i].className));
+	}
+	return blocks;
 };
 
 Disasm.prototype.drawContent = function(dom, callback) {
 	var _this = this;
 
-	this.nav.get(this.Dir.CURRENT, function(chunk) {
-		_this.curChunk = chunk;
-	});
+	var list = this.nav.getShownOffset();
+	isTopMax = (list[0] === 0);
 
-	this.nav.get(this.Dir.BEFORE, function(chunk) {
-		_this.isTopMax = chunk.offset === 0;
-		_this.drawChunk(chunk);
-		_this.firstElement = _this.drawChunk(_this.getCurChunk());
-	});
+	// If we are already at top
+	if (this.isTopMax && isTopMax) {
+		return;
+	} else {
+		this.isTopMax = isTopMax;
+	}
 
-	this.nav.get(this.Dir.AFTER, function(chunk) {
-		_this.drawChunk(chunk);
-		_this.container.getBody().scrollTop = 0;
-		_this.container.getBody().scrollTop = _this.getFirstElement().getBoundingClientRect().top;
+	// reset container
+	this.container.getBody().innerHTML = '';
 
-		// Everything has been drawn, maybe we should do something more
-		if (typeof callback !== 'undefined') {
-			callback();
-		}
-	});
+	for (var i = 0 ; i < list.length ; i++) {
+		var domAnchor = document.createElement('span');
+		this.container.getBody().appendChild(domAnchor);
+		this.nav.get(list[i].offset, list[i].size, function(anchor, last) {
+			return function(chunk) {
+				_this.drawChunk(chunk, anchor);
+
+				if (last && typeof callback !== 'undefined') {
+					callback();
+				}
+			};
+		}(domAnchor, (i === list.length - 1)));
+	}
 };
 
 /**
  * Draw a chunk before or after the current content
  */
-Disasm.prototype.drawChunk = function(chunk, where) {
-	if (where === this.Dir.BEFORE) {
-		this.container.getBody().innerHTML = chunk.raw + this.container.getBody().innerHTML;
-	} else {
-		this.container.getBody().innerHTML += chunk.raw;
+Disasm.prototype.drawChunk = function(chunk, domAnchor) {
+	domAnchor.innerHTML = chunk.data;
+	var pre = domAnchor.children[0];
+	var spans = pre.children;
+	var _this = this;
+	for (var i = 0 ; i < spans.length; i++) {
+		if (spans[i].tagName === 'SPAN') {
+			spans[i].addEventListener('contextmenu', function(id) {
+				return function(evt) {
+					return _this.oncontextmenu(evt, id);
+				};
+			}(spans[i].id));
+		}
 	}
-
-	return document.getElementById(chunk.domId);
+	return document.getElementById(domAnchor);
 };
 
 Disasm.prototype.infiniteDrawingContent = function(where, pos, endCallback) {
 	var _this = this;
-	this.nav.get(where, function(chunk) {
-		if (where === _this.Dir.BEFORE) {
-			_this.isTopMax = chunk.offset === 0;
-		} else {
-			if (_this.isTopMax) {
-				_this.nav.get(_this.Dir.BEFORE, function(chunk) {
-					if (chunk.offset > 0) {
-						_this.isTopMax = false;
-					}
-				});
-			}
-		}
-
-		if (chunk.offset === 0) {
-			return;
-		}
-
-		var element = (where === _this.Dir.BEFORE) ? _this.container.getBody().lastChild : _this.container.getBody().firstChild;
-		element.parentNode.removeChild(element);
-
-		_this.drawChunk(chunk, where);
-		_this.container.getBody().scrollTop = pos;
-
-		endCallback(_this.isTopMax); // pauseScrollEvent = false
-	});
+	var firstVisibleOffset = this.firstVisibleOffset();
+	this.drawContent(this.container.getBody(), function() {
+		_this.replaceScrollPosition(firstVisibleOffset);
+		endCallback();
+	}); // TODO Add stop scroll
 };
 
 Disasm.prototype.drawControls = function(dom) {
-	dom.innerHTML = 'todo';
+	var out = uiRoundButton('javascript:disasm.nav.go(-1);disasm.draw();', 'keyboard_arrow_up');
+	out += uiRoundButton('javascript:disasm.nav.go(1);disasm.draw();', 'keyboard_arrow_down');
+	out += '&nbsp;';
+	out += uiButton('javascript:analyze()', 'ANLZ');
+	out += uiButton('javascript:comment()', 'CMNT');
+	out += uiButton('javascript:info()', 'Info');
+	out += uiButton('javascript:rename()', 'RNME');
+	out += uiButton('javascript:write()', 'Wrte');
+
+	out += uiButton('javascript:disasm.openAnalysisDialog()', 'Process analysis');
+	out += '<ul id="disasm-history"></ul>';
+
+	dom.innerHTML = out;
+
+	this.history = document.getElementById('disasm-history');
+	this.drawHistory(this.history);
+};
+
+Disasm.prototype.drawHistory = function(dom) {
+	var canGoBefore = (this.indexOffsetHistory > 0);
+	var canGoAfter = (this.indexOffsetHistory < this.offsetHistory.length - 1);
+
+	var _this = this;
+	dom.innerHTML = '';
+	for (var i = 0 ; i < this.offsetHistory.length ; i++) {
+		var isCurrent = (i === this.indexOffsetHistory);
+
+		var li = document.createElement('li');
+		li.className = (isCurrent) ? 'active' : '';
+		li.i = i;
+		li.x = this.offsetHistory[i];
+		li.appendChild(document.createTextNode(this.offsetHistory[i]));
+		li.addEventListener('click', function(evt) {
+			var x = evt.target.x;
+			// Global does not trigger the callback for specific widget
+			seekAction.applyGlobal(x.toString());
+			_this.indexOffsetHistory = evt.target.i;
+			_this.nav.refreshCurrentOffset();
+			_this.draw();
+		});
+
+		dom.appendChild(li);
+	}
+
+	var li = document.createElement('li');
+	li.title = 'Seek();';
+	li.appendChild(document.createTextNode('?'));
+	li.addEventListener('click', function() {
+		seek();
+	});
+	dom.appendChild(li);
+};
+
+Disasm.prototype.openAnalysisDialog = function() {
+	this.analysisDialog.showModal();
+};
+
+/**
+ * We want to know the first offset currently visible at the moment
+ * when the user ask for more data by scrolling
+ */
+Disasm.prototype.firstVisibleOffset = function() {
+	// Part of the container already scrolled
+	var hiddenContainerPart = this.container.getBody().scrollTop;
+	if (hiddenContainerPart === 0) {
+		return;
+	}
+
+	// We want to isolate the chunk that it's visible on the first line visible
+	var curSum = 0;
+	var elements = this.container.getBody().children;
+	var selectedChunk = elements[0];
+	for (var i = 1 ; i < elements.length ; i++) {
+		var height = elements[i].getBoundingClientRect().height;
+		curSum += height;
+		// When the current container start in the visible zone
+		// we know it's occurs in the previous, we abort here
+		if (curSum > hiddenContainerPart) {
+			// We restore the previous value, we need it
+			curSum -= height;
+			break;
+		}
+		selectedChunk = elements[i];
+	}
+
+	// Then, we want to guess approximately which offset was that line
+	var visibleSpace = curSum - hiddenContainerPart;
+	var hiddenSpace = selectedChunk.getBoundingClientRect().height - visibleSpace;
+
+	var offsetRelatedToThatChunk = this.extractOffset_(selectedChunk.children[0].id);
+
+	var guessedOffset = offsetRelatedToThatChunk + Math.ceil(hiddenSpace / this.lineHeight);
+
+	return guessedOffset;
+};
+
+/**
+ * We know the last approx. visible offset from firstVisibleOffset
+ * we want to adjust the current view to set this same offset on
+ * a near position.
+ */
+Disasm.prototype.replaceScrollPosition = function(offset) {
+	//console.log(offset.toString(16));
+	if (typeof offset === 'undefined') {
+		return;
+	}
+
+	// We select the chunk where the offset belongs
+	var position = this.nav.getChunkPositionFor(offset);
+	if (position === -1) {
+		console.log('Chunk position from offset not found');
+		return;
+	}
+
+	var chunk = this.container.getBody().children[position];
+	var blockOffset = this.extractOffset_(chunk.children[0].id);
+	var startFromTop = chunk.offsetTop;
+	var chunkHeight = chunk.getBoundingClientRect().height;
+
+	var progression = (offset - blockOffset) / this.nav.getSize(blockOffset);
+	var adjustment = Math.floor(progression * chunkHeight);
+	var requiredScroll = startFromTop + adjustment;
+
+	this.container.getBody().scrollTop = requiredScroll;
 };
