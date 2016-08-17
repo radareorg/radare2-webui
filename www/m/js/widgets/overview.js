@@ -97,4 +97,6 @@ function panelOverview() {
 	updateFortune();
 	updateInfo();
 	updateEntropy();
+
+	componentHandler.upgradeDom();
 }

@@ -6,7 +6,7 @@ function Disasm(containerElement, lineHeight) {
 	this.refreshInitialOffset();
 	this.init();
 
-	this.offsetHistory = [this.initialOffset];
+	this.offsetHistory = ['0x' + this.initialOffset.toString(16)];
 	this.indexOffsetHistory = 0;
 
 	var _this = this;
@@ -236,29 +236,57 @@ Disasm.prototype.getCurrentOffset = function() {
 };
 
 Disasm.prototype.oncontextmenu = function(evt, offset) {
+	this.refreshContextMenu(offset);
+	var menu = document.getElementById('contextmenuDisasm');
+	evt.preventDefault();
+
+	if (this.contextMenuOpen) {
+		menu.classList.remove('active');
+	} else {
+		this.currentOffset = offset;
+		menu.classList.add('active');
+		menu.style.left = evt.clientX + 'px';
+		menu.style.top = evt.clientY + 'px';
+	}
+
+	this.contextMenuOpen = !this.contextMenuOpen;
+};
+
+Disasm.prototype.onfctmenu = function(evt, fct) {
+	evt.preventDefault();
+
+	var offset;
+	r2.cmd('?v ' + fct, function(hex) {
+		offset = hex;
+	});
+
+	var newName = prompt('Rename?', fct);
+	if (newName === null || newName === '') {
+		return;
+	}
+
+	r2.cmd('fr ' + newName + '@ ' + offset);
+};
+
+Disasm.prototype.onvarmenu = function(evt, varName) {
+	evt.preventDefault();
+
+	var newName = prompt('Rename?', varName);
+	if (newName === null || newName === '') {
+		return;
+	}
+
+	r2.cmd('afvn ' + varName + ' ' + newName);
+};
+
+Disasm.prototype.refreshContextMenu = function(offset) {
 	// check with aoj first, if 'val' field exists: open
 	var isUndefined;
 	r2.cmdj('aoj @' + offset, function(info) {
 		isUndefined = typeof info[0].val === 'undefined';
 	});
 
-	if (!isUndefined) {
-		var menu = document.getElementById('contextmenuDisasm');
-		evt.preventDefault();
-
-		if (this.contextMenuOpen) {
-			menu.classList.remove('active');
-		} else {
-			this.currentOffset = offset;
-			menu.classList.add('active');
-			menu.style.left = evt.clientX + 'px';
-			menu.style.top = evt.clientY + 'px';
-		}
-
-		this.contextMenuOpen = !this.contextMenuOpen;
-	} else {
-		console.log('NOT opening ctxt menu');
-	}
+	this.drawContextualMenu(!isUndefined);
 };
 
 Disasm.prototype.getPresentBlock = function() {
@@ -311,13 +339,34 @@ Disasm.prototype.drawChunk = function(chunk, domAnchor) {
 	var _this = this;
 	for (var i = 0 ; i < spans.length; i++) {
 		if (spans[i].tagName === 'SPAN') {
-			spans[i].addEventListener('contextmenu', function(id) {
-				return function(evt) {
-					return _this.oncontextmenu(evt, id);
-				};
-			}(spans[i].id));
+			if (spans[i].className.indexOf('offset') !== -1) {
+				spans[i].addEventListener('contextmenu', function(id) {
+					return function(evt) {
+						return _this.oncontextmenu(evt, id);
+					};
+				}(spans[i].id));
+			} else if (spans[i].className.indexOf('fcn') !== -1) {
+				spans[i].addEventListener('contextmenu', function(id) {
+					return function(evt) {
+						return _this.onfctmenu(evt, id);
+					};
+				}(spans[i].id));
+			} else if (spans[i].className.indexOf('var') !== -1) {
+				spans[i].addEventListener('contextmenu', function(id) {
+					return function(evt) {
+						return _this.onvarmenu(evt, id);
+					};
+				}(spans[i].id));
+			}
 		}
 	}
+
+	// Highligh current offset (seek)
+	var curElem = document.getElementById(this.nav.getSeekOffset());
+	if (curElem !== null) {
+		curElem.classList.add('currentOffset');
+	}
+
 	return document.getElementById(domAnchor);
 };
 
