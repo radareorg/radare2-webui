@@ -770,19 +770,20 @@ function panelFlags() {
 	c.innerHTML += uiButton('javascript:delAllFlags()', 'DeleteAll');
 	c.innerHTML += '<br /><br />';
 	r2.cmd('f', function(d) {
+
+		var table = new Table(
+			['+Offset', '+Size', 'Name'],
+			[true, true, false],
+			'flagsTable');
+
 		var lines = d.split(/\n/); //clickableOffsets (d).split (/\n/);
-		var body = uiTableBegin(['+Offset', '+Size', 'Name']);
 		for (var i in lines) {
 			var line = lines[i].split(/ /);
-			if (line.length >= 3)
-			body += uiTableRow([
-			'+' + line[0],
-			'+' + line[1],
-			line[2]
-			]);
+			if (line.length >= 3) {
+				table.addRow([line[0], line[1], line[2]]);
+			}
 		}
-		body += uiTableEnd();
-		c.innerHTML += body;
+		table.insertInto(c);
 	});
 }
 
@@ -797,18 +798,19 @@ function panelComments() {
 	c.innerHTML += uiButton('javascript:notes()', 'Notes');
 	c.innerHTML += '<br /><br />';
 	r2.cmd('CC', function(d) {
+		var table = new Table(
+			['+Offset', 'Comment'],
+			[true, false],
+			'commentsTable');
+
 		var lines = d.split(/\n/); //clickableOffsets (d).split (/\n/);
-		var body = uiTableBegin(['+Offset', 'Comment']);
 		for (var i in lines) {
 			var line = lines[i].split(/ (.+)?/);
-			if (line.length >= 2)
-			body += uiTableRow([
-			'+' + line[0],
-			'+' + line[1]
-			]);
+			if (line.length >= 2) {
+				table.addRow([line[0], line[1]]);
+			}
 		}
-		body += uiTableEnd();
-		c.innerHTML += body;
+		table.insertInto(c);
 	});
 }
 
