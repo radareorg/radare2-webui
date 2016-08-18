@@ -264,3 +264,7 @@ DisasmNavigator.prototype.refreshCurrentOffset = function() {
 		_this.currentOffset = parseInt(offset, 16);
 	});
 };
+
+DisasmNavigator.prototype.getSeekOffset = function() {
+	return this.currentOffset;
+};

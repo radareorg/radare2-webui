@@ -27,6 +27,9 @@ nav.context-menu ul li {
 	border-bottom:1px solid #E0E0E0;
 }
 
+nav.context-menu ul li.disabled {
+	color: #A0A0A0;
+}
 
 nav.context-menu ul > li > ul {
 	display: none;
