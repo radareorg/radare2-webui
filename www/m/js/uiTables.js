@@ -55,7 +55,7 @@ Table.prototype.addRow = function(cells) {
 		if (this.clickableOffset[i]) {
 			td.innerHTML = clickableOffsets(cells[i]);
 		} else {
-			td.appendChild(document.createTextNode(cells[i]));
+			td.innerHTML = cells[i];
 		}
 		tr.appendChild(td);
 	}

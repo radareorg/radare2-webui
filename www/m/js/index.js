@@ -578,9 +578,10 @@ function panelFunctions() {
 
 		var lines = d.split(/\n/); //clickableOffsets (d).split (/\n/);
 		for (var i in lines) {
-			var line = lines[i].split(/ +/);
-			if (line.length >= 3) {
-				table.addRow([line[0], line[3], line[1], line[2]]);
+			var items = lines[i].match(/^(0x[0-9a-f]+)\s+([0-9]+)\s+([0-9]+(\s+\-&gt;\s+[0-9]+)?)\s+(.+)$/);
+			if (items !== null) {
+				console.log(items);
+				table.addRow([items[1], items[5], items[2], items[3]]);
 			}
 		}
 		table.insertInto(c);
