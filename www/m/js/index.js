@@ -466,90 +466,6 @@ function panelSettings() {
 	c.innerHTML = out;
 }
 
-function printHeaderPanel(title, cmd, grep) {
-	var widget = widgetContainer.getWidget(title);
-	widget.setDark();
-	var dom = widgetContainer.getWidgetDOMWrapper(widget);
-
-	// TODO, warning? panelFunction // printHeaderPanel (not a complete widget)
-	updates.registerMethod(widget.getOffset(), panelFunctions);
-
-	var c = document.createElement('div');
-	dom.innerHTML = '';
-	dom.appendChild(c);
-
-	c.style.color = '#202020 !important';
-	c.style.backgroundColor = '#202020';
-	var out = '' ; //
-	/*
-	out += ''
-	+' <div class="mdl-tabs mdl-js-tabs">'
-	+'  <div class="mdl-tabs__tab-bar mds-js-ripple-effect">'
-	+'    <a href="#tab1-panel" class="mdl-tabs__tab is-active">Headers</a>'
-	+'    <a href="#tab2-panel" class="mdl-tabs__tab">Symbols</a>'
-	+'    <a href="#tab3-panel" class="mdl-tabs__tab">Imports</a>'
-	+'    <a href="#tab4-panel" class="mdl-tabs__tab">Relocs</a>'
-	+'    <a href="#tab5-panel" class="mdl-tabs__tab">Sections</a>'
-	+'    <a href="#tab6-panel" class="mdl-tabs__tab">SDB</a>'
-	+'  </div>'
-	+'  <div class="mdl-tabs__panel is-active" id="tab1-panel">'
-	+'    <p>Tab 1 Content</p>'
-	+'  </div>'
-	+'  <div class="mdl-tabs__panel" id="tab2-panel">'
-	+'    <p>Tab 2 Content</p>'
-	+'  </div>'
-	+'  <div class="mdl-tabs__panel" id="tab3-panel">'
-	+'    <p>Tab 3 Content</p>'
-	+'  </div>'
-	+'</div>';
-*/
-	out += '<div style=\'position:fixed;margin:0.5em\'>';
-	out += '&nbsp;' + uiRoundButton('javascript:location.href="/m"', 'undo');
-	out += uiButton('javascript:panelHeaders()', 'Headers');
-	out += uiButton('javascript:panelSymbols()', 'Symbols');
-	out += uiButton('javascript:panelImports()', 'Imports');
-	out += uiButton('javascript:panelRelocs()', 'Relocs');
-	out += uiButton('javascript:panelSections()', 'Sections');
-	out += uiButton('javascript:panelStrings()', 'Strings');
-	out += uiButton('javascript:panelSdb()', 'Sdb');
-	out += '</div><br /><br /><br /><br />';
-	c.innerHTML = out;
-
-	if (grep) {
-		cmd += '~' + grep;
-	}
-	r2.cmd(cmd, function(d) {
-		var color = '#f0f0f0';
-		d = clickableOffsets(d);
-		c.innerHTML += '<pre style=\'margin:1.2em;color:' + color + ' !important\'>' + d + '<pre>';
-	});
-}
-
-function panelSdb() {
-	printHeaderPanel('SDB', 'k bin/cur/***');
-}
-function panelSections() {
-	printHeaderPanel('Sections', 'iSq');
-}
-function panelStrings() {
-	printHeaderPanel('Strings', 'izq');
-}
-function panelImports() {
-	printHeaderPanel('Imports', 'isq', ' imp.');
-}
-
-function panelRelocs() {
-	printHeaderPanel('Relocs', 'ir');
-}
-
-function panelSymbols() {
-	printHeaderPanel('Imports', 'isq', '!imp');
-}
-
-function panelHeaders() {
-	printHeaderPanel('Headers', 'ie;i');
-}
-
 function panelFunctions() {
 	var widget = widgetContainer.getWidget('Functions');
 	widget.setDark();
@@ -1040,108 +956,6 @@ Array.prototype.forEach.call(document.querySelectorAll('.mdl-card__media'), func
 	});
 });
 
-function updateFortune() {
-	r2.cmd('fo', function(d) {
-		document.getElementById('fortune').innerHTML = d;
-		readFortune();
-	});
-}
-
-// say a message
-function speak(text, callback) {
-    var u = new SpeechSynthesisUtterance();
-    u.text = text;
-    u.lang = 'en-US';
- 
-    u.onend = function () {
-        if (callback) {
-            callback();
-        }
-    };
- 
-    u.onerror = function (e) {
-        if (callback) {
-            callback(e);
-        }
-    };
- 
-    speechSynthesis.speak(u);
-}
-
-function readFortune() {
-	var f = document.getElementById('fortune').innerHTML;
-	speak (f);
-}
-
-function updateInfo() {
-	r2.cmd('i', function(d) {
-		var lines = d.split(/\n/g);
-		var lines1 = lines.slice(0,lines.length / 2);
-		var lines2 = lines.slice(lines.length / 2);
-		var body = '';
-
-		body += '<table style=\'width:100%\'><tr><td>';
-		for (var i in lines1) {
-			var line = lines1[i].split(/ (.+)?/);
-			if (line.length >= 2)
-			body += '<b>' + line[0] + '</b> ' + line[1] + '<br/>';
-		}
-		body += '</td><td>';
-		for (var i in lines2) {
-			var line = lines2[i].split(/ (.+)?/);
-			if (line.length >= 2)
-			body += '<b>' + line[0] + '</b> ' + line[1] + '<br/>';
-		}
-		body += '</td></tr></table>';
-		document.getElementById('info').innerHTML = body;
-	});
-}
-
-function updateEntropy() {
-	var eg = document.getElementById('entropy-graph');
-	var box = eg.getBoundingClientRect();
-	var height = (0 | box.height) - 35 - 19;
-	r2.cmd('p=ej 50 $s @ $M', function(d) {
-		var body = '';
-		var res = JSON.parse(d);
-		var values = new Array();
-
-		for (var i in res['entropy']) values.push(res['entropy'][i]['value']);
-
-		var nbvals = values.length;
-		var min = Math.min.apply(null, values);
-		var max = Math.max.apply(null, values);
-		var inc = 500.0 / nbvals;
-
-		// Minimum entropy has 0.1 transparency. Max has 1.
-		for (var i in values) {
-			var y = 0.1 + (1 - 0.1) * ((values[i] - min) / (max - min));
-			var addr = '0x' + res['entropy'][i]['addr'].toString(16);
-			body += '<rect x="' + (inc * i).toString();
-			body += '" y="0" width="' + inc.toString();
-			body += '" height="' + height + '" style="fill:black;fill-opacity:';
-			body += y.toString() + ';"><title>';
-			body += addr + ' </title></rect>' ;
-
-			if (i % 8 == 0) {
-				body += '<text transform="matrix(1 0 0 1 ';
-				body += (i * inc).toString();
-				body += ' ' + (height + 15) + ')" fill="ff8888" font-family="\'Roboto\'" font-size="9">';
-				body += addr + '</text>';
-			}
-		}
-
-		eg.innerHTML = body;
-		eg.onclick = function(e) {
-			var box = eg.getBoundingClientRect();
-			var pos = e.clientX - box.left;
-			var i = 0 | (pos / (box.width / nbvals));
-			var addr = '0x' + res['entropy'][i]['addr'].toString(16);
-			seek(addr);
-		};
-	});
-}
-
 function onClick(a, b) {
 	var h = document.getElementById(a);
 	if (h) {
@@ -1217,8 +1031,6 @@ function ready() {
 	/* left menu */
 	onClick('analyze_button', analyzeButton);
 	onClick('menu_overview', panelOverview);
-	onClick('menu_headers', panelHeaders);
-	onClick('info_headers', panelHeaders);
 	onClick('menu_disasm', panelDisasm);
 	onClick('menu_debug', panelDebug);
 	onClick('menu_hexdump', panelHexdump);
@@ -1274,7 +1086,7 @@ document.body.onkeypress = function(e) {
 		panelHexdump,
 		panelFunctions,
 		panelFlags,
-		panelHeaders,
+		panelOverview,
 		panelSettings,
 		panelSearch
 		];
