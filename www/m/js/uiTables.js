@@ -5,10 +5,14 @@
  * @param {Array} nonum - List of booleans, set true if non-numeric
  * @param {String} id - Id (DOM) of the current table, internal usage for DataTable plugin
  */
-function Table(cols, nonum, id) {
+function Table(cols, nonum, id, onChange) {
 	this.cols = cols;
 	this.nonum = nonum;
-	this.clickableOffset = [];
+	this.clickableOffset = new Array(cols.length);
+	this.clickableOffset.fill(false);
+	this.contentEditable = new Array(cols.length);
+	this.contentEditable.fill(false);
+	this.onChange = onChange;
 	this.id = id || false;
 
 	this.init();
@@ -33,8 +37,8 @@ Table.prototype.init = function() {
 		if (this.cols[c][0] == '+') {
 			this.clickableOffset[c] = true;
 			this.cols[c] = this.cols[c].substr(1);
-		} else {
-			this.clickableOffset[c] = false;
+		} else if (this.cols[c][0] == '~') {
+			this.contentEditable[c] = true;
 		}
 
 		var th = document.createElement('th');
@@ -57,6 +61,42 @@ Table.prototype.addRow = function(cells) {
 		} else {
 			td.innerHTML = cells[i];
 		}
+
+		if (this.contentEditable[i]) {
+			var _this = this;
+			td.initVal = td.innerHTML;
+			td.contentEditable = true;
+			td.busy = false;
+
+			td.addEventListener('blur', function(evt) {
+				if (evt.target.busy) {
+					return;
+				}
+				if (evt.target.initVal == evt.target.innerHTML) {
+					return;
+				}
+				evt.target.busy = true;
+				_this.onChange(cells, evt.target.innerHTML);
+				evt.target.initVal = evt.target.innerHTML;
+				evt.target.busy = false;
+			});
+
+			td.addEventListener('keydown', function(evt) {
+				if (evt.keyCode != 13 || evt.target.busy) {
+					return;
+				}
+				if (evt.target.initVal == evt.target.innerHTML) {
+					return;
+				}
+				evt.preventDefault();
+				evt.target.busy = true;
+				_this.onChange(cells, evt.target.innerHTML);
+				evt.target.initVal = evt.target.innerHTML;
+				evt.target.busy = false;
+				evt.target.blur();
+			});
+		}
+
 		tr.appendChild(td);
 	}
 };
