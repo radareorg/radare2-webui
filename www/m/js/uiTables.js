@@ -108,16 +108,14 @@ Table.prototype.insertInto = function(node) {
 	}
 };
 
-
 /**
  * Legacy methods, extracted from main JS
  */
-
-function uiTableBegin(cols, id) {
+function uiTableBegin(cols, domId) {
 	var out = '';
-	var id = id || '';
-	console.log(id.substr(1));
-	out += '<table id="'+id.substr(1)+'" style="margin-left:10px" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">';
+	var id = domId || '';
+	var classes = 'mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp';
+	out += '<table id="' + id.substr(1) + '" style="margin-left:10px" class="' + classes + '">';
 	//out += '<table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable">';
 
 	out += '  <thead> <tr>';
@@ -141,7 +139,9 @@ function uiTableRow(cols) {
 	var out = '<tr>';
 	for (var i in cols) {
 		var col = cols[i];
-		if (!col) continue;
+		if (!col) {
+			continue;
+		}
 		if (col[0] == '+') {
 			col = clickableOffsets(col.substring(1));
 			type = '';

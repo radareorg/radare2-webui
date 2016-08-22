@@ -43,4 +43,9 @@ Widget.prototype.isAlreadyThere = function() {
 
 Widget.prototype.setDark = function() {
 	this.DOMWrapper.style.backgroundColor = 'rgb(32, 32, 32)';
+
+	// Flex containers compatibility
+	if (typeof this.DOMWrapper.children[1] !== 'undefined') {
+		this.DOMWrapper.children[1].style.backgroundColor = 'rgb(32, 32, 32)';
+	}
 };

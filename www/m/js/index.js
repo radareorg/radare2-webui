@@ -3,27 +3,30 @@ var inColor = true;
 var lastView = panelDisasm;
 
 function uiButton(href, label, type) {
+	var classes = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect ';
+	classes += 'mdl-color--accent mdl-color-text--accent-contrast';
 	if (type == 'active') {
-		return '&nbsp;<a href="' + href.replace(/"/g,'\'') + '" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--accent mdl-color-text--accent-contrast" style="background-color:#f04040 !important">' + label + '</a>';
+		var st = 'style="background-color:#f04040 !important"';
+		return '&nbsp;<a href="' + href.replace(/"/g, '\'') + '" class="' + classes + '" ' + st + '>' + label + '</a>';
 	}
-	return '&nbsp;<a href="' + href.replace(/"/g,'\'') + '" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--accent mdl-color-text--accent-contrast">' + label + '</a>';
+	return '&nbsp;<a href="' + href.replace(/"/g, '\'') + '" class="' + classes + '">' + label + '</a>';
 }
 
 function write() {
 	var str = prompt('hexpairs, quoted string or :assembly');
 	if (str != '') {
 		switch (str[0]) {
-		case ':':
-			str = str.substring(1);
-			r2.cmd('"wa ' + str + '"', update);
-			break;
-		case '"':
-			str = str.replace(/"/g, '');
-			r2.cmd('w ' + str, update);
-			break;
-		default:
-			r2.cmd('wx ' + str, update);
-			break;
+			case ':':
+				str = str.substring(1);
+				r2.cmd('"wa ' + str + '"', update);
+				break;
+			case '"':
+				str = str.replace(/"/g, '');
+				r2.cmd('w ' + str, update);
+				break;
+			default:
+				r2.cmd('wx ' + str, update);
+				break;
 		}
 	}
 }
@@ -92,7 +95,13 @@ function analyze() {
 	});
 }
 function uiCheckList(grp, id, label) {
-	return '<li> <label for="' + grp + '" class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect"> <input type="checkbox" id="' + id + '" class="mdl-checkbox__input" /><span class="mdl-checkbox__label">' + label + '</span> </label> </li>';
+	var output = '<li>';
+	ouput += '<label for="' + grp + '" class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect">';
+	ouput += '<input type="checkbox" id="' + id + '" class="mdl-checkbox__input" />';
+	ouput += '<span class="mdl-checkbox__label">' + label + '</span>';
+	ouput += '</label></li>';
+
+	return output;
 }
 
 function notes() {
@@ -105,24 +114,36 @@ function notes() {
 }
 
 function setFlagspace(fs) {
-	if (!fs) fs = prompt('name');
-	if (!fs) return;
+	if (!fs) {
+		fs = prompt('name');
+	}
+	if (!fs) {
+		return;
+	}
 	r2.cmd('fs ' + fs, function() {
 		flagspaces();
 	});
 }
 
 function renameFlagspace(fs) {
-	if (!fs) fs = prompt('name');
-	if (!fs) return;
+	if (!fs) {
+		fs = prompt('name');
+	}
+	if (!fs) {
+		return;
+	}
 	r2.cmd('fsr ' + fs, function() {
 		flagspaces();
 	});
 }
 
 function delFlagspace(fs) {
-	if (!fs) fs = '.';
-	if (!fs) return;
+	if (!fs) {
+		fs = '.';
+	}
+	if (!fs) {
+		return;
+	}
 	r2.cmd('fs-' + fs, function() {
 		flagspaces();
 	});
@@ -164,12 +185,13 @@ function flagspaces() {
 				var selected = line[2].indexOf('.') == -1;
 				var a = '';
 				a += '<a href="javascript:setFlagspace(\'' + line[3] + '\')">';
-				if (selected) a += '<font color=\'red\'>' + line[3] + '</font>';
-				else a += line[3];
+				if (selected) {
+					a += '<font color=\'red\'>' + line[3] + '</font>';
+				} else {
+					a += line[3];
+				}
 				a += '</a>';
-				body += uiTableRow([
-				'+' + line[1], a
-				]);
+				body += uiTableRow(['+' + line[1], a]);
 			}
 		}
 		body += uiTableEnd();
@@ -179,35 +201,35 @@ function flagspaces() {
 
 function analyzeSymbols() {
 	statusMessage('Analyzing symbols...');
-	r2.cmd('aa',function() {
+	r2.cmd('aa', function() {
 		statusMessage('done');
 		update();
 	});
 }
 function analyzeRefs() {
 	statusMessage('Analyzing references...');
-	r2.cmd('aar',function() {
+	r2.cmd('aar', function() {
 		statusMessage('done');
 		update();
 	});
 }
 function analyzeCalls() {
 	statusMessage('Analyzing calls...');
-	r2.cmd('aac',function() {
+	r2.cmd('aac', function() {
 		statusMessage('done');
 		update();
 	});
 }
 function analyzeFunction() {
 	statusMessage('Analyzing function...');
-	r2.cmd('af',function() {
+	r2.cmd('af', function() {
 		statusMessage('done');
 		update();
 	});
 }
 function analyzeNames() {
 	statusMessage('Analyzing names...');
-	r2.cmd('.afna @@ fcn.*',function() {
+	r2.cmd('.afna @@ fcn.*', function() {
 		statusMessage('done');
 		update();
 	});
@@ -250,7 +272,7 @@ function configATT() {
 
 function panelAbout() {
 	r2.cmd('?V', function(version) {
-		alert('radare2 material webui by --pancake @ 2015-2016\n\n'+version.trim());
+		alert('radare2 material webui by --pancake @ 2015-2016\n\n' + version.trim());
 	});
 }
 
@@ -295,9 +317,9 @@ function configColorFalse() { inColor = false; }
 var comboId = 0;
 
 function uiCombo(d) {
-	var fun_name = 'combo' + (++comboId);
-	var fun = fun_name + ' = function(e) {';
-	fun += ' var sel = document.getElementById("opt_' + fun_name + '");';
+	var funName = 'combo' + (++comboId);
+	var fun = funName + ' = function(e) {';
+	fun += ' var sel = document.getElementById("opt_' + funName + '");';
 	fun += ' var opt = sel.options[sel.selectedIndex].value;';
 	fun += ' switch (opt) {';
 	for (var a in d) {
@@ -306,7 +328,7 @@ function uiCombo(d) {
 	fun += '}}';
 	// CSP violation here
 	eval(fun);
-	var out = '<select id="opt_' + fun_name + '" onchange="' + fun_name + '()">';
+	var out = '<select id="opt_' + funName + '" onchange="' + funName + '()">';
 	for (var a in d) {
 		var def = (d[a].default) ? ' default' : '';
 		out += '<option' + def + '>' + d[a].name + '</option>';
@@ -317,16 +339,18 @@ function uiCombo(d) {
 
 function uiSwitch(d) {
 	// TODO: not yet done
-	var out = '' + d +
-	'<label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-1">' +
-	'<input type="checkbox" id="switch-1" class="mdl-switch__input" checked />' +
-	'<span class="mdl-switch__label"></span>' +
-	'</label>';
+	var out = d;
+	out += '<label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-1">';
+	out += '<input type="checkbox" id="switch-1" class="mdl-switch__input" checked />';
+	out += '<span class="mdl-switch__label"></span>';
+	out += '</label>';
 	return out;
 }
 
 function uiBlock(d) {
-	var out = '<div class="mdl-card__supporting-text mdl-shadow--2dp mdl-color-text--blue-grey-50 mdl-cell" style="display:inline-block;margin:5px;color:black !important;background-color:white !important">';
+	var classes = 'mdl-card__supporting-text mdl-shadow--2dp mdl-color-text--blue-grey-50 mdl-cell';
+	var styles = 'display:inline-block;margin:5px;color:black !important;background-color:white !important';
+	var out = '<div class="' + classes + '" style="' + styles + '">';
 	out += '<h3 style="color:black">' + d.name + '</h3>';
 	for (var i in d.blocks) {
 		var D = d.blocks[i];
@@ -405,36 +429,31 @@ function panelSettings() {
 	]
 	});
 	out += uiBlock({ name: 'Disassembly', blocks: [
-	{
-	name: 'Size', buttons: [
-	{ name: 'S', js: 'smallDisasm' },
-	{ name: 'M', js: 'mediumDisasm' },
-	{ name: 'L', js: 'largeDisasm' }
+	{ name: 'Size', buttons: [
+		{ name: 'S', js: 'smallDisasm' },
+		{ name: 'M', js: 'mediumDisasm' },
+		{ name: 'L', js: 'largeDisasm' }
 	]},
-	{
-	name: 'Decoding', buttons: [
-	{ name: 'Pseudo', js: 'configPseudo' },
-	{ name: 'Opcodes', js: 'configOpcodes' },
-	{ name: 'ATT', js: 'configATT' }
+	{ name: 'Decoding', buttons: [
+		{ name: 'Pseudo', js: 'configPseudo' },
+		{ name: 'Opcodes', js: 'configOpcodes' },
+		{ name: 'ATT', js: 'configATT' }
 	]},
-		       {
-			name: 'Colors', buttons: [
-			{ name: 'Yes', js: 'configColorTrue', default: true },
-			{ name: 'No', js: 'configColorFalse' }
-			]
-		}, {
-			name: 'Theme', buttons: [
-				{ name: 'Default', js: 'configColorDefault' },
-				{ name: 'Random', js: 'configColorRandom' },
-				{ name: 'Solarized', js: 'configColorTheme("solarized")' },
-				{ name: 'Ogray', js: 'configColorTheme("ogray")' },
-				{ name: 'Twilight', js: 'configColorTheme("twilight")' },
-				{ name: 'Rasta', js: 'configColorTheme("rasta")' },
-				{ name: 'Tango', js: 'configColorTheme("tango")' },
-				{ name: 'White', js: 'configColorTheme("white")' }
-				]}
-						]
-		});
+	{ name: 'Colors', buttons: [
+		{ name: 'Yes', js: 'configColorTrue', default: true },
+		{ name: 'No', js: 'configColorFalse' }
+	]},
+	{ name: 'Theme', buttons: [
+		{ name: 'Default', js: 'configColorDefault' },
+		{ name: 'Random', js: 'configColorRandom' },
+		{ name: 'Solarized', js: 'configColorTheme("solarized")' },
+		{ name: 'Ogray', js: 'configColorTheme("ogray")' },
+		{ name: 'Twilight', js: 'configColorTheme("twilight")' },
+		{ name: 'Rasta', js: 'configColorTheme("rasta")' },
+		{ name: 'Tango', js: 'configColorTheme("tango")' },
+		{ name: 'White', js: 'configColorTheme("white")' }
+		]}
+	]});
 	out += uiBlock({ name: 'Core/IO', blocks: [
 		{
 			name: 'Mode', buttons: [
@@ -443,19 +462,19 @@ function panelSettings() {
 			{ name: 'Debug', js: 'configDebug' }
 			]
 		}
-]});
+		]});
 	out += uiBlock({ name: 'Analysis', blocks: [
 		{
 			name: 'HasNext', buttons: [
 			{ name: 'Yes', js: 'configAnalHasnextTrue', default: true },
 			{ name: 'No', js: 'configAnalHasnextFalse' }
 			]
-		},{
+		}, {
 			name: 'Skip Nops', buttons: [
 			{ name: 'Yes', js: 'configAnalNopskipTrue', default: true },
 			{ name: 'No', js: 'configAnalNopskipFalse' }
 			]
-		},{
+		}, {
 			name: 'NonCode', buttons: [
 			{ name: 'Yes', js: 'configAnalNoncodeTrue' },
 			{ name: 'No', js: 'configAnalNoncodeFalse', default: true }
@@ -484,9 +503,6 @@ function panelFunctions() {
 	c.innerHTML = body;
 	r2.cmd('e scr.utf8=false');
 	r2.cmd('afl', function(d) {
-		//var dis = clickableOffsets (d);
-		//c.innerHTML += "<pre style='font-family:Console,Courier New,monospace' style='color:white !important'>"+dis+"<pre>";
-
 		var table = new Table(
 			['+Address', 'Name', '+Size', '+CC'],
 			[false, true, false, false],
@@ -496,7 +512,6 @@ function panelFunctions() {
 		for (var i in lines) {
 			var items = lines[i].match(/^(0x[0-9a-f]+)\s+([0-9]+)\s+([0-9]+(\s+\-&gt;\s+[0-9]+)?)\s+(.+)$/);
 			if (items !== null) {
-				console.log(items);
 				table.addRow([items[1], items[5], items[2], items[3]]);
 			}
 		}
@@ -505,14 +520,15 @@ function panelFunctions() {
 
 }
 
-var last_console_output = '';
+var lastConsoleOutput = '';
 
 function runCommand(text) {
-	if (!text)
-	text = document.getElementById('input').value;
+	if (!text) {
+		text = document.getElementById('input').value;
+	}
 	r2.cmd(text, function(d) {
-		last_console_output = '\n' + d;
-		document.getElementById('output').innerHTML = last_console_output;
+		lastConsoleOutput = '\n' + d;
+		document.getElementById('output').innerHTML = lastConsoleOutput;
 	});
 }
 
@@ -535,18 +551,20 @@ function panelConsole() {
 	updates.registerMethod(widget.getOffset(), panelConsole);
 
 	c.innerHTML = '<br />';
+	var common = 'onkeypress=\'consoleKey()\' class=\'mdl-card--expand mdl-textfield__input\' id=\'input\'';
 	if (inColor) {
 		c.style.backgroundColor = '#202020';
-		c.innerHTML += '<input style=\'position:fixed;padding-left:10px;top:4em;height:1.8em;color:white\' onkeypress=\'consoleKey()\' class=\'mdl-card--expand mdl-textfield__input\' id=\'input\'/>';
+		var styles = 'position:fixed;padding-left:10px;top:4em;height:1.8em;color:white';
+		c.innerHTML += '<input style=\'' + styles + '\' ' + common + ' />';
 		//c.innerHTML += uiButton('javascript:runCommand()', 'Run');
 		c.innerHTML += '<div id=\'output\' class=\'pre\' style=\'color:white !important\'><div>';
 	} else {
 		c.style.backgroundColor = '#f0f0f0';
-		c.innerHTML += '<input style=\'color:black\' onkeypress=\'consoleKey()\' class=\'mdl-card--expand mdl-textfield__input\' id=\'input\'/>';
+		c.innerHTML += '<input style=\'color:black\' ' + common + '/>';
 		c.innerHTML += uiButton('javascript:runCommand()', 'Run');
 		c.innerHTML += '<div id=\'output\' class=\'pre\' style=\'color:black!important\'><div>';
 	}
-	document.getElementById('output').innerHTML = last_console_output;
+	document.getElementById('output').innerHTML = lastConsoleOutput;
 }
 
 function searchKey(e) {
@@ -566,27 +584,34 @@ function runSearchMagic() {
 	});
 }
 function runSearchCode(text) {
-	if (!text) text = document.getElementById('search_input').value;
+	if (!text) {
+		text = document.getElementById('search_input').value;
+	}
 	r2.cmd('"/c ' + text + '"', function(d) {
 		document.getElementById('search_output').innerHTML = clickableOffsets(d);
 	});
 }
 function runSearchString(text) {
-	if (!text) text = document.getElementById('search_input').value;
+	if (!text) {
+		text = document.getElementById('search_input').value;
+	}
 	r2.cmd('/ ' + text, function(d) {
 		document.getElementById('search_output').innerHTML = clickableOffsets(d);
 	});
 }
 function runSearchROP(text) {
-	if (!text) text = document.getElementById('search_input').value;
+	if (!text) {
+		text = document.getElementById('search_input').value;
+	}
 	r2.cmd('"/R ' + text + '"', function(d) {
 		document.getElementById('search_output').innerHTML = clickableOffsets(d);
 	});
 }
 
 function runSearch(text) {
-	if (!text)
-	text = document.getElementById('search_input').value;
+	if (!text) {
+		text = document.getElementById('search_input').value;
+	}
 	if (text[0] == '"') {
 		r2.cmd('"/ ' + text + '"', function(d) {
 			document.getElementById('search_output').innerHTML = clickableOffsets(d);
@@ -600,14 +625,14 @@ function runSearch(text) {
 
 function indentScript() {
 	var str = document.getElementById('script').value;
-	var indented = js_beautify(str);
+	var indented = /* NOT DEFINED js_beautify*/ (str);
 	document.getElementById('script').value = indented;
-	localStorage['script'] = indented;
+	localStorage.script = indented;
 }
 
 function runScript() {
 	var str = document.getElementById('script').value;
-	localStorage['script'] = str;
+	localStorage.script = str;
 	document.getElementById('scriptOutput').innerHTML = '';
 	try {
 		var msg = '"use strict";' +
@@ -662,8 +687,10 @@ function panelSearch() {
 	updates.registerMethod(widget.getOffset(), panelSearch);
 
 	c.style.backgroundColor = '#f0f0f0';
+	var style = 'background-color:white !important;padding-left:10px;top:3.5em;height:1.8em;color:white';
+	var classes = 'mdl-card--expand mdl-textfield__input';
 	var out = '<br />';
-	out += '<input style=\'background-color:white !important;padding-left:10px;top:3.5em;height:1.8em;color:white\' onkeypress=\'searchKey()\' class=\'mdl-card--expand mdl-textfield__input\' id=\'search_input\'/>';
+	out += '<input style=\'' + style + '\' onkeypress=\'searchKey()\' class=\'' + classes + '\' id=\'search_input\'/>';
 	out += '<br />';
 	out += uiButton('javascript:runSearch()', 'Hex');
 	out += uiButton('javascript:runSearchString()', 'String');
@@ -845,10 +872,12 @@ function blocks() {
 	var widget = widgetContainer.getWidget('Blocks');
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
 
-	c.style['overflow'] = 'none';
+	c.style.overflow = 'none';
 	var color = inColor ? 'white' : 'black';
+	var cl = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect ';
+	cl += 'mdl-color--accent mdl-color-text--accent-contrast';
 	c.innerHTML = '<br />';
-	c.innerHTML += '&nbsp;<a href="javascript:panelDisasm()" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--accent mdl-color-text--accent-contrast">&lt; INFO</a> <h3 color=white></h3>';
+	c.innerHTML += '&nbsp;<a href="javascript:panelDisasm()" class="' + cl + '">&lt; INFO</a> <h3 color=white></h3>';
 	var tail = inColor ? '@e:scr.color=1,scr.html=1' : '';
 	r2.cmd('pdr' + tail, function(d) {
 		c.innerHTML += '<pre style=\'color:' + color + '\'>' + d + '<pre>';
@@ -859,10 +888,12 @@ function pdtext() {
 	var widget = widgetContainer.getWidget('Function');
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
 
-	c.style['overflow'] = 'none';
+	c.style.overflow = 'none';
 	var color = inColor ? 'white' : 'black';
+	var cl = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect ';
+	cl += 'mdl-color--accent mdl-color-text--accent-contrast';
 	c.innerHTML = '<br />';
-	c.innerHTML += '&nbsp;<a href="javascript:panelDisasm()" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--accent mdl-color-text--accent-contrast">&lt; INFO</a> <h3 color=white></h3>';
+	c.innerHTML += '&nbsp;<a href="javascript:panelDisasm()" class="' + cl + '">&lt; INFO</a> <h3 color=white></h3>';
 	var tail = inColor ? '@e:scr.color=1,scr.html=1,asm.lineswidth=0' : '@e:asm.lineswidth=0';
 	r2.cmd('e scr.color=1;s entry0;s $S;pD $SS;e scr.color=0', function(d) {
 		d = clickableOffsets(d);
@@ -874,10 +905,12 @@ function pdf() {
 	var widget = widgetContainer.getWidget('Function');
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
 
-	c.style['overflow'] = 'none';
+	c.style.overflow = 'none';
 	var color = inColor ? 'white' : 'black';
+	var cl = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect ';
+	cl += 'mdl-color--accent mdl-color-text--accent-contrast';
 	c.innerHTML = '<br />';
-	c.innerHTML += '&nbsp;<a href="javascript:panelDisasm()" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--accent mdl-color-text--accent-contrast">&lt; INFO</a> <h3 color=white></h3>';
+	c.innerHTML += '&nbsp;<a href="javascript:panelDisasm()" class="' + cl + '">&lt; INFO</a> <h3 color=white></h3>';
 	var tail = inColor ? '@e:scr.color=1,scr.html=1,asm.lineswidth=0' : '@e:asm.lineswidth=0';
 	r2.cmd('pdf' + tail, function(d) {
 		c.innerHTML += '<pre style=\'color:' + color + '\'>' + d + '<pre>';
@@ -888,10 +921,12 @@ function decompile() {
 	var widget = widgetContainer.getWidget('Decompile');
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
 
-	c.style['overflow'] = 'none';
+	c.style.overflow = 'none';
 	var color = inColor ? 'white' : 'black';
+	var cl = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect ';
+	cl += 'mdl-color--accent mdl-color-text--accent-contrast';
 	c.innerHTML = '<br />';
-	c.innerHTML += '&nbsp;<a href="javascript:panelDisasm()" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--accent mdl-color-text--accent-contrast">&lt; INFO</a> <h3 color=white></h3>';
+	c.innerHTML += '&nbsp;<a href="javascript:panelDisasm()" class="' + cl + '">&lt; INFO</a> <h3 color=white></h3>';
 	var tail = inColor ? '@e:scr.color=1,scr.html=1' : '';
 	r2.cmd('pdc' + tail, function(d) {
 		c.innerHTML += '<pre style=\'color:' + color + '\'>' + d + '<pre>';
@@ -903,9 +938,11 @@ function graph() {
 	widget.setDark();
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
 
-	c.style['overflow'] = 'auto';
+	c.style.overflow = 'auto';
 	var color = inColor ? 'white' : 'black';
-	c.innerHTML = '<br />&nbsp;<a href="javascript:panelDisasm()" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--accent mdl-color-text--accent-contrast">&lt; INFO</a>';
+	var cl = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect ';
+	cl += 'mdl-color--accent mdl-color-text--accent-contrast';
+	c.innerHTML = '<br />&nbsp;<a href="javascript:panelDisasm()" class="' + cl + '">&lt; INFO</a>';
 	var tail = inColor ? '@e:scr.color=1,scr.html=1' : '';
 	r2.cmd('agf' + tail, function(d) {
 		d = clickableOffsets(d);
@@ -1040,7 +1077,7 @@ function ready() {
 	});
 
 	// Close the drawer on click with small screens
-	document.querySelector('.mdl-layout__drawer').addEventListener('click', function () {
+	document.querySelector('.mdl-layout__drawer').addEventListener('click', function() {
 		document.querySelector('.mdl-layout__obfuscator').classList.remove('is-visible');
 		this.classList.remove('is-visible');
 	}, false);
@@ -1069,7 +1106,9 @@ document.body.onkeypress = function(e) {
 		var k = e.charCode - 0x30;
 		if (k >= 0 && k < keys.length) {
 			var fn = keys[k];
-			if (fn) fn();
+			if (fn) {
+				fn();
+			}
 		}
 	}
 };
