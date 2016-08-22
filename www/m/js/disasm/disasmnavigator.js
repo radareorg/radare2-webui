@@ -88,8 +88,12 @@ DisasmNavigator.prototype.crunchingData = function(onReadyCallback) {
 DisasmNavigator.prototype.getOverlappingIntervals = function(start, end) {
 	var intervals = [];
 	for (var offset in this.navigationData) {
+		var startInterval = offset;
 		var endInterval = offset + this.navigationData[offset].size;
-		if (start >= offset || end <= endInterval) {
+		if ((startInterval <= start && endInterval >= end) || // all-incl
+			(startInterval <= start && endInterval >= start) || // before-overlap
+			(startInterval <= end && endInterval >= end) || // after-overlap
+			(startInterval >= start && endInterval <= end)) { // included
 			intervals.push(offset);
 		}
 	}
@@ -105,6 +109,8 @@ DisasmNavigator.prototype.populateFirst = function() {
  */
 DisasmNavigator.prototype.fillGap = function(start, end, artifical) {
 	var curSize = end - start;
+	// FIX, can't cut everywhere: byte alignment (invalid lines)
+	return [{offset: start, size: curSize, artifical: artifical}];
 	if (curSize > this.howManyLines) {
 		var half = Math.round(end / 2);
 		return [{

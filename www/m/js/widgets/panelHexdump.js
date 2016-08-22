@@ -20,11 +20,13 @@ function panelHexdump() {
 	}
 
 	hexdump.draw();
+	widget.setDark();
 
 	var recall = function() {
 		hexdump.refreshInitialOffset();
 		hexdump.resetContainer(c);
 		hexdump.draw();
+		widget.setDark();
 	};
 
 	// Hexdump is "seekable", we need to define behavior before and after drawing

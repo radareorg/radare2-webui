@@ -36,6 +36,7 @@ var infoCellHeight = -1;
 function panelOverview() {
 	var widget = widgetContainer.getWidget('Overview');
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
+	lastViews.registerMethod(widget.getOffset(), panelOverview);
 	updates.registerMethod(widget.getOffset(), panelOverview);
 
 	var out = '<div class="mdl-grid demo-content">';
@@ -121,7 +122,7 @@ function panelOverview() {
 	out += '</div>';
 	out += '<div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">';
 	out += '	<h3>Entropy</h3>';
-	out += '		<svg fill="currentColor" viewBox="0 0 500 80" id="entropy-graph"></svg>';
+	out += '	<svg fill="currentColor" viewBox="0 0 500 80" id="entropy-graph"></svg>';
 	out += '</div>';
 
 	out += '<div class="demo-charts mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid">';
@@ -227,8 +228,8 @@ function updateInfo() {
 
 function updateEntropy() {
 	var eg = document.getElementById('entropy-graph');
-	var box = eg.getBoundingClientRect();
-	var height = (0 | box.height) - 35 - 19;
+	var boxHeight = eg.viewBox.baseVal.height;
+	var height = (0 | boxHeight) - 19;
 	r2.cmd('p=ej 50 $s @ $M', function(d) {
 		var body = '';
 		var res = JSON.parse(d);

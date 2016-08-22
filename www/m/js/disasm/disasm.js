@@ -91,11 +91,9 @@ Disasm.prototype.processChosenAnalysis = function(endCallback) {
 
 	// Reprocessing
 	this.nav.crunchingData(function() {
-		// Done
+		// After, we refresh the current display
+		this.draw(endCallback);
 	});
-
-	// After, we refresh the current display
-	this.draw(endCallback);
 };
 
 Disasm.prototype.drawAnalysisDialog = function() {

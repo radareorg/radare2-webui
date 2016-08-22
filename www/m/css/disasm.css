@@ -1,7 +1,4 @@
 .disasmPanel {
-	position:absolute;
-	left:0;
-	right:0;
 	background-color: rgb(32, 32, 32);
 	color: white;
 	overflow: hidden !important;

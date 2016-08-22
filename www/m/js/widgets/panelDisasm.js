@@ -12,11 +12,13 @@ function panelDisasm() {
 	}
 
 	disasm.draw();
+	widget.setDark();
 
 	var recall = function() {
 		disasm.refreshInitialOffset();
 		disasm.resetContainer(c);
 		disasm.draw();
+		widget.setDark();
 	};
 
 	// Disasm is "seekable", we need to define behavior before and after drawing
