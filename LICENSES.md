@@ -44,6 +44,7 @@ material (responsive) interface
 * [dialog-polyfill](https://github.com/GoogleChrome/dialog-polyfill) (BSD)
 * [DataTables](https://datatables.net/) (MIT)
 * [FileSaver](https://github.com/eligrey/FileSaver.js) (MIT)
+* [mdl-selectfield](https://github.com/mebibou/mdl-selectfield) (MIT)
 
 panels (desktop) interface
 -----------
