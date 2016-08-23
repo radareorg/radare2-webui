@@ -26,6 +26,7 @@ gulp.task('dependencies', ['bower'], function() {
 		'./vendors/material-design-lite/material.min.js',
 		'./vendors/dialog-polyfill/dialog-polyfill.js',
 		'./vendors/datatables.net/js/jquery.dataTables.min.js',
+		'./vendors/mdl-selectfield/dist/mdl-selectfield.min.js',
 		'./vendors/file-saver/FileSaver.min.js'])
 		.pipe(gulp.dest(DEST + 'vendors/'));
 });
@@ -50,6 +51,7 @@ gulp.task('js', ['jscs'], function() {
 gulp.task('cssdeps', ['bower'], function() {
 	gulp.src([
 		'./vendors/dialog-polyfill/dialog-polyfill.css',
+		'./vendors/mdl-selectfield/dist/mdl-selectfield.min.css',
 		'./vendors/material-design-lite/material.min.css'])
 		.pipe(gulp.dest(DEST + 'vendors/'));
 

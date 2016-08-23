@@ -2,16 +2,6 @@ var update = function() {/* nop */};
 var inColor = true;
 var lastView = panelDisasm;
 
-function uiButton(href, label, type) {
-	var classes = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect ';
-	classes += 'mdl-color--accent mdl-color-text--accent-contrast';
-	if (type == 'active') {
-		var st = 'style="background-color:#f04040 !important"';
-		return '&nbsp;<a href="' + href.replace(/"/g, '\'') + '" class="' + classes + '" ' + st + '>' + label + '</a>';
-	}
-	return '&nbsp;<a href="' + href.replace(/"/g, '\'') + '" class="' + classes + '">' + label + '</a>';
-}
-
 function write() {
 	var str = prompt('hexpairs, quoted string or :assembly');
 	if (str != '') {
@@ -93,15 +83,6 @@ function analyze() {
 	r2.cmd('af', function() {
 		panelDisasm();
 	});
-}
-function uiCheckList(grp, id, label) {
-	var output = '<li>';
-	ouput += '<label for="' + grp + '" class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect">';
-	ouput += '<input type="checkbox" id="' + id + '" class="mdl-checkbox__input" />';
-	ouput += '<span class="mdl-checkbox__label">' + label + '</span>';
-	ouput += '</label></li>';
-
-	return output;
 }
 
 function notes() {
@@ -235,254 +216,10 @@ function analyzeNames() {
 	});
 }
 
-function smallDisasm() {
-	r2.cmd('e asm.bytes=false');
-	r2.cmd('e asm.lines=false');
-	r2.cmd('e asm.cmtright=false');
-}
-
-function mediumDisasm() {
-	r2.cmd('e asm.bytes=false');
-	r2.cmd('e asm.lines=true');
-	r2.cmd('e asm.lineswidth=8');
-	r2.cmd('e asm.cmtright=false');
-}
-
-function largeDisasm() {
-	r2.cmd('e asm.bytes=true');
-	r2.cmd('e asm.lines=true');
-	r2.cmd('e asm.lineswidth=12');
-	r2.cmd('e asm.cmtright=true');
-}
-
-function configPseudo() {
-	r2.cmd('e asm.pseudo=1');
-	r2.cmd('e asm.syntax=intel');
-}
-
-function configOpcodes() {
-	r2.cmd('e asm.pseudo=0');
-	r2.cmd('e asm.syntax=intel');
-}
-
-function configATT() {
-	r2.cmd('e asm.pseudo=0');
-	r2.cmd('e asm.syntax=att');
-}
-
 function panelAbout() {
 	r2.cmd('?V', function(version) {
 		alert('radare2 material webui by --pancake @ 2015-2016\n\n' + version.trim());
 	});
-}
-
-function configColorDefault() {
-	r2.cmd('ecd', function() {
-		update();
-	});
-}
-function configColorRandom() {
-	r2.cmd('ecr', function() {
-		update();
-	});
-}
-
-function configColorTheme(theme) {
-	r2.cmd('eco ' + theme, function() {
-		update();
-	});
-}
-
-function configPA() {
-	r2.cmd('e io.va=false');
-}
-
-function configVA() {
-	r2.cmd('e io.va=true');
-}
-
-function configDebug() {
-	r2.cmd('e io.va=true');
-	r2.cmd('e io.debug=true');
-}
-
-function configArch(name) { r2.cmd('e asm.arch=' + name); }
-function configBits8() { r2.cmd('e asm.bits=8'); }
-function configBits16() { r2.cmd('e asm.bits=16'); }
-function configBits32() { r2.cmd('e asm.bits=32'); }
-function configBits64() { r2.cmd('e asm.bits=64'); }
-function configColorTrue() { inColor = true; }
-function configColorFalse() { inColor = false; }
-
-var comboId = 0;
-
-function uiCombo(d) {
-	var funName = 'combo' + (++comboId);
-	var fun = funName + ' = function(e) {';
-	fun += ' var sel = document.getElementById("opt_' + funName + '");';
-	fun += ' var opt = sel.options[sel.selectedIndex].value;';
-	fun += ' switch (opt) {';
-	for (var a in d) {
-		fun += 'case "' + d[a].name + '": ' + d[a].js + '(' + d[a].name + ');break;';
-	}
-	fun += '}}';
-	// CSP violation here
-	eval(fun);
-	var out = '<select id="opt_' + funName + '" onchange="' + funName + '()">';
-	for (var a in d) {
-		var def = (d[a].default) ? ' default' : '';
-		out += '<option' + def + '>' + d[a].name + '</option>';
-	}
-	out += '</select>';
-	return out;
-}
-
-function uiSwitch(d) {
-	// TODO: not yet done
-	var out = d;
-	out += '<label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-1">';
-	out += '<input type="checkbox" id="switch-1" class="mdl-switch__input" checked />';
-	out += '<span class="mdl-switch__label"></span>';
-	out += '</label>';
-	return out;
-}
-
-function uiBlock(d) {
-	var classes = 'mdl-card__supporting-text mdl-shadow--2dp mdl-color-text--blue-grey-50 mdl-cell';
-	var styles = 'display:inline-block;margin:5px;color:black !important;background-color:white !important';
-	var out = '<div class="' + classes + '" style="' + styles + '">';
-	out += '<h3 style="color:black">' + d.name + '</h3>';
-	for (var i in d.blocks) {
-		var D = d.blocks[i];
-		out += '<br />' + D.name + ': ';
-		out += uiCombo(D.buttons);
-	}
-	out += '</div>';
-	return out;
-}
-
-function panelSettings() {
-	var out = '';
-
-	var widget = widgetContainer.getWidget('Settings');
-	var c = widgetContainer.getWidgetDOMWrapper(widget);
-
-	updates.registerMethod(widget.getOffset(), panelSettings);
-
-	c.style.backgroundColor = '#f0f0f0';
-	out += '<div style=\'margin:10px\'>';
-	out += uiBlock({ name: 'Platform', blocks: [
-	{ name: 'Arch', buttons: [
-	{ name: 'x86', js: 'configArch', default: true },
-	{ name: 'arm', js: 'configArch' },
-	{ name: 'mips', js: 'configArch' },
-	{ name: 'java', js: 'configArch' },
-	{ name: 'dalvik', js: 'configArch' },
-	{ name: '6502', js: 'configArch' },
-	{ name: '8051', js: 'configArch' },
-	{ name: 'h8300', js: 'configArch' },
-	{ name: 'hppa', js: 'configArch' },
-	{ name: 'i4004', js: 'configArch' },
-	{ name: 'i8008', js: 'configArch' },
-	{ name: 'lh5801', js: 'configArch' },
-	{ name: 'lm32', js: 'configArch' },
-	{ name: 'm68k', js: 'configArch' },
-	{ name: 'malbolge', js: 'configArch' },
-	{ name: 'mcs96', js: 'configArch' },
-	{ name: 'msp430', js: 'configArch' },
-	{ name: 'nios2', js: 'configArch' },
-	{ name: 'ppc', js: 'configArch' },
-	{ name: 'rar', js: 'configArch' },
-	{ name: 'sh', js: 'configArch' },
-	{ name: 'snes', js: 'configArch' },
-	{ name: 'sparc', js: 'configArch' },
-	{ name: 'spc700', js: 'configArch' },
-	{ name: 'sysz', js: 'configArch' },
-	{ name: 'tms320', js: 'configArch' },
-	{ name: 'v810', js: 'configArch' },
-	{ name: 'v850', js: 'configArch' },
-	{ name: 'ws', js: 'configArch' },
-	{ name: 'xcore', js: 'configArch' },
-	{ name: 'prospeller', js: 'configArch' },
-	{ name: 'gb', js: 'configArch' },
-	{ name: 'z80', js: 'configArch' },
-	{ name: 'arc', js: 'configArch' },
-	{ name: 'avr', js: 'configArch' },
-	{ name: 'bf', js: 'configArch' },
-	{ name: 'cr16', js: 'configArch' },
-	{ name: 'cris', js: 'configArch' },
-	{ name: 'csr', js: 'configArch' },
-	{ name: 'dcpu16', js: 'configArch' },
-	{ name: 'ebc', js: 'configArch' }
-	]},
-	{ name: 'Bits', buttons: [
-	{ name: '64', js: 'configBits64' },
-	{ name: '32', js: 'configBits32', default: true },
-	{ name: '16', js: 'configBits16' },
-	{ name: '8', js: 'configBits8' }
-	]},
-	{ name: 'OS', buttons: [
-	{ name: 'Linux', js: 'configOS_LIN', default: true },
-	{ name: 'Windows', js: 'configOS_W32' },
-	{ name: 'OSX', js: 'configOS_OSX' }
-	]}
-	]
-	});
-	out += uiBlock({ name: 'Disassembly', blocks: [
-	{ name: 'Size', buttons: [
-		{ name: 'S', js: 'smallDisasm' },
-		{ name: 'M', js: 'mediumDisasm' },
-		{ name: 'L', js: 'largeDisasm' }
-	]},
-	{ name: 'Decoding', buttons: [
-		{ name: 'Pseudo', js: 'configPseudo' },
-		{ name: 'Opcodes', js: 'configOpcodes' },
-		{ name: 'ATT', js: 'configATT' }
-	]},
-	{ name: 'Colors', buttons: [
-		{ name: 'Yes', js: 'configColorTrue', default: true },
-		{ name: 'No', js: 'configColorFalse' }
-	]},
-	{ name: 'Theme', buttons: [
-		{ name: 'Default', js: 'configColorDefault' },
-		{ name: 'Random', js: 'configColorRandom' },
-		{ name: 'Solarized', js: 'configColorTheme("solarized")' },
-		{ name: 'Ogray', js: 'configColorTheme("ogray")' },
-		{ name: 'Twilight', js: 'configColorTheme("twilight")' },
-		{ name: 'Rasta', js: 'configColorTheme("rasta")' },
-		{ name: 'Tango', js: 'configColorTheme("tango")' },
-		{ name: 'White', js: 'configColorTheme("white")' }
-		]}
-	]});
-	out += uiBlock({ name: 'Core/IO', blocks: [
-		{
-			name: 'Mode', buttons: [
-			{ name: 'PA', js: 'configPA' },
-			{ name: 'VA', js: 'configVA' },
-			{ name: 'Debug', js: 'configDebug' }
-			]
-		}
-		]});
-	out += uiBlock({ name: 'Analysis', blocks: [
-		{
-			name: 'HasNext', buttons: [
-			{ name: 'Yes', js: 'configAnalHasnextTrue', default: true },
-			{ name: 'No', js: 'configAnalHasnextFalse' }
-			]
-		}, {
-			name: 'Skip Nops', buttons: [
-			{ name: 'Yes', js: 'configAnalNopskipTrue', default: true },
-			{ name: 'No', js: 'configAnalNopskipFalse' }
-			]
-		}, {
-			name: 'NonCode', buttons: [
-			{ name: 'Yes', js: 'configAnalNoncodeTrue' },
-			{ name: 'No', js: 'configAnalNoncodeFalse', default: true }
-			]
-		}
-		]});
-	out += '</div>';
-	c.innerHTML = out;
 }
 
 function panelFunctions() {
@@ -739,14 +476,6 @@ function up() {
 function down() {
 	r2.cmd('s++');
 	update();
-}
-
-function uiRoundButton(a, b, c) {
-	var out = '';
-	out += '<button onclick=' + a + ' class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect" ' + c + '>';
-	out += '<i class="material-icons" style="opacity:1">' + b + '</i>';
-	out += '</button>';
-	return out;
 }
 
 var nativeDebugger = false;
@@ -1017,6 +746,9 @@ function ready() {
 		return;
 	}
 	twice = true;
+
+	// Loading configuration from localStorage (see panelSettings)
+	applyConf();
 
 	updates = new UpdateManager();
 	lastViews = new UpdateManager();
