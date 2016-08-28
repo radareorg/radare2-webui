@@ -89,14 +89,25 @@ Disasm.prototype.processChosenAnalysis = function(endCallback) {
 	*/
 
 	// Reprocessing
+	var _this = this;
 	this.nav.crunchingData(function() {
 		// After, we refresh the current display
-		this.draw(endCallback);
+		_this.draw(endCallback);
 	});
 };
 
 Disasm.prototype.drawAnalysisDialog = function() {
 	this.analysisMethods = [{
+		name: 'Analyse current offset',
+		ugly: 'curoffset',
+		active: true,
+		action: function(active) {
+			if (!active) {
+				return;
+			}
+			r2.cmd('af');
+		}
+	},{
 		name: 'Analyze symbols',
 		ugly: 'symbols',
 		active: false,
@@ -380,13 +391,12 @@ Disasm.prototype.drawControls = function(dom) {
 	var out = uiRoundButton('javascript:disasm.nav.go(-1);disasm.draw();', 'keyboard_arrow_up');
 	out += uiRoundButton('javascript:disasm.nav.go(1);disasm.draw();', 'keyboard_arrow_down');
 	out += '&nbsp;';
-	out += uiButton('javascript:analyze()', 'ANLZ');
+	out += uiButton('javascript:disasm.openAnalysisDialog()', 'ANLZ');
 	out += uiButton('javascript:comment()', 'CMNT');
 	out += uiButton('javascript:info()', 'Info');
 	out += uiButton('javascript:rename()', 'RNME');
 	out += uiButton('javascript:write()', 'Wrte');
 
-	out += uiButton('javascript:disasm.openAnalysisDialog()', 'Process analysis');
 	out += '<ul id="disasm-history"></ul>';
 
 	dom.innerHTML = out;
