@@ -17,8 +17,7 @@ function Disasm(containerElement, lineHeight) {
 		}
 		_this.offsetHistory.push(offset);
 		_this.indexOffsetHistory = _this.offsetHistory.length - 1;
-		_this.nav.refreshCurrentOffset();
-		_this.draw();
+		_this.drawControls(_this.container.getControls());
 	});
 }
 
@@ -415,8 +414,7 @@ Disasm.prototype.drawHistory = function(dom) {
 			// Global does not trigger the callback for specific widget
 			seekAction.applyGlobal(x.toString());
 			_this.indexOffsetHistory = evt.target.i;
-			_this.nav.refreshCurrentOffset();
-			_this.draw();
+			_this.drawControls(_this.container.getControls());
 		});
 
 		dom.appendChild(li);
