@@ -36,8 +36,9 @@ var infoCellHeight = -1;
 function panelOverview() {
 	var widget = widgetContainer.getWidget('Overview');
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
-	lastViews.registerMethod(widget.getOffset(), panelOverview);
-	updates.registerMethod(widget.getOffset(), panelOverview);
+
+	lastViews.registerMethod(widget.getOffset(), panelDisasm);
+	updates.registerMethod(widget.getOffset(), function() {});
 
 	var out = '<div class="mdl-grid demo-content">';
 	out += '<div class="demo-graphs mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--8-col" id="info-cell">';

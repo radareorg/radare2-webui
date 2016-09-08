@@ -105,7 +105,7 @@ Hexdump.prototype.drawChunk = function(chunk, where) {
 
 		var offsetEl = document.createElement('li');
 		offset.appendChild(offsetEl);
-		offsetEl.appendChild(document.createTextNode('0x' + (chunk.offset + (i * 16)).toString(16)));
+		offsetEl.appendChild(document.createTextNode(int2fixedHex(chunk.offset + (i * 16), 8)));
 
 		offsetEl.assoc = hexpairs;
 

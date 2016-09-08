@@ -2,7 +2,8 @@ function panelComments() {
 	var widget = widgetContainer.getWidget('Comments');
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
 
-	updates.registerMethod(widget.getOffset(), panelComments);
+	lastViews.registerMethod(widget.getOffset(), panelDisasm);
+	updates.registerMethod(widget.getOffset(), function() {});
 
 	c.style.backgroundColor = '#f0f0f0';
 	c.innerHTML = '<br />';

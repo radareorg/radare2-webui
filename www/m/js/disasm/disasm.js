@@ -501,7 +501,12 @@ Disasm.prototype.replaceScrollPosition = function(offset) {
 	}
 
 	var chunk = this.container.getBody().children[position];
-	var blockOffset = this.extractOffset_(chunk.children[0].id);
+
+	var firstEligibleElement = 0;
+	while (typeof chunk.children[firstEligibleElement].id === 'undefined') {
+		firstEligibleElement++;
+	}
+	var blockOffset = this.extractOffset_(chunk.children[firstEligibleElement].id);
 	var startFromTop = chunk.offsetTop;
 	var chunkHeight = chunk.getBoundingClientRect().height;
 

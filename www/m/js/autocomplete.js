@@ -97,7 +97,7 @@ Autocompletion.prototype.addNode_ = function(item, active) {
 		};
 	})(item.pos));
 
-	node.addEventListener('mousedown', (function(pos) {
+	node.addEventListener('click', (function(pos) {
 		return function() {
 			_this.setActiveChoice(pos);
 			_this.valid();

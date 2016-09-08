@@ -23,3 +23,11 @@ function isAsciiVisible(offset) {
 function basename(path) {
 	return path.split(/[\\/]/).pop();
 }
+
+function int2fixedHex(nb, length) {
+	var hex = nb.toString(16);
+	while (hex.length < length) {
+		hex = '0' + hex;
+	}
+	return '0x' + hex;
+}
