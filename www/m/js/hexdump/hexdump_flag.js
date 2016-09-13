@@ -44,9 +44,19 @@ Hexdump.prototype.applyFlags = function(lines, blockInitialOffset, flags) {
 		}
 
 		var flagLine = document.createElement('li');
+		var theOffset = int2fixedHex(flag.offset, 8);
 		flagLine.classList.add('block' + blockInitialOffset);
 		flagLine.classList.add('flag');
-		flagLine.appendChild(document.createTextNode('[0x' + flag.offset.toString(16) + '] ' + flag.name));
+		flagLine.offset = theOffset;
+		flagLine.appendChild(document.createTextNode('[' + theOffset + '] ' + flag.name));
+		flagLine.title = 'Go to Disassembly';
+		flagLine.style.cursor = 'pointer';
+		flagLine.addEventListener('click', function(offset) {
+			return function() {
+				seekAction.applyGlobal(offset);
+				return panelDisasm();
+			};
+		}(theOffset));
 		flagLine.title = flag.size + ' bytes';
 		flagLine.style.color = this.getFlagColor(flag.name);
 		this.listContent.insertBefore(flagLine, line);

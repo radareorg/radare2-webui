@@ -227,7 +227,8 @@ function panelFunctions() {
 	widget.setDark();
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
 
-	updates.registerMethod(widget.getOffset(), panelFunctions);
+	updates.registerMethod(widget.getOffset(), function() {});
+	lastViews.registerMethod(widget.getOffset(), panelDisasm);
 
 	c.style.backgroundColor = '#f0f0f0';
 	var body = '<br />';
@@ -443,7 +444,8 @@ function panelFlags() {
 	var widget = widgetContainer.getWidget('Flags');
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
 
-	updates.registerMethod(widget.getOffset(), panelFlags);
+	updates.registerMethod(widget.getOffset(), function() {});
+	lastViews.registerMethod(widget.getOffset(), panelDisasm);
 
 	c.style.backgroundColor = '#f0f0f0';
 	c.innerHTML = '<br />';
@@ -520,7 +522,7 @@ function panelDebug() {
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
 
 	updates.registerMethod(widget.getOffset(), panelDebug);
-	lastViews.registerMethod(widget.getOffset(), panelDebug);
+	lastViews.registerMethod(widget.getOffset(), function() {});
 
 	if (inColor) {
 		c.style.backgroundColor = '#202020';
@@ -664,8 +666,8 @@ function decompile() {
 
 function graph() {
 	var widget = widgetContainer.getWidget('Graph');
-	widget.setDark();
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
+	widget.setDark();
 
 	c.style.overflow = 'auto';
 	var color = inColor ? 'white' : 'black';
@@ -805,7 +807,7 @@ function ready() {
 		if (!widgetContainer.isSplitted()) {
 			widgetContainer.split(widgetContainer.Layout.VERTICAL);
 		}
-		panelDisasm();
+		disasm.draw();
 	});
 
 	// Close the drawer on click with small screens
