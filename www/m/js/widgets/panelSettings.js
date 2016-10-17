@@ -97,6 +97,7 @@ var R2Conf = {
 	analSkipNops: { name: 'analSkipNops', defVal: true, apply: function(p) { console.log('analSkipNops is ' + p); } },
 	analNonCode: { name: 'analNonCode', defVal: false, apply: function(p) { console.log('analNonCode is ' + p); } },
 	colors: { name: 'colors', defVal: true, apply: function(p) { inColor = p; } },
+	useTTS: { name: 'tts', defVal: true, apply: function(p) { R2Conf.useTTS.value = p; } },
 	theme: { name: 'theme', defVal: 'none', apply: function(p) { r2.cmd('eco ' + p); } } // TODO
 };
 
@@ -124,6 +125,9 @@ function panelSettings() {
 
 	var colors = createGrid(grid, 'Colors');
 	drawColors(colors);
+
+	var tts = createGrid(grid, 'TTS');
+	drawTTS(tts);
 
 	var reset = createGrid(grid, 'Reset configuration');
 	uiActionButton(reset, function() {
@@ -223,6 +227,13 @@ function drawColors(dom) {
 
 	uiSelect(dom, 'Theme', colors, colors.indexOf(getConf(R2Conf.theme)), function(theme) {
 		saveConf(R2Conf.theme, theme);
+	});
+}
+
+
+function drawTTS(dom) {
+	uiSwitch(dom, 'Use TTS', getConf(R2Conf.useTTS), function(param, state) {
+		saveConf(R2Conf.useTTS, state);
 	});
 }
 
