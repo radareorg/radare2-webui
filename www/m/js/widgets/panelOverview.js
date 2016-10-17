@@ -155,7 +155,7 @@ function panelOverview() {
 	updateFortune();
 	updateInfo();
 	updateEntropy();
-	
+
 	componentHandler.upgradeDom();
 
 	// Set max height with MDL behavior
@@ -198,7 +198,12 @@ function speak(text, callback) {
 
 function readFortune() {
 	var f = document.getElementById('fortune').innerHTML;
-	speak(f);
+
+	if (R2Conf.useTTS.value === false) {
+		// user doesn't want TTS
+	}else{
+	  speak(f);
+	}
 }
 
 function updateInfo() {
