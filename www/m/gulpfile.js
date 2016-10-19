@@ -6,7 +6,9 @@ var gulp = require('gulp'),
 	replace = require('gulp-replace'),
 	googleWebFonts = require('gulp-google-webfonts'),
 	jscs = require('gulp-jscs'),
-	livereload = require('gulp-livereload');
+	livereload = require('gulp-livereload'),
+	uglifycss = require('gulp-uglifycss'),
+	htmlmin = require('gulp-htmlmin');
 
 var R2 = '../lib/';
 var DEST = '../../dist/m/';
@@ -21,10 +23,14 @@ gulp.task('dependencies', ['bower'], function() {
 		.pipe(concat('r2.js'))
 		.pipe(gulp.dest(DEST));
 
+	gulp.src(
+		'./vendors/dialog-polyfill/dialog-polyfill.js')
+		.pipe(uglify())
+		.pipe(gulp.dest(DEST + 'vendors/'));
+
 	gulp.src([
 		'./vendors/jquery/dist/jquery.min.js',
 		'./vendors/material-design-lite/material.min.js',
-		'./vendors/dialog-polyfill/dialog-polyfill.js',
 		'./vendors/datatables.net/js/jquery.dataTables.min.js',
 		'./vendors/mdl-selectfield/dist/mdl-selectfield.min.js',
 		'./vendors/file-saver/FileSaver.min.js'])
@@ -39,8 +45,9 @@ gulp.task('jscs', function() {
 
 gulp.task('js', ['jscs'], function() {
 	gulp.src(['./js/*.js', './js/**/*.js'])
-		//.pipe(uglify())
 		.pipe(concat('index.js'))
+		.pipe(gulp.dest(DEST))
+		.pipe(uglify())
 		.pipe(gulp.dest(DEST))
 		.pipe(livereload());
 	gulp.src(['./workers/*.js', './js/tools.js'])
@@ -49,8 +56,15 @@ gulp.task('js', ['jscs'], function() {
 });
 
 gulp.task('cssdeps', ['bower'], function() {
+	gulp.src(
+		'./vendors/dialog-polyfill/dialog-polyfill.css')
+		.pipe(uglifycss({
+      "maxLineLen": 80,
+      "uglyComments": true
+    	}))
+		.pipe(gulp.dest(DEST + 'vendors/'));
+
 	gulp.src([
-		'./vendors/dialog-polyfill/dialog-polyfill.css',
 		'./vendors/mdl-selectfield/dist/mdl-selectfield.min.css',
 		'./vendors/material-design-lite/material.min.css'])
 		.pipe(gulp.dest(DEST + 'vendors/'));
@@ -80,6 +94,10 @@ gulp.task('fonts', ['bower'], function() {
 		.pipe(gulp.dest(DEST + 'vendors/fonts/'));
 
 	gulp.src('./vendors/material-design-icons-iconfont/dist/material-design-icons.css')
+		.pipe(uglifycss({
+			"maxLineLen": 80,
+			"uglyComments": true
+			}))
 		.pipe(gulp.dest(DEST + 'vendors/'));
 
 	gulp.src(['./fonts/*'])
@@ -91,6 +109,8 @@ gulp.task('fonts', ['bower'], function() {
 
 gulp.task('html', function() {
 	gulp.src(['./index.html', 'vsplit', 'hsplit'])
+		.pipe(gulp.dest(DEST))
+		.pipe(htmlmin({collapseWhitespace: true}))
 		.pipe(gulp.dest(DEST))
 		.pipe(livereload());
 });
