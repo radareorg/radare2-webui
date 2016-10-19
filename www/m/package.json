@@ -33,5 +33,9 @@
     "gulp-livereload": "^3.8.1",
     "gulp-replace": "^0.5.4",
     "gulp-uglify": "^2.0.0"
+  },
+  "dependencies": {
+    "gulp-htmlmin": "^3.0.0",
+    "gulp-uglifycss": "^1.0.6"
   }
 }
