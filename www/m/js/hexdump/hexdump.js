@@ -9,6 +9,7 @@ function Hexdump(containerElement, lineHeight, isBigEndian) {
 	this.container = new FlexContainer(containerElement, 'hex');
 	this.lineHeight = lineHeight;
 	this.bigEndian = isBigEndian;
+	this.nbColumns = 16;
 	this.hexLength = this.Sizes.PAIRS;
 	this.init();
 	this.resetContainer(containerElement);
@@ -139,7 +140,7 @@ Hexdump.prototype.getCurrentSelection = function() {
  */
 Hexdump.prototype.defineInfiniteParams = function() {
 	RadareInfiniteBlock.prototype.defineInfiniteParams.call(this);
-	this.nav = new HexPairNavigator(this.howManyLines, this.initialOffset);
+	this.nav = new HexPairNavigator(this.howManyLines, this.nbColumns, this.initialOffset);
 	this.nav.updateModifications();
 };
 

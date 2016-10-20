@@ -4,7 +4,7 @@
  */
 HexPairNavigator.prototype = new BlockNavigator();
 HexPairNavigator.prototype.constructor = HexPairNavigator;
-function HexPairNavigator(howManyLines, startOffset) {
+function HexPairNavigator(howManyLines, nbCols, startOffset) {
 	this.howManyBytes = howManyLines * 16;
 	this.gap = this.howManyBytes;
 	this.currentOffset = startOffset;
@@ -13,9 +13,24 @@ function HexPairNavigator(howManyLines, startOffset) {
 	this.curChunk = undefined;
 
 	this.providerWorker = new Worker('hexchunkProvider.js');
-	this.providerWorker.postMessage(this.howManyBytes);
+	this.providerWorker.postMessage({
+		howManyBytes: this.howManyBytes,
+		nbCols: nbCols
+	});
 
 	this.init();
+};
+
+/**
+ * Force the configuration to be actualized on worker
+ */
+HexPairNavigator.prototype.changeNbCols = function(nbCols) {
+	this.providerWorker.postMessage({
+		howManyBytes: this.howManyBytes,
+		nbCols: nbCols,
+		reset: true
+	});
+	this.reset();
 };
 
 /**

@@ -94,8 +94,8 @@ Hexdump.prototype.drawChunk = function(chunk, where) {
 		}
 
 		line.offset = {};
-		line.offset.start = chunk.offset + (16 * i);
-		line.offset.end = line.offset.start + 15;
+		line.offset.start = chunk.offset + (this.nbColumns * i);
+		line.offset.end = line.offset.start + (this.nbColumns - 1);
 
 		var offset = document.createElement('ul');
 		var hexpairs = document.createElement('ul');
@@ -105,14 +105,14 @@ Hexdump.prototype.drawChunk = function(chunk, where) {
 
 		var offsetEl = document.createElement('li');
 		offset.appendChild(offsetEl);
-		offsetEl.appendChild(document.createTextNode(int2fixedHex(chunk.offset + (i * 16), 8)));
+		offsetEl.appendChild(document.createTextNode(int2fixedHex(chunk.offset + (i * this.nbColumns), 8)));
 
 		offsetEl.assoc = hexpairs;
 
 		offsetEl.addEventListener('dblclick', function(evt) {
 			evt.preventDefault();
 			_this.selectionFirst = evt.target.parentNode.nextSibling.children[0];
-			_this.selectionEnd = evt.target.parentNode.nextSibling.children[15];
+			_this.selectionEnd = evt.target.parentNode.nextSibling.children[_this.nbColumns - 1];
 			_this.processSelection();
 		});
 
@@ -127,7 +127,7 @@ Hexdump.prototype.drawChunk = function(chunk, where) {
 
 		drawMethod.apply(
 			this,
-			[hexpairs, asciis, chunk.hex[i], chunk.ascii[i], chunk.modified, chunk.offset + (16 * i), size]
+			[hexpairs, asciis, chunk.hex[i], chunk.ascii[i], chunk.modified, chunk.offset + (this.nbColumns * i), size]
 		);
 
 		if (typeof firstElement === 'undefined') {
