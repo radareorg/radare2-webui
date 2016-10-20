@@ -39,6 +39,7 @@ var R2Conf = {
 	platform: { name: 'platform', defVal: 'x86', apply: function(p) { r2.cmd('e asm.arch=' + p); } },
 	bits: { name: 'bits', defVal: '32', apply: function(p) { r2.cmd('e asm.bits=' + p); } },
 	utf8: { name: 'utf8', defVal: 'true', apply: function(p) { r2.cmd('e scr.utf8=' + p); } },
+	ucase: { name: 'ucase', defVal: 'false', apply: function(p) { r2.cmd('e asm.ucase=' + p); } },
 	bytes: { name: 'bytes', defVal: 'false', apply: function(p) { r2.cmd('e asm.bytes=' + p); } },
 	os: { name: 'os', defVal: 'Linux', apply: function(p) { console.log('OS is now: ' + p); } }, // missing
 	size: { name: 'size', defVal: 'S', apply: function(p) {
@@ -180,6 +181,9 @@ function drawDisassembly(dom) {
 	});
 	uiSwitch(dom, 'Utf8', getConf(R2Conf.utf8), function(param, state) {
 		saveConf(R2Conf.utf8, state);
+	});
+	uiSwitch(dom, 'UpperCase', getConf(R2Conf.ucase), function(param, state) {
+		saveConf(R2Conf.ucase, state);
 	});
 	uiSwitch(dom, 'Show Bytes', getConf(R2Conf.bytes), function(param, state) {
 		saveConf(R2Conf.bytes, state);
