@@ -41,15 +41,15 @@ function panelOverview() {
 	updates.registerMethod(widget.getOffset(), function() {});
 
 	var out = '<div class="mdl-grid demo-content">';
-	out += '<div class="demo-graphs mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--8-col" id="info-cell">';
+	out += '<div class="demo-graphs mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--8-col" id="info-cell" height="100%">';
 	out += '	<div class="mdl-tabs mdl-js-tabs">';
-	out += '		<div class="mdl-tabs__tab-bar" id="overview-tabs">';
-	out += '			<a href="#tab-info" class="mdl-tabs__tab is-active">Headers</a>';
-	out += '			<a href="#tab-symbols" class="mdl-tabs__tab" onclick="overviewLoad(this, headersCmd.symbols)">Symbols</a>';
-	out += '			<a href="#tab-imports" class="mdl-tabs__tab" onclick="overviewLoad(this, headersCmd.imports)">Imports</a>';
-	out += '			<a href="#tab-relocs" class="mdl-tabs__tab" onclick="overviewLoad(this, headersCmd.relocs)">Relocs</a>';
-	out += '			<a href="#tab-sections" class="mdl-tabs__tab" onclick="overviewLoad(this, headersCmd.sections)">Sections</a>';
-	out += '			<a href="#tab-strings" class="mdl-tabs__tab" onclick="overviewLoad(this, headersCmd.strings)">Strings</a>';
+	out += '		<div class="mdl-tabs__tab-bar" id="overview-tabs" style="margin-left:-30px;margin-top:-20px;margin-right:-30px">';
+	out += '			<a href="#tab-info" class="mdl-tabs__tab is-active">Hdr</a>';
+	out += '			<a href="#tab-symbols" class="mdl-tabs__tab" onclick="overviewLoad(this, headersCmd.symbols)">Sym</a>';
+	out += '			<a href="#tab-imports" class="mdl-tabs__tab" onclick="overviewLoad(this, headersCmd.imports)">Imp</a>';
+	out += '			<a href="#tab-relocs" class="mdl-tabs__tab" onclick="overviewLoad(this, headersCmd.relocs)">Rel</a>';
+	out += '			<a href="#tab-sections" class="mdl-tabs__tab" onclick="overviewLoad(this, headersCmd.sections)">Sec</a>';
+	out += '			<a href="#tab-strings" class="mdl-tabs__tab" onclick="overviewLoad(this, headersCmd.strings)">Str</a>';
 	out += '			<a href="#tab-sdb" class="mdl-tabs__tab" onclick="overviewLoad(this, headersCmd.sdb)">SDB</a>';
 	out += '		</div>';
 	out += '		<div id="overview-content">';
@@ -66,21 +66,11 @@ function panelOverview() {
 	out += '</div>';
 
 	out += '<div class="demo-cards mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-grid mdl-grid--no-spacing">';
-	out += '	<div class="demo-updates mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-cell--4-col-tablet mdl-cell--12-col-desktop">';
-	out += '		<div class="mdl-card__title mdl-card--expand mdl-color--teal-300">';
-	out += '			<h2 class="mdl-card__title-text">Fortunes</h2>';
-	out += '		</div>';
-	out += '		<div class="mdl-card__supporting-text mdl-color-text--grey-600" id="fortune">';
-	out += '			Always use r2 from git';
-	out += '		</div>';
-	out += '		<div class="mdl-card__actions mdl-card--border">';
-	out += '			<a href="javascript:updateFortune()" class="mdl-button mdl-js-button mdl-js-ripple-effect">Next</a>';
-	out += '		</div>';
-	out += '	</div>';
-	out += '	<div class="demo-separator mdl-cell--1-col"></div>';
 	out += '	<div class="demo-options mdl-card mdl-color--teal-300 mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-cell--3-col-tablet mdl-cell--12-col-desktop">';
 	out += '		<div class="mdl-card__supporting-text mdl-color-grey-600">';
-	out += '			<h3 class="mdl-cart__title-text">Analysis Options</h3>';
+	out += '		<div class="mdl-card__title mdl-card--expand mdl-color--teal-300">';
+	out += '			<h2 class="mdl-card__title-text">Analysis Options</h2>';
+	out += '		</div>';
 	out += '			<ul>';
 	out += '				<li>';
 	out += '					<label for="anal_symbols" class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect">';
@@ -118,6 +108,18 @@ function panelOverview() {
 	out += '			<a href="#" id="analyze_button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color--blue-grey-50 mdl-color-text--blue-greu-50">Analyze</a>';
 	out += '			<div class="mdl-layout-spacer"></div>';
 	out += '			<i class="material-icons">room</i>';
+	out += '		</div>';
+	out += '	</div>';
+	out += '	<div class="demo-separator mdl-cell--1-col"></div>';
+	out += '	<div class="demo-updates mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-cell--4-col-tablet mdl-cell--12-col-desktop">';
+	out += '		<div class="mdl-card__title mdl-card--expand mdl-color--teal-300">';
+	out += '			<h2 class="mdl-card__title-text">Fortunes</h2>';
+	out += '		</div>';
+	out += '		<div class="mdl-card__supporting-text mdl-color-text--grey-600" id="fortune">';
+	out += '			Always use r2 from git';
+	out += '		</div>';
+	out += '		<div class="mdl-card__actions mdl-card--border">';
+	out += '			<a href="javascript:updateFortune()" class="mdl-button mdl-js-button mdl-js-ripple-effect">Next</a>';
 	out += '		</div>';
 	out += '	</div>';
 	out += '</div>';
@@ -213,7 +215,8 @@ function updateInfo() {
 		var lines2 = lines.slice(lines.length / 2);
 		var body = '';
 
-		body += '<table style=\'width:100%\'><tr><td>';
+		body += '<br /><br/>';
+		body += '<table style=\'width:100%\'><tr><td style="vertical-align:top">';
 		for (var i in lines1) {
 			var line = lines1[i].split(/ (.+)?/);
 			if (line.length >= 2) {
