@@ -5,13 +5,13 @@ build:
 	$(shell npm bin)/gulp
 
 run: build
-	r2 -qe http.root=$$PWD/.. -e http.ui=m -c=H /bin/ls
+	r2 -qe http.root=$$PWD/../../dist -e http.ui=m -c=H /bin/ls
 
 watch:
 	$(shell npm bin)/gulp watch
 
 r:
-	r2 -qe http.root=$$PWD/dist -e http.ui=. -c=H /bin/ls
+	r2 -qe http.root=$$PWD/../../dist -e http.ui=m -c=H /bin/ls
 
 FILES=$(shell git ls-files .)
 
