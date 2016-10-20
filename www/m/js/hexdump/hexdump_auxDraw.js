@@ -282,6 +282,8 @@ Hexdump.prototype.drawControls = function(dom) {
 
 	var wordBlock = document.createElement('li');
 	controlList.appendChild(wordBlock);
+	var nbColumnsBlock = document.createElement('li');
+	controlList.appendChild(nbColumnsBlock);
 	var bigEndianBlock = document.createElement('li');
 	controlList.appendChild(bigEndianBlock);
 	var selectionBlock = document.createElement('li');
@@ -306,6 +308,28 @@ Hexdump.prototype.drawControls = function(dom) {
 
 	select.addEventListener('change', function() {
 		_this.hexLength = parseInt(this.value);
+		_this.draw();
+	}, false);
+
+	// Nb columns
+	var selectColumns = document.createElement('span');
+	selectColumns.title = 'Number of columns per line';
+	selectColumns.appendChild(document.createTextNode('Nb cols: '));
+	var selectCols = document.createElement('select');
+	selectColumns.appendChild(selectCols);
+	for (var i = 1 ; i <= 16 ; i++) {
+		var option = document.createElement('option');
+		option.value = i;
+		option.text = i;
+		if (i === this.nbColumns) {
+			option.selected = true;
+		}
+		selectCols.appendChild(option);
+	}
+
+	selectCols.addEventListener('change', function() {
+		_this.nbColumns = parseInt(this.value);
+		_this.nav.changeNbCols(_this.nbColumns);
 		_this.draw();
 	}, false);
 
@@ -379,6 +403,7 @@ Hexdump.prototype.drawControls = function(dom) {
 	});
 
 	wordBlock.appendChild(selectWord);
+	nbColumnsBlock.appendChild(selectColumns);
 	bigEndianBlock.appendChild(labelCheckboxBE);
 	selectionBlock.appendChild(labelCheckboxSelection);
 	flagBlock.appendChild(labelFlags);
