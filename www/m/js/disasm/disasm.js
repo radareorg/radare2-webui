@@ -213,14 +213,6 @@ Disasm.prototype.drawAnalysisDialog = function() {
 	actions.className = 'mdl-dialog__actions';
 	this.analysisDialog.appendChild(actions);
 
-	var closeButton = document.createElement('button');
-	closeButton.className = 'mdl-button';
-	closeButton.innerHTML = 'Close';
-	closeButton.addEventListener('click', function() {
-		_this.analysisDialog.close();
-	});
-	actions.appendChild(closeButton);
-
 	var proceedButton = document.createElement('button');
 	proceedButton.className = 'mdl-button';
 	proceedButton.innerHTML = 'Proceed';
@@ -230,6 +222,14 @@ Disasm.prototype.drawAnalysisDialog = function() {
 		});
 	});
 	actions.appendChild(proceedButton);
+
+	var closeButton = document.createElement('button');
+	closeButton.className = 'mdl-button';
+	closeButton.innerHTML = 'Close';
+	closeButton.addEventListener('click', function() {
+		_this.analysisDialog.close();
+	});
+	actions.appendChild(closeButton);
 
 	document.body.appendChild(this.analysisDialog);
 	componentHandler.upgradeDom();
@@ -388,7 +388,15 @@ Disasm.prototype.infiniteDrawingContent = function(where, pos, endCallback) {
 };
 
 Disasm.prototype.drawControls = function(dom) {
-	var out = uiRoundButton('javascript:disasm.nav.go(-1);disasm.draw();', 'keyboard_arrow_up');
+	var out = '';
+
+	out += uiButton('javascript:info()', 'Info');
+	out += uiButton('javascript:write()', 'Wrte');
+	out += uiButton('javascript:graph()', 'Grph');
+	out += uiButton('javascript:disasm.openAnalysisDialog()', 'Anlz');
+
+/*
+	out += uiRoundButton('javascript:disasm.nav.go(-1);disasm.draw();', 'keyboard_arrow_up');
 	out += uiRoundButton('javascript:disasm.nav.go(1);disasm.draw();', 'keyboard_arrow_down');
 	out += '&nbsp;';
 	out += uiButton('javascript:disasm.openAnalysisDialog()', 'ANLZ');
@@ -396,6 +404,7 @@ Disasm.prototype.drawControls = function(dom) {
 	out += uiButton('javascript:info()', 'Info');
 	out += uiButton('javascript:rename()', 'RNME');
 	out += uiButton('javascript:write()', 'Wrte');
+*/
 
 	out += '<ul id="disasm-history"></ul>';
 
