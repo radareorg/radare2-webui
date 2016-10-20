@@ -42,6 +42,7 @@ Hexdump.prototype.infineHeightProvisioning = 2;
  */
 Hexdump.prototype.Sizes = {
 	PAIRS: -1,
+	HALF: 2, // 16 bits
 	WORD: 4, // 32 bits
 	QUADWORD: 8 // 64 bits
 };

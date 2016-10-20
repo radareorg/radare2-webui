@@ -296,7 +296,9 @@ Hexdump.prototype.drawControls = function(dom) {
 	controlList.appendChild(flagBlock);
 
 	var selectWord = document.createElement('span');
+/*
 	selectWord.appendChild(document.createTextNode('Word length: '));
+*/
 	var select = document.createElement('select');
 	selectWord.appendChild(select);
 
@@ -318,7 +320,7 @@ Hexdump.prototype.drawControls = function(dom) {
 	// Nb columns
 	var selectColumns = document.createElement('span');
 	selectColumns.title = 'Number of columns per line';
-	selectColumns.appendChild(document.createTextNode('Nb cols: '));
+	// selectColumns.appendChild(document.createTextNode('Nb cols: '));
 	var selectCols = document.createElement('select');
 	selectColumns.appendChild(selectCols);
 	for (var i = 1 ; i <= 16 ; i++) {
@@ -345,7 +347,7 @@ Hexdump.prototype.drawControls = function(dom) {
 
 	var textBigEndian = document.createElement('span');
 	textBigEndian.classList.add('mdl-checkbox__label');
-	textBigEndian.appendChild(document.createTextNode('is big endian'));
+	textBigEndian.appendChild(document.createTextNode('bigEndian'));
 
 	var labelCheckboxBE = document.createElement('label');
 	labelCheckboxBE.classList.add('mdl-checkbox');
@@ -367,7 +369,7 @@ Hexdump.prototype.drawControls = function(dom) {
 
 	var textSelection = document.createElement('span');
 	textSelection.classList.add('mdl-checkbox__label');
-	textSelection.appendChild(document.createTextNode('is editable'));
+	textSelection.appendChild(document.createTextNode('isEditable'));
 
 	var labelCheckboxSelection = document.createElement('label');
 	labelCheckboxSelection.classList.add('mdl-checkbox');
@@ -392,7 +394,7 @@ Hexdump.prototype.drawControls = function(dom) {
 
 	var textFlags = document.createElement('span');
 	textFlags.classList.add('mdl-checkbox__label');
-	textFlags.appendChild(document.createTextNode('show flags'));
+	textFlags.appendChild(document.createTextNode('showFlags'));
 
 	var labelFlags = document.createElement('label');
 	labelFlags.classList.add('mdl-checkbox');
