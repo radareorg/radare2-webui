@@ -87,10 +87,10 @@ function analyze() {
 
 function notes() {
 	var widget = widgetContainer.getWidget('Notes');
-	var dom = widgetContainer.getWidgetDOMWrapper(widget);
+	var c = widgetContainer.getWidgetDOMWrapper(widget);
 
 	var out = '<br />' + uiButton('javascript:panelComments()', '&lt; Comments');
-	out += '<br /><br /><textarea rows=32 style="width:100%"></textarea>';
+	out += '<br /><br /><textarea rows=32 style="width:100%;height:100%"></textarea>';
 	c.innerHTML = out;
 }
 
