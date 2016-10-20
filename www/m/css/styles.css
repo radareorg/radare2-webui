@@ -180,7 +180,7 @@ _:-ms-input-placeholder, :root .demo-graph {
   color: #00b9d8;
 }
 .demo-graph:nth-child(2) {
-  color: #d9006e;
+  color: #238082;
 }
 
 .demo-cards {
@@ -213,7 +213,7 @@ _:-ms-input-placeholder, :root .demo-graph {
   background-repeat: no-repeat;
 }
 .demo-cards .mdl-card__actions a {
-  color: #00BCD4;
+  color: #016e7c;
   text-decoration: none;
 }
 
@@ -292,7 +292,8 @@ td {
 
 .statusbar {
   position:absolute;
-  border-top: 5px solid green;
+  /* taken from .toproundbuton */
+  border-top: 5px solid #238082;
   z-index:100;
   display:block;
   bottom:0;
@@ -328,7 +329,7 @@ td {
 }
 
 .statusbar.half {
-  height: 30vh;
+  height: 40vh;
 }
 
 .statusbar.full {
@@ -344,22 +345,28 @@ td {
 }
 
 .toproundbutton {
-	z-index: 2000 !important;
-	font-weight:bold !important;
-	position:fixed !important;
-	bottom:15px !important;
-opacity:1;
-	right: 15px;
-	color: white !important;
-	background-color:#30a030!important;
+  z-index: 2000 !important;
+  font-weight:bold !important;
+  position:fixed !important;
+  bottom:15px !important;
+  opacity:1;
+  right: 15px;
+  color: white !important;
+  background-color:#238082!important;
 }
 
 mdl-select {
   -webkit-appearance:none;
   height: 2.3em;
   margin: 0.3em;
-  background-color: #3199FF;
+  background-color: #286096;
   padding-left: 16px;
   padding-right: 16px;
   border: 10px;
+}
+
+mdl-fixed {
+  position:fixed;
+  padding-left: 8px;
+  top:4em;
 }

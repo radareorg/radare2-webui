@@ -605,8 +605,8 @@ function blocks() {
 
 	c.style.overflow = 'none';
 	var color = inColor ? 'white' : 'black';
-	var cl = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect ';
-	cl += 'mdl-color--accent mdl-color-text--accent-contrast';
+	var cl = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-fixed';
+	// cl += 'mdl-color--accent mdl-color-text--accent-contrast';
 	c.innerHTML = '<br />';
 	c.innerHTML += '&nbsp;<a href="javascript:panelDisasm()" class="' + cl + '">&lt; INFO</a> <h3 color=white></h3>';
 	var tail = inColor ? '@e:scr.color=1,scr.html=1' : '';
@@ -621,8 +621,8 @@ function pdtext() {
 
 	c.style.overflow = 'none';
 	var color = inColor ? 'white' : 'black';
-	var cl = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect ';
-	cl += 'mdl-color--accent mdl-color-text--accent-contrast';
+	var cl = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-fixed';
+	// cl += 'mdl-color--accent mdl-color-text--accent-contrast';
 	c.innerHTML = '<br />';
 	c.innerHTML += '&nbsp;<a href="javascript:panelDisasm()" class="' + cl + '">&lt; INFO</a> <h3 color=white></h3>';
 	var tail = inColor ? '@e:scr.color=1,scr.html=1,asm.lineswidth=0' : '@e:asm.lineswidth=0';
@@ -669,11 +669,13 @@ function graph() {
 	var c = widgetContainer.getWidgetDOMWrapper(widget);
 	widget.setDark();
 
+	// document.getElementById("viewport").
+	c.setAttribute('content','user-scalable=yes, width=device-width, minimum-scale=1,  maximum-scale=1');
 	c.style.overflow = 'auto';
 	var color = inColor ? 'white' : 'black';
 	var cl = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect ';
-	cl += 'mdl-color--accent mdl-color-text--accent-contrast';
-	c.innerHTML = '<br />&nbsp;<a href="javascript:panelDisasm()" class="' + cl + '">&lt; INFO</a>';
+	// cl += 'mdl-color--accent mdl-color-text--accent-contrast';
+	c.innerHTML = '<br />&nbsp;<a style="position:fixed;padding-left:10px;top:4em" href="javascript:panelDisasm()" class="' + cl + '">&lt; DISASM</a>';
 	var tail = inColor ? '@e:scr.color=1,scr.html=1' : '';
 	r2.cmd('agf' + tail, function(d) {
 		d = clickableOffsets(d);
