@@ -40,6 +40,7 @@ var R2Conf = {
 	bits: { name: 'bits', defVal: '32', apply: function(p) { r2.cmd('e asm.bits=' + p); } },
 	utf8: { name: 'utf8', defVal: 'true', apply: function(p) { r2.cmd('e scr.utf8=' + p); } },
 	ucase: { name: 'ucase', defVal: 'false', apply: function(p) { r2.cmd('e asm.ucase=' + p); } },
+	describe: { name: 'describe', defVal: 'false', apply: function(p) { r2.cmd('e asm.describe=' + p); } },
 	bytes: { name: 'bytes', defVal: 'false', apply: function(p) { r2.cmd('e asm.bytes=' + p); } },
 	os: { name: 'os', defVal: 'Linux', apply: function(p) { console.log('OS is now: ' + p); } }, // missing
 	size: { name: 'size', defVal: 'S', apply: function(p) {
@@ -187,6 +188,9 @@ function drawDisassembly(dom) {
 	});
 	uiSwitch(dom, 'Show Bytes', getConf(R2Conf.bytes), function(param, state) {
 		saveConf(R2Conf.bytes, state);
+	});
+	uiSwitch(dom, 'DescribeOps', getConf(R2Conf.describe), function(param, state) {
+		saveConf(R2Conf.describe, state);
 	});
 }
 
