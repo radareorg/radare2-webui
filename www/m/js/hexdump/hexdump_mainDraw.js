@@ -211,7 +211,15 @@ Hexdump.prototype.drawWords_ = function(hexpairs, asciis, pairs, chars, modifica
 
 	for (var x = 0 ; x < words.length ; x++) {
 		var hexpairEl = document.createElement('li');
-		hexpairEl.appendChild(document.createTextNode('0x' + words[x]));
+		if (size === 2) {
+			var word = '' + new Int16Array([+words[x]])[0]
+			if (word.length < 5) {
+				word = Array(5 - word.length).join('_') + word
+			}
+		} else {
+			var word = '0x' + words[x];
+		}
+		hexpairEl.appendChild(document.createTextNode(word));
 		hexpairs.appendChild(hexpairEl);
 	}
 };
