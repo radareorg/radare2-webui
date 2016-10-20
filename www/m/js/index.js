@@ -657,7 +657,8 @@ function decompile() {
 	var cl = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect ';
 	cl += 'mdl-color--accent mdl-color-text--accent-contrast';
 	c.innerHTML = '<br />';
-	c.innerHTML += '&nbsp;<a href="javascript:panelDisasm()" class="' + cl + '">&lt; INFO</a> <h3 color=white></h3>';
+	c.innerHTML += '&nbsp;<a href="javascript:panelDisasm()" class="' +
+							cl + '">&lt; INFO</a> <h3 color=white></h3>';
 	var tail = inColor ? '@e:scr.color=1,scr.html=1' : '';
 	r2.cmd('pdc' + tail, function(d) {
 		c.innerHTML += '<pre style=\'color:' + color + '\'>' + d + '<pre>';
@@ -670,12 +671,17 @@ function graph() {
 	widget.setDark();
 
 	// document.getElementById("viewport").
-	c.setAttribute('content','user-scalable=yes, width=device-width, minimum-scale=1,  maximum-scale=1');
+	c.setAttribute(
+		'content',
+		'user-scalable=yes, width=device-width, minimum-scale=1, maximum-scale=1'
+	);
 	c.style.overflow = 'auto';
 	var color = inColor ? 'white' : 'black';
 	var cl = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect ';
 	// cl += 'mdl-color--accent mdl-color-text--accent-contrast';
-	c.innerHTML = '<br />&nbsp;<a style="position:fixed;padding-left:10px;top:4em" href="javascript:panelDisasm()" class="' + cl + '">&lt; DISASM</a>';
+	c.innerHTML = '<br />&nbsp;' +
+		'<a style="position:fixed;padding-left:10px;top:4em" href="javascript:panelDisasm()" class="' +
+		cl + '">&lt; DISASM</a>';
 	var tail = inColor ? '@e:scr.color=1,scr.html=1' : '';
 	r2.cmd('agf' + tail, function(d) {
 		d = clickableOffsets(d);
