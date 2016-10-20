@@ -38,6 +38,8 @@ function resetConf() {
 var R2Conf = {
 	platform: { name: 'platform', defVal: 'x86', apply: function(p) { r2.cmd('e asm.arch=' + p); } },
 	bits: { name: 'bits', defVal: '32', apply: function(p) { r2.cmd('e asm.bits=' + p); } },
+	utf8: { name: 'utf8', defVal: 'true', apply: function(p) { r2.cmd('e scr.utf8=' + p); } },
+	bytes: { name: 'bytes', defVal: 'false', apply: function(p) { r2.cmd('e asm.bytes=' + p); } },
 	os: { name: 'os', defVal: 'Linux', apply: function(p) { console.log('OS is now: ' + p); } }, // missing
 	size: { name: 'size', defVal: 'S', apply: function(p) {
 			switch (p) {
@@ -96,7 +98,7 @@ var R2Conf = {
 	analHasNext: { name: 'analHasNext', defVal: true, apply: function(p) { console.log('analHasNext is ' + p); } },
 	analSkipNops: { name: 'analSkipNops', defVal: true, apply: function(p) { console.log('analSkipNops is ' + p); } },
 	analNonCode: { name: 'analNonCode', defVal: false, apply: function(p) { console.log('analNonCode is ' + p); } },
-	colors: { name: 'colors', defVal: true, apply: function(p) { inColor = p; } },
+	colors: { name: 'colors', defVal: true, apply: function(p) { inColor = p; r2.cmd('e scr.color=' + p);} },
 	useTTS: { name: 'tts', defVal: true, apply: function(p) { R2Conf.useTTS.value = p; } },
 	theme: { name: 'theme', defVal: 'none', apply: function(p) { r2.cmd('eco ' + p); } } // TODO
 };
@@ -175,6 +177,12 @@ function drawDisassembly(dom) {
 	var decoding = ['Pseudo', 'Opcodes', 'ATT'];
 	uiSelect(dom, 'Decoding', decoding, decoding.indexOf(getConf(R2Conf.decoding)), function(item) {
 		saveConf(R2Conf.decoding, item);
+	});
+	uiSwitch(dom, 'Utf8', getConf(R2Conf.utf8), function(param, state) {
+		saveConf(R2Conf.utf8, state);
+	});
+	uiSwitch(dom, 'Show Bytes', getConf(R2Conf.bytes), function(param, state) {
+		saveConf(R2Conf.bytes, state);
 	});
 }
 
