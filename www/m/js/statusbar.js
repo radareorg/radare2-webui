@@ -99,6 +99,7 @@ function statusMessage(x, t) {
 function statusToggle() {
 	var statusbar = document.getElementById('statusbar');
 	var container = document.getElementById('container');
+
 	if (statusMode == Mode.HALF) {
 		statusTab = Tab.LOGS;
 		statusMode = Mode.LINE;
@@ -166,16 +167,19 @@ function statusNext() {
 function statusConsole() {
 	var statusbar = document.getElementById('statusbar');
 	var container = document.getElementById('container');
-	if (statusTab === Tab.CONSOLE && statusMode !== Mode.LINE) {
-		statusToggle();
-		statusMode = Mode.LINE;
-		return;
+	if (statusTab === Tab.CONSOLE) {
+		if (statusMode !== Mode.LINE) {
+			statusToggle();
+			statusMode = Mode.LINE;
+			return;
+		}
+		statusTab = Tab.CONSOLE;
 	}
 	if (statusMode === Mode.HALF) {
 		/* do something here */
 		statusMode = Mode.LINE;
-		statusTab = Tab.CONSOLE;
 	} else if (statusMode === Mode.LINE) {
+		statusTab = Mode.CONSOLE;
 		statusMode = Mode.HALF;
 		try {
 			statusbar.parentNode.classList.remove('full');
@@ -251,6 +255,7 @@ function statusInitialize() {
 	statusbar.innerHTML = '';
 	statusbar.parentNode.addEventListener('click', function() {
 		if (statusMode == Mode.LINE) {
+			statusTab = Tab.CONSOLE;
 			statusToggle();
 		}
 	});
