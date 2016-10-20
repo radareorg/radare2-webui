@@ -27,6 +27,10 @@ Hexdump.prototype.drawContextualMenu = function() {
 
 	var exportAs = [
 		{ name: 'Assembly', fct: function(evt, range) { return exportOp('ASM', range, 'pca', 'asm'); } },
+		{ name: 'Disassembly', fct: function(evt, range) { return exportOp('DISASM', range, 'pD', 'disasm'); } },
+		{ name: 'Hexpairs', fct: function(evt, range) { return exportOp('HEXPAIRS', range, 'p8', 'disasm'); } },
+		{ name: 'Base64 Encode', fct: function(evt, range) { return exportOp('b64e', range, 'p6e', 'disasm'); } },
+		{ name: 'Base64 Decode', fct: function(evt, range) { return exportOp('b64d', range, 'p6d', 'disasm'); } },
 		{ name: 'Binary', fct: function(evt, range) {
 			var bytes = new Uint8Array(_this.nav.getBytes(range));
 			var blob = new Blob([bytes], {type: 'application/octet-stream'});
