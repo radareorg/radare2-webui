@@ -166,7 +166,16 @@ function statusNext() {
 function statusConsole() {
 	var statusbar = document.getElementById('statusbar');
 	var container = document.getElementById('container');
-	if (statusMode === Mode.LINE) {
+	if (statusTab === Tab.CONSOLE && statusMode !== Mode.LINE) {
+		statusToggle();
+		statusMode = Mode.LINE;
+		return;
+	}
+	if (statusMode === Mode.HALF) {
+		/* do something here */
+		statusMode = Mode.LINE;
+		statusTab = Tab.CONSOLE;
+	} else if (statusMode === Mode.LINE) {
 		statusMode = Mode.HALF;
 		try {
 			statusbar.parentNode.classList.remove('full');
@@ -181,7 +190,6 @@ function statusConsole() {
 	}
 	if (statusTab == Tab.CONSOLE) {
 		statusTab = Tab.LOGS;
-
 	} else {
 		statusTab = Tab.CONSOLE;
 	}

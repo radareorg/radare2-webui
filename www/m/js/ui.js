@@ -1,6 +1,6 @@
 function uiButton(href, label, type) {
 	var classes = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect ';
-	classes += 'mdl-color--accent mdl-color-text--accent-contrast';
+	// classes += 'mdl-color--accent mdl-color-text--accent-contrast';
 	if (type == 'active') {
 		var st = 'style="background-color:#f04040 !important"';
 		return '&nbsp;<a href="' + href.replace(/"/g, '\'') + '" class="' + classes + '" ' + st + '>' + label + '</a>';
@@ -68,6 +68,9 @@ function uiSwitch(dom, name, isChecked, onChange) {
 	span.className = 'mdl-switch__label';
 	span.innerHTML = name;
 	label.appendChild(span);
+
+	var br = document.createElement('br');
+	label.appendChild(br);
 }
 
 function uiActionButton(dom, action, label) {

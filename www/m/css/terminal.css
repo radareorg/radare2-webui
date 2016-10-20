@@ -15,7 +15,7 @@
 	font-family: monospace;
 	color: white;
 	white-space: pre-wrap;
-	padding-bottom: 1em;
+	padding-bottom: 2em;
 }
 
 .terminal_prompt {
@@ -23,11 +23,13 @@
 }
 
 .terminal_input {
-	border: none;
+	border: 2px solid #238082;
 	position:fixed;
-	bottom: 2em;
+	bottom: 0em;
+	height:2em;
 	color: white;
 	background: black;
+	font-size: 1.2em;
 	width:100%;
 	overflow:hidden;
 	font-family: monospace;
