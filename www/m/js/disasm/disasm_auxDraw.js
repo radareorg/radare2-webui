@@ -54,7 +54,7 @@ Disasm.prototype.drawContextualMenu = function(enableAoj) {
 		// { name: 'define flag color (fc)', shortcut: 'C', fct: function(evt, offset) { return applyOp(offset, 'C'); } },
 		// { name: 'set as data', shortcut: 'd', fct: function(evt, offset) { return applyOp(offset, 'd'); } },
 		// { name: 'end of function', shortcut: 'e', fct: function(evt, offset) { return applyOp(offset, 'e'); } },
-		{ aoj: true, name: 'analyze function', shortcut: 'f', fct: function(evt, offset) { return applyOp(offset, 'af'); } },
+		{ aoj: false, name: 'analyze function', shortcut: 'F', fct: function(evt, offset) { return applyOp(offset, 'af'); } },
 		// { name: 'format', shortcut: 'F', fct: function(evt, offset) { return applyOp(offset, 'F'); } },
 		{ aoj: true, name: 'immediate base...', shortcut: 'i', expand: [
 			{
@@ -77,6 +77,8 @@ Disasm.prototype.drawContextualMenu = function(enableAoj) {
 		// { name: 'merge up (join this and previous function)', shortcut: 'k', fct: function(evt, offset) { return applyOp(offset, 'k'); } },
 		// { name: 'highlight word', shortcut: 'h', fct: function(evt, offset) { return applyOp(offset, 'h'); } },
 		// { name: 'manpage for current call', shortcut: 'm', fct: function(evt, offset) { return applyOp(offset, 'm'); } },
+		{ aoj: false, name: 'add comment', shortcut: ';', fct: function(evt, offset) { return applyOp(offset, 'CC', 'Name'); } },
+		{ aoj: false, name: 'set flag', shortcut: 'f', fct: function(evt, offset) { return applyOp(offset, 'f', 'Name'); } },
 		{ aoj: true, name: 'rename flag', shortcut: 'n', fct: function(evt, offset) { return applyOp(offset, 'fr', 'Name'); } },
 		// { name: 'rename function', shortcut: 'r', fct: function(evt, offset) { return applyOp(offset, 'r'); } },
 		// { name: 'find references /r', shortcut: 'R', fct: function(evt, offset) { return applyOp(offset, 'R'); } },
@@ -84,6 +86,9 @@ Disasm.prototype.drawContextualMenu = function(enableAoj) {
 		// { name: 'set strings in current block', shortcut: 'S', fct: function(evt, offset) { return applyOp(offset, 'S'); } },
 		// { name: 'undefine metadata here', shortcut: 'u', fct: function(evt, offset) { return applyOp(offset, 'u'); } },
 		{ aoj: false, name: 'find xrefs', shortcut: 'x', fct: function(evt, offset) { return displayRes(offset, 'axtj'); } },
+		{ aoj: false, name: 'as data', shortcut: 'D', fct: function(evt, offset) { return applyOp(offset, 'Cd ', 'Size'); } },
+		{ aoj: false, name: 'as code', shortcut: 'F', fct: function(evt, offset) { return applyOp(offset, 'C-'); } },
+		{ aoj: false, name: 'as string', shortcut: 'S', fct: function(evt, offset) { return applyOp(offset, 'Cs'); } },
 		// { name: 'set as 32bit word', shortcut: 'w', fct: function(evt, offset) { return applyOp(offset, 'w'); } },
 		// { name: 'set as 64bit word', shortcut: 'W', fct: function(evt, offset) { return applyOp(offset, 'W'); } }
 	];
