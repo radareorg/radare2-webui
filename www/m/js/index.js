@@ -270,41 +270,6 @@ function runCommand(text) {
 	});
 }
 
-function consoleKey(e) {
-	var inp = document.getElementById('input');
-	if (!e) {
-		inp.onkeypress = consoleKey;
-	} else {
-		if (e.keyCode == 13) {
-			runCommand(inp.value);
-			inp.value = '';
-		}
-	}
-}
-
-function panelConsole() {
-	var widget = widgetContainer.getWidget('Console');
-	var c = widgetContainer.getWidgetDOMWrapper(widget);
-
-	updates.registerMethod(widget.getOffset(), panelConsole);
-
-	c.innerHTML = '<br />';
-	var common = 'onkeypress=\'consoleKey()\' class=\'mdl-card--expand mdl-textfield__input\' id=\'input\'';
-	if (inColor) {
-		c.style.backgroundColor = '#202020';
-		var styles = 'position:fixed;padding-left:10px;top:4em;height:1.8em;color:white';
-		c.innerHTML += '<input style=\'' + styles + '\' ' + common + ' />';
-		//c.innerHTML += uiButton('javascript:runCommand()', 'Run');
-		c.innerHTML += '<div id=\'output\' class=\'pre\' style=\'color:white !important\'><div>';
-	} else {
-		c.style.backgroundColor = '#f0f0f0';
-		c.innerHTML += '<input style=\'color:black\' ' + common + '/>';
-		c.innerHTML += uiButton('javascript:runCommand()', 'Run');
-		c.innerHTML += '<div id=\'output\' class=\'pre\' style=\'color:black!important\'><div>';
-	}
-	document.getElementById('output').innerHTML = lastConsoleOutput;
-}
-
 function searchKey(e) {
 	var inp = document.getElementById('search_input');
 	if (!e) {
@@ -409,6 +374,7 @@ function panelScript() {
 	var out = '<br />' + uiButton('javascript:runScript()', 'Run');
 	out += '&nbsp;' + uiButton('javascript:indentScript()', 'Indent');
 	out += '&nbsp;' + uiButton('javascript:toggleScriptOutput()', 'Output');
+	out += '&nbsp;' + uiButton('javascript:panelConsole()', 'Console');
 	out += '<br /><div class="output" id="scriptOutput"></div><br />';
 	out += '<textarea rows=32 id="script" class="pre" style="width:100%">';
 	if (!localScript) {
