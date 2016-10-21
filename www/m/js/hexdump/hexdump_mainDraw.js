@@ -5,6 +5,7 @@ Hexdump.prototype.drawContent = function(dom, callback) {
 	dom.innerHTML = '';
 
 	this.listContent = document.createElement('ul');
+	this.listContent.className = 'listContent';
 	dom.appendChild(this.listContent);
 
 	var _this = this;

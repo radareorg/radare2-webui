@@ -318,26 +318,50 @@ Hexdump.prototype.drawControls = function(dom) {
 	}, false);
 
 	// Nb columns
+	var nbCols = document.createElement('input');
+	nbCols.className = 'mdl-textfield__input';
+	nbCols.style.width = '26px';
+	nbCols.style.display = 'inline';
+	nbCols.pattern = '[0-9]+';
+	nbCols.value = this.nbColumns;
+
+	var setNbCols = function(dom) {
+		return function(cols) {
+			_this.nbColumns = cols;
+			_this.nav.changeNbCols(cols);
+			_this.draw();
+			dom.value = cols;
+		};
+	}(nbCols);
+
 	var selectColumns = document.createElement('span');
 	selectColumns.title = 'Number of columns per line';
-	// selectColumns.appendChild(document.createTextNode('Nb cols: '));
-	var selectCols = document.createElement('select');
-	selectColumns.appendChild(selectCols);
-	for (var i = 1 ; i <= 16 ; i++) {
-		var option = document.createElement('option');
-		option.value = i;
-		option.text = i;
-		if (i === this.nbColumns) {
-			option.selected = true;
-		}
-		selectCols.appendChild(option);
-	}
 
-	selectCols.addEventListener('change', function() {
-		_this.nbColumns = parseInt(this.value);
-		_this.nav.changeNbCols(_this.nbColumns);
-		_this.draw();
-	}, false);
+	var buttonLess = document.createElement('button');
+	buttonLess.className = 'mdl-button mdl-js-button mdl-button--icon';
+	buttonLess.appendChild(document.createTextNode('-'));
+	buttonLess.addEventListener('click', function() {
+		setNbCols(_this.nbColumns - 1);
+	});
+
+	var buttonMore = document.createElement('button');
+	buttonMore.className = 'mdl-button mdl-js-button mdl-button--icon';
+	buttonMore.appendChild(document.createTextNode('+'));
+	buttonMore.addEventListener('click', function() {
+		setNbCols(_this.nbColumns + 1);
+	});
+
+	nbCols.addEventListener('change', function(evt) {
+		var curVal = parseInt(evt.target.value);
+		setNbCols(curVal);
+	});
+
+	selectColumns.appendChild(buttonLess);
+	selectColumns.appendChild(document.createTextNode(' '));
+	selectColumns.appendChild(nbCols);
+	selectColumns.appendChild(document.createTextNode(' '));
+	selectColumns.appendChild(buttonMore);
+
 
 	// Big endian
 	var checkboxBigEndian = document.createElement('input');
