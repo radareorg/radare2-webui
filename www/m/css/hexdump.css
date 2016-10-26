@@ -29,6 +29,10 @@
 	font-family: "DejaVu Sans Mono", Console, Courier New, monospace;
 }
 
+ul.listContent li {
+	white-space: nowrap;
+}
+
 ul.offset, ul.hexpairs, ul.ascii  {
 	margin:0;
 	padding:0;
@@ -39,16 +43,15 @@ ul.offset, ul.hexpairs, ul.ascii  {
 ul.offset {
 	width:120px;
 	text-align:right;
-	margin-right:10px;
+	margin-right:20px;
 }
 
 ul.hexpairs {
 	text-align:center;
-	min-width:400px;
 }
 
 ul.ascii {
-	margin-left:10px;
+	margin-left:20px;
 }
 
 ul.hexpairs li input, ul.ascii li input {
