@@ -32,7 +32,8 @@
     "gulp-jscs": "^4.0.0",
     "gulp-livereload": "^3.8.1",
     "gulp-replace": "^0.5.4",
-    "gulp-uglify": "^2.0.0"
+    "gulp-uglify": "^2.0.0",
+    "run-sequence": "^1.2.2"
   },
   "dependencies": {
     "gulp-htmlmin": "^3.0.0",

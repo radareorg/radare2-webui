@@ -9,7 +9,7 @@ runenyo:
 	r2 -q -e http.homeroot=dist -e http.ui=enyo -c=H /bin/ls
 
 runm:
-	r2 -q -e http.homeroot=dist -e http.ui=m -c=H /bin/ls
+	r2 -q -e http.homeroot=dev -e http.ui=m -c=H /bin/ls
 
 runt:
 	r2 -q -e http.homeroot=dist -e http.ui=t -c=H /bin/ls
@@ -39,7 +39,10 @@ clean:
 	$(MAKE) -C www/enyo clean
 	rm -rf dist
 
-dist: build
+release: build
+	$(MAKE) -C www/m release
+
+dist: release
 	tar cJvf radare2-webui-$(VERSION).tar.xz dist
 
 indivualdist:
