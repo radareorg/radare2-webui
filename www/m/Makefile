@@ -4,6 +4,9 @@ build:
 	npm install
 	$(shell npm bin)/gulp
 
+release:
+	$(shell npm bin)/gulp release
+
 run: build
 	r2 -qe http.root=$$PWD/../../dist -e http.ui=m -c=H /bin/ls
 
