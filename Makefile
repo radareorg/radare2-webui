@@ -41,7 +41,7 @@ runt:
 	r2 -q -e http.homeroot=dist -e http.ui=t -c=H /bin/ls
 
 runp:
-	r2 -q -e http.homeroot=dist -e http.ui=p -c=H /bin/ls
+	r2 -q -e http.homeroot=dev -e http.ui=p -c=H /bin/ls
 
 #####################
 # Building releases #
@@ -57,6 +57,7 @@ release-material: material
 release-tiles: tiles
 
 release-panel: panel
+	̂$(MAKE) -c www/p release
 
 release: release-root release-enyo release-material release-tiles release-panel
 

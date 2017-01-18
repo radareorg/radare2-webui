@@ -4,47 +4,43 @@ var gulp = require('gulp'),
 	concat = require('gulp-concat'),
 	bower = require('gulp-bower');
 
-
-var R2 = '../lib/';
-var DEST = '../../dist/p/'
+var paths = {
+	r2: '../lib/',
+	dev: '../../dev/p/',
+	dist: '../../dist/p/'
+};
 
 gulp.task('common', function() {
-	gulp.src(R2+'*.js')
-		.pipe(uglify())
+	gulp.src(paths.r2+'*.js')
 		.pipe(concat('r2core.js'))
-		.pipe(gulp.dest(DEST));
+		.pipe(gulp.dest(paths.dev));
 
-	gulp.src(R2+'*.css')
-		.pipe(cleanCSS())
+	gulp.src(paths.r2+'*.css')
 		.pipe(concat('r2core.css'))
-		.pipe(gulp.dest(DEST));
+		.pipe(gulp.dest(paths.dev));
 });
 
 gulp.task('js', function() {
 	
 	gulp.src('./lib/js/panels/*.js')
-		.pipe(uglify())
 		.pipe(concat('panels.js'))
-		.pipe(gulp.dest(DEST));
+		.pipe(gulp.dest(paths.dev));
 
 	gulp.src('./lib/js/dependencies/*.js')
-		.pipe(uglify())
 		.pipe(concat('dependencies.js'))
-		.pipe(gulp.dest(DEST));
+		.pipe(gulp.dest(paths.dev));
 
 	gulp.src('./lib/js/*.js')
-		.pipe(uglify())
 		.pipe(concat('main.js'))
-		.pipe(gulp.dest(DEST));
+		.pipe(gulp.dest(paths.dev));
 });
 
 
 gulp.task('css', function() {
 
 	gulp.src(['./lib/css/jquery-ui.css', './lib/css/tree.jquery.css', './lib/css/index.css'])
-		.pipe(cleanCSS())
 		.pipe(concat('dependencies.css'))
-		.pipe(gulp.dest(DEST));
+		.pipe(gulp.dest(paths.dev));
 });
 
 gulp.task('bower', function() {
@@ -68,10 +64,26 @@ gulp.task('vendors', ['bower'], function() {
 			'vendors/jointjs/dist/joint.min.js',
 			'vendors/jointjs/plugins/layout/DirectedGraph/joint.layout.DirectedGraph.js'
 		 ])
-		.pipe(gulp.dest(DEST+'vendors/'));
+		.pipe(gulp.dest(paths.dev+'vendors/'));
 });
 
 gulp.task('default', ['vendors', 'js', 'css', 'common'], function() {
 	gulp.src(['./index.html', '*.png'])
-		.pipe(gulp.dest(DEST));
+		.pipe(gulp.dest(paths.dev));
+});
+
+gulp.task('release', ['default'], function() {
+	gulp.src([paths.dev + 'index.html', paths.dev + '*.png'])
+		.pipe(gulp.dest(paths.dist));
+	
+	gulp.src([paths.dev + '*.css'])
+		.pipe(cleanCSS())
+		.pipe(gulp.dest(paths.dist));
+
+	gulp.src([paths.dev + '*.js'])
+		.pipe(uglify())
+		.pipe(gulp.dest(paths.dist));
+
+	gulp.src([paths.dev + 'vendors/*.*'])
+		.pipe(gulp.dest(paths.dist + 'vendors/'));
 });
