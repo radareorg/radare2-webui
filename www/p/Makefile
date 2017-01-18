@@ -2,6 +2,9 @@ build:
 	npm install
 	$(shell npm bin)/gulp
 
+release:
+	$(shell npm bin)/gulp release
+
 all: build
 
 run: build
