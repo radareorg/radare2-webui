@@ -57,7 +57,7 @@ release-material: material
 release-tiles: tiles
 
 release-panel: panel
-	̂$(MAKE) -c www/p release
+	$(MAKE) -c www/p release
 
 release: release-root release-enyo release-material release-tiles release-panel
 
