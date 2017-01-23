@@ -37,21 +37,23 @@ var BBGraph = function() {
 		}
 	});
 };
-BBGraph.prototype.addVertex = function(addr, vlen) {
+BBGraph.prototype.addVertex = function(addr, vlen, dom) {
+    // if vertex is not yet created, do it
 	if (this.vertices[addr] === undefined) {
 		this.vertices[addr] = {};
 		this.vertices[addr].parents = [];
 		this.vertices[addr].children = [];
-		if (vlen === undefined) {
-			this.vertices[addr].len = 1;
-			var dom = document.createElement('div');
-			dom.id = 'bb_' + addr;
-			dom.className = 'basicblock enyo-selectable ec_gui_background ec_gui_border';
-			dom.innerHTML = '<div class=\'instruction enyo-selectable\'><span class=\'insaddr datainstruction ec_offset addr addr_0x' + addr.toString(16) + '\' >0x' + addr.toString(16) + '</span></div>';
-			this.vertices[addr].rendered = dom;
-		}
+        if (vlen === undefined && dom === undefined) {
+            this.vertices[addr].len = 1;
+            dom = document.createElement('div');
+            dom.id = 'bb_' + addr;
+            dom.className = 'basicblock enyo-selectable ec_gui_background ec_gui_border';
+            dom.innerHTML = '<div class=\'instruction enyo-selectable\'><span class=\'insaddr datainstruction ec_offset addr addr_0x' + addr.toString(16) + '\' >0x' + addr.toString(16) + '</span></div>';
+            this.vertices[addr].rendered = dom;
+        }
 	}
-	if (vlen !== undefined) {
+    // function is called with vlen and dom arguments, set them
+    if (vlen !== undefined && dom !== undefined) {
 		this.vertices[addr].len = vlen;
 		this.vertices[addr].rendered = dom;
 	}
@@ -83,7 +85,10 @@ BBGraph.prototype.makeLink = function(v1, v2, color) {
 			'.connection': {
 				'stroke-width': 1,
 				stroke: color
-			}
+			},
+            '.link-tools': {
+                display: 'none'
+            }
 		},
 		smooth: true
 	}));
@@ -218,7 +223,7 @@ BBGraph.prototype.render = function() {
 	$('#minimap .basicblock').remove();
 
 	// make minimap rect transparent
-	graph.getCell('minimap_area').attr({rect: { stroke: 'transparent'}});
+    graph.getCell('minimap_area').attr({rect: { stroke: 'transparent'}});
 
 	var svg_width = $('#canvas svg')[0].getBBox().width;
 	var svg_height = $('#canvas svg')[0].getBBox().height;
@@ -647,31 +652,76 @@ function html_for_instruction(ins) {
 	var asm_xrefs = (r2.settings['asm.xrefs']);
 	var asm_cmtright = (r2.settings['asm.cmtright']);
 
-	if (ins.fcn_addr > 0 && offset === '0x' + ins.fcn_addr.toString(16)) {
-		if (r2ui._dis.display == 'flat') idump += '<div class="ec_flow">; -----------------------------------------------------------</div>';
-		var results;
-		var cmd = 'afij ' + offset + ';afvj ' + offset + ';afaj ' + offset;
-		r2.cmd(cmd, function(x) {
-			results = x.split('\n');
-		});
-		var info = JSON.parse(results[0]);
-		if (info !== null && info !== undefined && info.length > 0)
-			idump += '<div class="ec_fname">(fcn) ' + info[0].name + '</div>';
-		var vars = JSON.parse(results[1]);
-		var fvars = [];
-		for (var i in vars) {
-			idump += '<div class="ec_flag">; ' + vars[i].kind + ' ' + vars[i].type  + ' <span class=\'fvar id_' + address_canonicalize(offset) + '_' + vars[i].ref + ' ec_prompt faddr faddr_' + address_canonicalize(offset) + '\'>' + escapeHTML(vars[i].name) + '</span> @ ' + vars[i].ref + '</div>';
-			fvars[fvars.length] = {name: vars[i].name, id:  address_canonicalize(offset) + '_' + vars[i].ref};
-		}
-		r2.varMap[ins.fcn_addr] = fvars;
-		var args = JSON.parse(results[2]);
-		var fargs = [];
-		for (var i in args) {
-			idump += '<div class="ec_flag">; ' + args[i].kind + ' ' + args[i].type  + ' <span class=\'farg id_' + address_canonicalize(offset) + '_' + args[i].ref + ' ec_prompt faddr faddr_' + address_canonicalize(offset) + '\'>' + escapeHTML(args[i].name) + '</span> @ ' + args[i].ref + '</div>';
-			fargs[fargs.length] = {name: args[i].name, id:  address_canonicalize(offset) + '_' + args[i].ref};
-		}
-		r2.argMap[ins.fcn_addr] = fargs;
-	}
+    if (ins.fcn_addr > 0 && offset === "0x"+ins.fcn_addr.toString(16)) {
+        if (r2ui._dis.display == "flat") idump += '<div class="ec_flow">; -----------------------------------------------------------</div>';
+
+        // Get Instruction info
+        var results;
+        var cmd = "afij " + offset;
+        r2.cmd(cmd, function(x){
+        results = x.split("\n");
+        });
+        try {
+            var info = JSON.parse(results[0]);
+            if (info !== null && info !== undefined && info.length > 0)
+            idump += '<div class="ec_fname">(fcn) ' + info[0].name + '</div>';
+        } catch (err) {
+            console.log("Error getting instruction information from afij command");
+        }
+
+        // Get function variables
+        var vars_reg_based = [];
+        cmd = "afvrj " + offset;
+        r2.cmd(cmd, function(x){
+        vars_reg_based = x.split("\n");
+        });
+        try {
+            var vars = JSON.parse(vars_reg_based[0]);
+            var fvars = [];
+            for (var i in vars) {
+            idump += '<div class="ec_flag">; ' + vars[i].kind + " " + vars[i].type  + " <span class='fvar id_" + address_canonicalize(offset) + "_" + vars[i].ref + " ec_prompt faddr faddr_" + address_canonicalize(offset) + "'>" + escapeHTML(vars[i].name) + "</span> @ " + vars[i].ref + '</div>';
+            fvars[fvars.length] = {name: vars[i].name, id:  address_canonicalize(offset) + "_" + vars[i].ref};
+            }
+            r2.varMap[ins.fcn_addr] = fvars;
+        } catch (err) {
+            console.log("Error getting variable information from afvj command");
+        }
+
+        // Get function arguments
+        var args_merged = [];
+        var args_bp_based = [];
+        var args_sp_based = [];
+        cmd = "afvbj " + offset;
+        r2.cmd(cmd, function(x){
+        args_bp_based = x.split("\n");
+        });
+        cmd = "afvsj " + offset;
+        r2.cmd(cmd, function(x){
+        args_sp_based = x.split("\n");
+        });
+        args_merged = args_bp_based.concat(args_sp_based);
+        try {
+            var args = JSON.parse(args_merged[0]);
+            var fargs = [];
+            for (var i in args) {
+                var ref = ""
+                if (args[i].ref !== null && args[i].ref !== undefined) {
+                    var ref_base = args[i].ref.base;
+                    var ref_offset = args[i].ref.offset;
+                    var ref_type = args[i].ref.type;
+                    var ref_sign = "+";
+                    if (ref_offset - 0) ref_sig = "-";
+                    ref = ref_base + ref_sign + ref_offset;
+                }
+                idump += '<div class="ec_flag">; ' + args[i].kind + " " + args[i].type  + " <span class='farg id_" + address_canonicalize(offset) + "_" + ref + " ec_prompt faddr faddr_" + address_canonicalize(offset) + "'>" + escapeHTML(args[i].name) + "</span> @ " + ref + '</div>';
+            fargs[fargs.length] = {name: args[i].name, id:  address_canonicalize(offset) + "_" + args[i].ref};
+            }
+            r2.argMap[ins.fcn_addr] = fargs;
+        } catch (err) {
+            console.log("Error getting argument information from afaj command");
+        }
+    }
+
 	if (asm_flags) {
 		var flags;
 		if (ins.flags !== undefined && ins.flags !== null) {
@@ -894,9 +944,11 @@ Element.prototype.documentOffsetTop = function() {
 
 function scroll_to_address(address) {
 	var elements = $('.insaddr.addr_' + address);
-	var top = elements[0].documentOffsetTop() - window.innerHeight / 2;
-	top = Math.max(0, top);
-	$('#main_panel').scrollTo({'top': top, 'left': 0});
+	if (elements[0] !== null && elements[0] !== undefined) {
+        var top = elements[0].documentOffsetTop() - window.innerHeight / 2;
+        top = Math.max(0, top);
+        $('#main_panel').scrollTo({'top': top, 'left': 0});
+    }
 }
 
 function has_scrollbar(divnode) {
