@@ -3,7 +3,7 @@
   "main": "main.js",
   "homepage": "https://github.com/radare/radare2",
   "authors": [
-    "pancake <pancake@nopcode.org>"
+    "pwntester <alvaro@pwntester.com>"
   ],
   "description": "Panel ui for radare2",
   "moduleType": [],
@@ -16,18 +16,18 @@
     "tests"
   ],
   "dependencies": {
-    "jquery": "2.2.1",
-    "jquery-ui": "1.9.2",
+    "jquery": "2.2.4",
+    "jquery-ui": "1.10.3",
     "jquery.scrollTo": "2.1.2",
     "jquery.layout": "*",
-    "backbone": "1.3.2",
-    "jointjs": "joint#0.9.7",
-    "spectrum": "1.8.0",
+    "backbone": "1.3.3",
+    "jointjs": "joint#1.0.3",
+    "graphlib": "^1.0.5",
+    "dagre": "0.7.4",
     "onoff": "jquery.onoff#0.3.6",
     "jquery-ui-contextmenu": "mar10/jquery-ui-contextmenu#6a185167e1c7b5de6e8b85eebca12465f1265ca4"
   },
   "resolutions": {
-    "jquery": "2.2.1",
-    "backbone": "1.3.2"
+    "jquery": "2.2.4"
   }
 }

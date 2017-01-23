@@ -32,7 +32,10 @@
 	<script type="text/javascript" src="./vendors/lodash.min.js"></script>
 	<script type="text/javascript" src="./vendors/backbone-min.js"></script>
 	<script type="text/javascript" src="./vendors/joint.min.js"></script>
-	<script type="text/javascript" src="./vendors/joint.layout.DirectedGraph.js"></script>
+
+	<script type="text/javascript" src="./vendors/graphlib.core.js"></script>
+	<script type="text/javascript" src="./vendors/dagre.core.js"></script>
+	<script type="text/javascript" src="./vendors/joint.layout.DirectedGraph.min.js"></script>
 
 	<!-- R2 Core -->
 	<script type="text/javascript" src="./r2core.js"></script>
@@ -64,7 +67,7 @@
 		<li><a href="#logs_tab"><span>Logs</span></a></li>
 		<li><a href="#projects_tab"><span>Projects</span></a></li>
 	</ul>
-	<div id="center_panel" class="ui-layout-content ui-widget-content ui-corner-bottom" style="border-top: 0; padding-bottom: 1em;">
+	<div id="center_panel" class="ui-layout-content ui-widget-content ui-corner-bottom" style="border-top: 0; padding-bottom: 0em;">
 		<div id="disasm_tab"></div>
 		<div id="hex_tab" style="background-color:rgb(20,20,20);"></div>
 		<div id="strings_tab" style="background-color:rgb(20,20,20);"></div>
