@@ -1,6 +1,7 @@
 var myLayout;
 
 $(document).ready(function() {
+
 	// create tabs FIRST so elems are correct size BEFORE Layout measures them
 	$('#main_panel').tabs({
 		select: function(event, ui) {

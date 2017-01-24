@@ -61,8 +61,10 @@ gulp.task('vendors', ['bower'], function() {
 			'vendors/onoff/dist/jquery.onoff.min.js',
 			'vendors/lodash/lodash.min.js',
 			'vendors/backbone/backbone-min.js',
+			'vendors/graphlib/dist/graphlib.core.js',
+			'vendors/dagre/dist/dagre.core.js',
 			'vendors/jointjs/dist/joint.min.js',
-			'vendors/jointjs/plugins/layout/DirectedGraph/joint.layout.DirectedGraph.js'
+			'vendors/jointjs/dist/joint.layout.DirectedGraph.min.js'
 		 ])
 		.pipe(gulp.dest(paths.dev+'vendors/'));
 });
