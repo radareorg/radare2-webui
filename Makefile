@@ -1,4 +1,4 @@
-VERSION=0.10.4
+VERSION=1.2.0
 
 all: build
 	$(MAKE) run
