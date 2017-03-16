@@ -26,7 +26,7 @@
 		<meta name="mobile-web-app-capable" content="yes">
 		<link rel="icon" sizes="192x192" href="images/touch/chrome-touch-icon-192x192.png">
 
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=true">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=yes">
 		<!-- Add to homescreen for Safari on iOS -->
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -64,12 +64,25 @@
 			<header class="demo-header mdl-layout__header mdl-color--white mdl-color--grey-100 mdl-color-text--grey-600">
 				<div class="mdl-layout__header-row">
 					<span class="mdl-layout-title" id='title'>Overview</span>
+
 					<div class="mdl-layout-spacer"></div>
-					<div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable">
-						<label class="mdl-button mdl-js-button mdl-button--icon" for="search">
-							<i class="material-icons">search</i>
-						</label>
-						<div class="mdl-textfield__expandable-holder mydropdown">
+
+					<button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" title="Layout options" id="hdrbtn">
+						<i class="material-icons">aspect_ratio</i>
+					</button>
+
+					<ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
+						<li class="mdl-menu__item" onclick="window.open('./', '_blank');">New Window</li>
+						<li class="mdl-menu__item" id="layout_single">Single Panel</li>
+						<li class="mdl-menu__item" id="layout_vertical">Vertical Split</li>
+					</ul>
+
+					<label class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" title="Search" for="search">
+						<i class="material-icons">search</i>
+					</label>
+
+					<div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable mydropdown">
+						<div class="mdl-textfield__expandable-holder">
 							<input class="mdl-textfield__input" type="text" id="search" autocomplete="off" />
 							<label class="mdl-textfield__label" for="search">Enter your query...</label>
 							<ul class="ddcontent" id="search_autocomplete">
@@ -77,47 +90,40 @@
 							</ul>
 						</div>
 					</div>
-
-					<button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="hdrbtn">
-						<i class="material-icons">more_vert</i>
-					</button>
-
-					<ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
-						<li class="mdl-menu__item"><a target=_blank href="./">New Window</a></li>
-						<li onclick="widgetContainer.merge()" class="mdl-menu__item">Single Panel</li>
-						<!--<li onclick="hSplit()" class="mdl-menu__item">Horiz Split</li>-->
-						<li onclick="widgetContainer.split(widgetContainer.Layout.VERTICAL);" class="mdl-menu__item">Vert Split</li>
-						<li id='menu_seek' class="mdl-menu__item">Seek</li>
-						<!-- <li id='menu_console' class="mdl-menu__item">Console</li> -->
-						<li id='menu_settings' class="mdl-menu__item">Settings</li>
-						<li id='menu_about' class="mdl-menu__item">About</li>
-						<li id='menu_mail' class="mdl-menu__item">Contact</li>
-					</ul>
-
-					<div id="widgetTools"></div>
 				</div>
 			</header>
 
 			<div class="demo-drawer mdl-layout__drawer mdl-color--blue-grey-900 hoverable">
 				<header class="demo-drawer-header">
 					<p class="mdl-typography--text-center">
-						<a href="./">
+						<a href="#" id="demo_avatar">
 							<img src="images/icon.png" class="demo-avatar">
 						</a>
 					</p>
 
 					<div class="demo-avatar-dropdown">
-						<span><!-- empty --></span>
+						<button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" title="Global settings" id="menu_settings">
+							<i class="material-icons md-light">settings</i>
+						</button>
+
+						<button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="menu_seek" title="Seek">
+							<i class="material-icons md-light">gps_fixed</i>
+						</button>
+
 						<div class="mdl-layout-spacer"></div>
+
 						<button id="accbtn" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
-							<i class="material-icons">arrow_drop_down</i>
+							<i class="material-icons md-light">arrow_drop_down</i>
 						</button>
 						<ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="accbtn">
-							<li class="mdl-menu__item"><a href="open.html">Open</a></li>
+							<li class="mdl-menu__item"><a href="../open.html">Open</a></li>
 							<li id='menu_project_save' class="mdl-menu__item">Save</li>
 							<li id='menu_project_delete' class="mdl-menu__item">Delete</li>
-							<li id='menu_project_close' class="mdl-menu__item">Close</li>
+							<li id='menu_project_close' class="mdl-menu__item mdl-menu__item--full-bleed-divider">Close</li>
+							<li id='menu_about' class="mdl-menu__item">About</li>
+							<li id='menu_mail' class="mdl-menu__item">Contact</li>
 						</ul>
+
 					</div>
 				</header>
 
@@ -130,7 +136,7 @@
 					<a id='menu_flags' class="mdl-navigation__link"><i class="mdl-color-text--blue-grey-400 material-icons">flag</i>Flags</a>
 					<a id='menu_search' class="mdl-navigation__link"><i class="mdl-color-text--blue-grey-400 material-icons">search</i>Search</a>
 					<a id='menu_script' class="mdl-navigation__link"><i class="mdl-color-text--blue-grey-400 material-icons">extension</i>Script</a>
-					<a id='menu_comments' class="mdl-navigation__link" href="javascript:panelComments()"><i class="mdl-color-text--blue-grey-400 material-icons">forum</i>Comments</a>
+					<a id='menu_comments' class="mdl-navigation__link"><i class="mdl-color-text--blue-grey-400 material-icons">forum</i>Comments</a>
 <!--
 					<a id='menu_comments' class="mdl-navigation__link" href="javascript:panelConsole()"><i class="mdl-color-text--blue-grey-400 material-icons">computer</i>Console</a>
 -->
@@ -244,6 +250,7 @@
 		<script type="application/javascript" src="./vendors/material.min.js"></script>
 		<script type="application/javascript" src="./vendors/mdl-selectfield.min.js"></script>
 		<script type="application/javascript" src="./vendors/FileSaver.min.js"></script>
-		<script type="application/javascript" src="./index.js"></script>
+		<script type="application/javascript" src="./legacy.js"></script>
+		<script type="application/javascript" src="./app.js"></script>
 	</body>
 </html>

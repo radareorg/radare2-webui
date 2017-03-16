@@ -28,6 +28,19 @@ function extractVar(str) {
 	return res[2];
 }
 
+// TODO dirty 
+function prepareClickableOffsets(x) {
+	x = x.replace(/0x([a-zA-Z0-9]*)/g,
+	'<a class=\'r2seek\'>0x$1</a>');
+	x = x.replace(/sym\.([\.a-zA-Z0-9_]*)/g,
+	'<a class=\'r2seek\'>sym.$1</a>');
+	x = x.replace(/fcn\.([\.a-zA-Z0-9_]*)/g,
+	'<a class=\'r2seek\'>fcn.$1</a>');
+	x = x.replace(/str\.([\.a-zA-Z0-9_]*)/g,
+	'<a class=\'r2seek\'>str.$1</a>');
+	return x;
+}
+
 function getChunk(where, howManyLines) {
 	var raw;
 
@@ -36,7 +49,7 @@ function getChunk(where, howManyLines) {
 		raw = d;
 	});
 
-	raw = clickableOffsets(raw);
+	raw = prepareClickableOffsets(raw);
 	var lines = raw.split('\n');
 	for (var i = 0 ; i < lines.length ; i++) {
 

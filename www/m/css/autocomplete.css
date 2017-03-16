@@ -1,14 +1,22 @@
-.mydropdown > .ddcontent {
+div.mydropdown > div > .ddcontent {
     display: none;
     position: absolute;
     right:0;
     background-color: #f9f9f9;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    padding: 12px 16px;
     width: 400px;
 	margin:0;
 	padding:0;
-	
+}
+
+div.mydropdown, div.mydropdown div {
+	margin: 0;
+	min-width: 0;
+}
+
+div.mydropdown.is-focused > div {
+	padding:0;
+	margin-left:12px;
 }
 
 ul.ddcontent li {
@@ -28,7 +36,3 @@ ul.ddcontent li.active {
 ul.ddcontent li:last-child {
 	border:none;
 }
-/*
-.mydropdown:hover > .ddcontent {
-    display: block;
-}*/

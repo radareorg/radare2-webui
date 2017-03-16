@@ -10,10 +10,19 @@
 	box-sizing: border-box;
 }
 
+.rwidget.dark {
+	background-color: #202020;
+	color: white;
+}
+
 .rwidget.full {
 }
 
 .rwidget.focus {
+}
+
+.rwidget:nth-child(2) {
+	display: none;
 }
 
 /**
@@ -47,6 +56,7 @@
 
 .rwidget.vertical:nth-child(2) {
 	right:0;
+	display: block;
 }
 
 /**

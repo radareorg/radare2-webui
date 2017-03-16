@@ -1,0 +1,20 @@
+export const Widgets = {
+	OVERVIEW: 'overview',
+	DISASSEMBLY: 'disassembly',
+	DISASSEMBLY_GRAPH: 'disasm_graph',
+	DISASSEMBLY_INFOS: 'disasm_infos',
+	DISASSEMBLY_INFOS_FULL: 'disasm_infos_full',
+	DISASSEMBLY_FUNCTIONS: 'disasm_functions',
+	DISASSEMBLY_BLOCKS: 'disasm_blocks',
+	DISASSEMBLY_DECOMPILE: 'disasm_decompile',
+	HEXDUMP: 'hexdump',
+	DEBUGGER: 'debugger',
+	FUNCTIONS: 'functions',
+	FLAGS: 'flags',
+	FLAGS_SPACE: 'flags_space',
+	SEARCH: 'search',
+	SCRIPTS: 'scripts',
+	COMMENTS: 'comments',
+	NOTES: 'notes',
+	SETTINGS: 'settings'
+}

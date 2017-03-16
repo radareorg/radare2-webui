@@ -2,16 +2,19 @@ all: build
 
 build:
 	npm install
-	$(shell npm bin)/gulp
+	npm run build
 
 release:
-	$(shell npm bin)/gulp release
+	npm run release
 
 run: build
 	r2 -qe http.root=$$PWD/../../dist -e http.ui=m -c=H /bin/ls
 
 watch:
-	$(shell npm bin)/gulp watch
+	npm run watch
+
+tests:
+	npm run test
 
 r:
 	r2 -qe http.root=$$PWD/../../dist -e http.ui=m -c=H /bin/ls

@@ -11,6 +11,11 @@
 	height:80px;
 }
 
+.disasm.flex-controls .button-controls-disasm {
+	padding:16px;
+	display: inline-block;
+}
+
 .disasm.flex-body {
 	top:80px;
 	line-height: 1.2em;
@@ -34,10 +39,7 @@ div.disasm span:hover.offset, div.disasm span:hover.fcn {
 }
 
 ul#disasm-history {
-}
-
-ul#disasm-history:before {
-	content: 'History: ';
+	display: inline-block;
 }
 
 ul#disasm-history li {
