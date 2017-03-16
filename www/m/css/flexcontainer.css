@@ -1,6 +1,4 @@
 .flex-controls {
-	position:absolute;
-	top:0;
 	height:50px;
 	width:100%;
 	overflow:auto;
@@ -12,4 +10,5 @@
 	top:50px;
 	width:100%;
 	overflow:auto;
+	background:inherit;
 }
