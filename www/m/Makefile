@@ -10,8 +10,8 @@ release: node_modules
 node_modules:
 	npm install
 
-run: build
-	r2 -qe http.root=$$PWD/../../dist -e http.ui=m -c=H /bin/ls
+run:
+	r2 -q -e http.sandbox=false -e http.root=$$PWD/../../dist -e http.ui=m -c=H /bin/ls
 
 watch:
 	npm run watch
