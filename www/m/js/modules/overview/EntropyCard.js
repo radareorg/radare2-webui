@@ -33,11 +33,18 @@ export class EntropyCard {
 	}
 
 	refreshEntropy() {
-		r2.cmdj('p=ej 50 $s @ $M', (d) => this.entropy = d.entropy);
+		r2.cmdj('p=ej 50 $s @ $M', (d) => {
+			if (d && d.entropy) {
+				this.entropy = d.entropy;
+			}
+		});
 	}
 
 	draw() {
 		const nbVals = this.entropy.length;
+		if (nbVals < 1) {
+			return;
+		}
 		const minVal = this.entropy.reduce((prev, curr) => (prev.value < curr.value) ? prev : curr).value;
 		const maxVal = this.entropy.reduce((prev, curr) => (prev.value > curr.value) ? prev : curr).value;
 		const width = this.width / nbVals;
