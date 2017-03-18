@@ -4,8 +4,11 @@ build:
 	npm install
 	npm run build
 
-release:
+release: node_modules
 	npm run release
+
+node_modules:
+	npm install
 
 run: build
 	r2 -qe http.root=$$PWD/../../dist -e http.ui=m -c=H /bin/ls
