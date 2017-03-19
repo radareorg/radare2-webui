@@ -1,3 +1,5 @@
+// builds r2core.js from lib/*.js
+
 var gulp = require('gulp'),
 	bower = require('gulp-bower');
 

@@ -294,7 +294,7 @@ r2.load_settings = function() {
 r2.flags = {};
 
 r2.update_flags = function() {
-	r2.cmd('fs *;fj', function(x) {
+	r2.cmd('fs *;fj|', function(x) {
 
 		var fs = JSON.parse(x);
 		if (fs !== undefined && fs !== null) {
