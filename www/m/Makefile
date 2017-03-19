@@ -11,7 +11,7 @@ node_modules:
 	npm install
 
 run:
-	r2 -q -e http.sandbox=false -e http.root=$$PWD/../../dist -e http.ui=m -c=H /bin/ls
+	r2 -q -e http.sandbox=false -e http.root=$$PWD/../../dev -e http.ui=m -c=H /bin/ls
 
 watch:
 	npm run watch

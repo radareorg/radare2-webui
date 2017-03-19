@@ -8,7 +8,7 @@ export class InfoCard {
 
 	constructor(howManyPreload = 1) {
 		this.headersCmd = [
-			{ name: 'HDR', title: 'Headers',     format: this.formatAsKeyValue, cmd: 'i',   grep: null,   ready: false },
+			{ name: 'HDR', title: 'Headers',     format: this.formatAsKeyValue, cmd: 'i|',   grep: null,   ready: false },
 			{ name: 'SYM', title: 'Symbols',     format: this.fromatAsCode,     cmd: 'isq', grep: '!imp', ready: false },
 			{ name: 'IMP', title: 'Imports',     format: this.fromatAsCode,     cmd: 'isq', grep: 'imp.', ready: false },
 			{ name: 'REL', title: 'Relocations', format: this.fromatAsCode,     cmd: 'ir',  grep: null,   ready: false },

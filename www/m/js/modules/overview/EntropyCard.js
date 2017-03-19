@@ -33,7 +33,7 @@ export class EntropyCard {
 	}
 
 	refreshEntropy() {
-		r2.cmdj('p=ej 50 $s @ $M', (d) => {
+		r2.cmdj('p=ej 50 $s @ $M|', (d) => {
 			if (d && d.entropy) {
 				this.entropy = d.entropy;
 			}
