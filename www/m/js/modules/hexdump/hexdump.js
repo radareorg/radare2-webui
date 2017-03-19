@@ -7,6 +7,7 @@ import {WordSizes} from './WordSizes';
 import {uiContext} from '../../core/UIContext';
 import {Widgets} from '../../widgets/Widgets';
 import {Inputs} from '../../helpers/Inputs';
+import {applySeek, formatOffset} from '../../helpers/Format';
 import {r2Wrapper} from '../../core/R2Wrapper';
 
 /**
@@ -67,7 +68,7 @@ export class Hexdump extends RadareInfiniteBlock {
 		}
 
 		window.addEventListener('mousedown', (evt) => {
-			if (evt.button !== 0) {
+			if (evt.button !== 0 || this.contextMenuOpen) {
 				return;
 			}
 			this.cleanSelection();
@@ -113,7 +114,7 @@ export class Hexdump extends RadareInfiniteBlock {
 		// TODO: cache, faster
 		this.container.reset();
 
-		this.container.drawBody(function(element) {
+		this.container.drawBody((element) => {
 			element.appendChild(document.createElement('div')); // offsets
 			element.appendChild(document.createElement('div')); // hexpairs
 			element.appendChild(document.createElement('div')); // ascii
@@ -139,10 +140,9 @@ export class Hexdump extends RadareInfiniteBlock {
 	 * Sequence to draw the whole UI
 	 */
 	draw() {
-		var _this = this;
 		this.drawControls(this.container.getControls());
-		this.drawContent(this.container.getBody(), function() {
-			_this.colorizeFlag();
+		this.drawContent(this.container.getBody(), () => {
+			this.colorizeFlag();
 		});
 	}
 
@@ -167,6 +167,15 @@ export class Hexdump extends RadareInfiniteBlock {
 		return this.bgColors[this.lastColorUsed];
 	}
 
+	/** Assemble two pairs depending of endianness */
+	honoringEndian(x, y) {
+		if (this.bigEndian) {
+			return x + y
+		} else {
+			return y + x;
+		}
+	}
+
 	/**
 	 * Convert a pair to a word considering endian
 	 */
@@ -175,21 +184,10 @@ export class Hexdump extends RadareInfiniteBlock {
 			return list;
 		}
 
-		var honoringEndian;
-		if (this.bigEndian) {
-			honoringEndian = function(x, y) {
-				return x + y;
-			};
-		} else {
-			honoringEndian = function(x, y) {
-				return y + x;
-			};
-		}
-
-		var newList = [];
-		for (var i = 0 ; i < list.length / 2 ; i++) {
+		let newList = [];
+		for (let i = 0 ; i < list.length / 2 ; i++) {
 			newList.push(
-				honoringEndian(
+				this.honoringEndian(
 					list[i * 2],
 					list[(i * 2) + 1]
 				)
@@ -293,13 +291,12 @@ export class Hexdump extends RadareInfiniteBlock {
 		this.listContent.className = 'listContent';
 		dom.appendChild(this.listContent);
 
-		var _this = this;
-		this.listContent.addEventListener('contextmenu', function(evt) {
-			if (typeof _this.currentSelection === 'undefined' ||
-				typeof _this.currentSelection.from === 'undefined' ||
-				typeof _this.currentSelection.to === 'undefined') {
+		this.listContent.addEventListener('contextmenu', (evt) => {
+			if (typeof this.currentSelection === 'undefined' ||
+				typeof this.currentSelection.from === 'undefined' ||
+				typeof this.currentSelection.to === 'undefined') {
 				// If undefined, we chose to have one-byte selection
-				_this.currentSelection = {
+				this.currentSelection = {
 					from: evt.target.offset,
 					to: evt.target.offset
 				};
@@ -307,7 +304,7 @@ export class Hexdump extends RadareInfiniteBlock {
 			evt.preventDefault();
 			var menu = document.getElementById('contextmenuHex');
 
-			if (_this.contextMenuOpen) {
+			if (this.contextMenuOpen) {
 				menu.classList.remove('active');
 			} else {
 				menu.classList.add('active');
@@ -315,23 +312,23 @@ export class Hexdump extends RadareInfiniteBlock {
 				menu.style.top = evt.clientY + 'px';
 			}
 
-			_this.contextMenuOpen = !_this.contextMenuOpen;
+			this.contextMenuOpen = !this.contextMenuOpen;
 		});
 
-		this.nav.get(NavigatorDirection.CURRENT, function(chunk) {
-			_this.curChunk = chunk;
+		this.nav.get(NavigatorDirection.CURRENT, (chunk) => {
+			this.curChunk = chunk;
 		});
 
-		this.nav.get(NavigatorDirection.BEFORE, function(chunk) {
-			_this.isTopMax = chunk.offset === 0;
-			_this.drawChunk(chunk);
-			_this.firstElement = _this.drawChunk(_this.getCurChunk());
+		this.nav.get(NavigatorDirection.BEFORE, (chunk) => {
+			this.isTopMax = chunk.offset === 0;
+			this.drawChunk(chunk);
+			this.firstElement = this.drawChunk(this.getCurChunk());
 		});
 
-		this.nav.get(NavigatorDirection.AFTER, function(chunk) {
-			_this.drawChunk(chunk);
-			_this.content.scrollTop = 0;
-			_this.content.scrollTop = _this.getFirstElement().getBoundingClientRect().top;
+		this.nav.get(NavigatorDirection.AFTER, (chunk) => {
+			this.drawChunk(chunk);
+			this.content.scrollTop = 0;
+			this.content.scrollTop = this.getFirstElement().getBoundingClientRect().top;
 
 			// Everything has been drawn, maybe we should do something more
 			if (typeof callback !== 'undefined') {
@@ -348,7 +345,6 @@ export class Hexdump extends RadareInfiniteBlock {
 			return this.firstElement;
 		}
 
-		var _this = this;
 		var drawMethod;
 		var size;
 		if (this.hexLength === -1) {
@@ -366,7 +362,7 @@ export class Hexdump extends RadareInfiniteBlock {
 		var firstElement;
 		var i;
 		for (var x = 0 ; x < chunk.hex.length ; x++) {
-			var line = document.createElement('li');
+			const line = document.createElement('li');
 			line.className = 'block' + chunk.offset;
 
 			if (where === NavigatorDirection.AFTER) {
@@ -378,6 +374,8 @@ export class Hexdump extends RadareInfiniteBlock {
 				lines.unshift(line);
 				i = (chunk.hex.length - 1) - x;
 			}
+
+			line.addEventListener('mousedown', (evt) => { this.currentLine = line; });
 
 			line.offset = {};
 			line.offset.start = chunk.offset + (this.nbColumns * i);
@@ -391,17 +389,13 @@ export class Hexdump extends RadareInfiniteBlock {
 
 			var offsetEl = document.createElement('li');
 			offset.appendChild(offsetEl);
-			offsetEl.appendChild(document.createTextNode(int2fixedHex(chunk.offset + (i * this.nbColumns), 8)));
+			const hex = int2fixedHex(chunk.offset + (i * this.nbColumns), 8);
+			const offsetElA = document.createElement('a');
+			offsetElA.innerHTML = hex;
+			applySeek(offsetElA);
+			offsetEl.appendChild(offsetElA);
 
 			offsetEl.assoc = hexpairs;
-
-			offsetEl.addEventListener('dblclick', function(evt) {
-				evt.preventDefault();
-				_this.selectionFirst = evt.target.parentNode.nextSibling.children[0];
-				_this.selectionEnd = evt.target.parentNode.nextSibling.children[_this.nbColumns - 1];
-				_this.processSelection();
-				return false;
-			});
 
 			hexpairs.style.lineHeight = this.lineHeight + 'px';
 			hexpairs.classList.add('hexpairs');
@@ -431,15 +425,14 @@ export class Hexdump extends RadareInfiniteBlock {
 	 * Trigerred by scrolling, determine and add content at the right place
 	 */
 	infiniteDrawingContent(where, pos, endCallback) {
-		var _this = this;
-		this.nav.get(where, function(chunk) {
+		this.nav.get(where, (chunk) => {
 			if (where === NavigatorDirection.BEFORE) {
-				_this.isTopMax = chunk.offset === 0;
+				this.isTopMax = chunk.offset === 0;
 			} else {
-				if (_this.isTopMax) {
-					_this.nav.get(NavigatorDirection.BEFORE, function(chunk) {
+				if (this.isTopMax) {
+					this.nav.get(NavigatorDirection.BEFORE, (chunk) => {
 						if (chunk.offset > 0) {
-							_this.isTopMax = false;
+							this.isTopMax = false;
 						}
 					});
 				}
@@ -451,20 +444,20 @@ export class Hexdump extends RadareInfiniteBlock {
 
 			var removing;
 			if (where === NavigatorDirection.BEFORE) {
-				removing = _this.listContent.lastChild.className;
+				removing = this.listContent.lastChild.className;
 			} else {
-				removing = _this.listContent.firstChild.className;
+				removing = this.listContent.firstChild.className;
 			}
 			var elements = Array.prototype.slice.call(document.getElementsByClassName(removing));
 			for (var i = 0 ; i < elements.length ; i++) {
 				elements[i].parentNode.removeChild(elements[i]);
 			}
 
-			_this.drawChunk(chunk, where);
-			_this.content.scrollTop = pos;
-			_this.colorizeFlag(true);
+			this.drawChunk(chunk, where);
+			this.content.scrollTop = pos;
+			this.colorizeFlag(true);
 
-			endCallback(_this.isTopMax); // pauseScrollEvent = false
+			endCallback(this.isTopMax); // pauseScrollEvent = false
 		});
 	}
 
@@ -498,15 +491,19 @@ export class Hexdump extends RadareInfiniteBlock {
 
 		for (var x = 0 ; x < words.length ; x++) {
 			var hexpairEl = document.createElement('li');
+			var contentNode;
 			if (size === 2) {
 				var word = '' + new Int16Array([+words[x]])[0]
 				if (word.length < 5) {
 					word = Array(5 - word.length).join('_') + word
 				}
+				contentNode = document.createTextNode(word);
 			} else {
-				var word = '0x' + words[x];
+				contentNode = document.createElement('a');
+				contentNode.innerHTML = '0x' + words[x];
+				applySeek(contentNode);
 			}
-			hexpairEl.appendChild(document.createTextNode(word));
+			hexpairEl.appendChild(contentNode);
 			hexpairs.appendChild(hexpairEl);
 		}
 	}
@@ -516,31 +513,18 @@ export class Hexdump extends RadareInfiniteBlock {
 	 */
 	drawPairs_(hexpairs, asciis, pairs, chars, modifications, offset) {
 		hexpairs.classList.add('pairs');
-		var _this = this;
 
 		var editableHexEvent = {
-			keydown: function(evt) {
-				if (evt.keyCode === 13) {
-					collectHexpair(evt.target);
-				}
-			},
-			blur: function(evt) {
-				collectHexpair(evt.target);
-			}
+			keydown: (evt) => evt.keyCode === 13 && collectHexpair(evt.target),
+			blur: (evt) => collectHexpair(evt.target)
 		};
 
 		var editableAsciiEvent = {
-			keydown: function(evt) {
-				if (evt.keyCode === 13) {
-					collectAscii(evt.target);
-				}
-			},
-			blur: function(evt) {
-				collectAscii(evt.target);
-			}
+			keydown: (evt) => evt.keyCode === 13 && collectAscii(evt.target),
+			blur: (evt) => collectAscii(evt.target)
 		};
 
-		var collectHexpair = function(target) {
+		var collectHexpair = (target) => {
 			if (target.busy) {
 				return; // Event has been already triggered elsewhere
 			}
@@ -561,36 +545,36 @@ export class Hexdump extends RadareInfiniteBlock {
 
 			var value = regex[0];
 			target = target.parentNode;
-			var initial = _this.nav.reportChange(target.offset, value);
+			var initial = this.nav.reportChange(target.offset, value);
 
 			target.innerHTML = value;
 			target.assoc.innerHTML = hexPairToASCII(value);
 			if (initial !== null) {
 				target.classList.add('modified');
 				target.assoc.classList.add('modified');
-				_this.colorizeByte(target, value);
-				_this.colorizeByte(target.assoc, value);
-				_this.onChangeCallback(target.offset, initial, value);
+				this.colorizeByte(target, value);
+				this.colorizeByte(target.assoc, value);
+				this.onChangeCallback(target.offset, initial, value);
 			}
 
 			target.removeEventListener('keydown', editableHexEvent.keydown);
 			target.removeEventListener('blur', editableHexEvent.blur);
 		};
 
-		var collectAscii = function(target) {
+		var collectAscii = (target) => {
 			var value = target.value[0];
 			var hex = ASCIIToHexpair(value);
 			target = target.parentNode;
-			var initial = _this.nav.reportChange(target.assoc.offset, hex);
+			var initial = this.nav.reportChange(target.assoc.offset, hex);
 
 			target.innerHTML = value;
 			target.assoc.innerHTML = hex;
 			if (initial !== null) {
 				target.classList.add('modified');
 				target.assoc.classList.add('modified');
-				_this.colorizeByte(target, value);
-				_this.colorizeByte(target.assoc, value);
-				_this.onChangeCallback(target.assoc.offset, target.assoc.innerHTML, hex);
+				this.colorizeByte(target, value);
+				this.colorizeByte(target.assoc, value);
+				this.onChangeCallback(target.assoc.offset, target.assoc.innerHTML, hex);
 			}
 
 			target.removeEventListener('keydown', editableAsciiEvent.keydown);
@@ -633,24 +617,14 @@ export class Hexdump extends RadareInfiniteBlock {
 			this.colorizeByte(hexpairEl, pairs[x]);
 			this.colorizeByte(asciiEl, pairs[x]);
 
-			hexpairEl.addEventListener('mouseenter', function(evt) {
-				_this.showPairs_(evt.target, evt.target.assoc, true);
-			});
+			hexpairEl.addEventListener('mouseenter', (evt) => this.showPairs_(evt.target, evt.target.assoc, true));
+			hexpairEl.addEventListener('mouseleave', (evt) => this.showPairs_(evt.target, evt.target.assoc, false));
 
-			hexpairEl.addEventListener('mouseleave', function(evt) {
-				_this.showPairs_(evt.target, evt.target.assoc, false);
-			});
-
-			asciiEl.addEventListener('mouseenter', function(evt) {
-				_this.showPairs_(evt.target, evt.target.assoc, true);
-			});
-
-			asciiEl.addEventListener('mouseleave', function(evt) {
-				_this.showPairs_(evt.target, evt.target.assoc, false);
-			});
+			asciiEl.addEventListener('mouseenter', (evt) => this.showPairs_(evt.target, evt.target.assoc, true));
+			asciiEl.addEventListener('mouseleave', (evt) => this.showPairs_(evt.target, evt.target.assoc, false));
 
 			if (this.isWritable()) {
-				hexpairEl.addEventListener('click', function(evt) {
+				hexpairEl.addEventListener('click', (evt) => {
 					if (evt.button !== 0) {
 						return;
 					}
@@ -668,7 +642,7 @@ export class Hexdump extends RadareInfiniteBlock {
 					form.focus();
 				});
 
-				asciiEl.addEventListener('click', function(evt) {
+				asciiEl.addEventListener('click', (evt) => {
 					if (evt.button !== 0) {
 						return;
 					}
@@ -684,35 +658,40 @@ export class Hexdump extends RadareInfiniteBlock {
 					form.focus();
 				});
 			} else {
-				hexpairEl.addEventListener('click', function() {
-					_this.beingSelected = false;
-					_this.cleanSelection();
+				hexpairEl.addEventListener('click', () => {
+					this.beingSelected = false;
+					this.cleanSelection();
 				});
 
-				hexpairEl.addEventListener('mousedown', function(evt) {
+				const stopSelection = () => {
+					this.beingSelected = false;
+					window.removeEventListener('mouseup', stopSelection);
+				};
+
+				hexpairEl.addEventListener('mousedown', (evt) => {
 					if (evt.button !== 0) {
 						return;
 					}
 					evt.preventDefault();
-					_this.beingSelected = true;
-					_this.selectionFirst = evt.target;
+					this.beingSelected = true;
+					this.selectionFirst = evt.target;
+					window.addEventListener('mouseup', stopSelection);
 				});
 
-				hexpairEl.addEventListener('mouseover', function(evt) {
-					if (!_this.beingSelected) {
+				hexpairEl.addEventListener('mouseover', (evt) => {
+					if (!this.beingSelected) {
 						return;
 					}
-					_this.selectionEnd = evt.target;
-					_this.processSelection(true);
+					this.selectionEnd = evt.target;
+					this.processSelection(true);
 				});
 
-				hexpairEl.addEventListener('mouseup', function(evt) {
-					if (!_this.beingSelected) {
+				hexpairEl.addEventListener('mouseup', (evt) => {
+					if (!this.beingSelected) {
 						return;
 					}
-					_this.selectionEnd = evt.target;
-					_this.processSelection(false);
-					_this.beingSelected = false;
+					this.selectionEnd = evt.target;
+					this.processSelection(false);
 				});
 			}
 		}
@@ -725,20 +704,14 @@ export class Hexdump extends RadareInfiniteBlock {
 	 * Populate the content of the contextual menu (on hexpair selection)
 	 */
 	drawContextualMenu() {
-		var _this = this;
-
-		var exportOp = function(name, range, command, ext) {
+		var exportOp = (name, range, command, ext) => {
 			var output;
-			r2.cmd(command + ' ' + (range.to - range.from) + ' @' + range.from, function(d) {
-				output = d;
-			});
+			r2.cmd(command + ' ' + (range.to - range.from) + ' @' + range.from, (d) => { output = d; });
 
-			var dialog = _this.createExportDialog('Export as ' + name + ':', output, function() {
+			var dialog = this.createExportDialog('Export as ' + name + ':', output, () => {
 				var blob = new Blob([output], {type: 'text/plain'});
 				var fileName;
-				r2.cmdj('ij', function(d) {
-					fileName = basename(d.core.file);
-				});
+				r2.cmdj('ij', (d) => { fileName = basename(d.core.file); });
 				fileName += '_0x' + range.from.toString(16) + '-0x' + range.to.toString(16) + '.' + ext;
 				saveAs(blob, fileName);
 			});
@@ -748,60 +721,53 @@ export class Hexdump extends RadareInfiniteBlock {
 			dialog.showModal();
 		};
 
+		var bytes;
 		var exportAs = [
-			{ name: 'Assembly', fct: function(evt, range) { return exportOp('ASM', range, 'pca', 'asm'); } },
-			{ name: 'Disassembly', fct: function(evt, range) { return exportOp('DISASM', range, 'pD', 'disasm'); } },
-			{ name: 'Hexpairs', fct: function(evt, range) { return exportOp('HEXPAIRS', range, 'p8', 'disasm'); } },
-			{ name: 'Base64 Encode', fct: function(evt, range) { return exportOp('b64e', range, 'p6e', 'disasm'); } },
-			{ name: 'Base64 Decode', fct: function(evt, range) { return exportOp('b64d', range, 'p6d', 'disasm'); } },
-			{ name: 'Binary', fct: function(evt, range) {
-				var bytes = new Uint8Array(_this.nav.getBytes(range));
+			{ name: 'Assembly', fct: (evt, range) => exportOp('ASM', range, 'pca', 'asm') },
+			{ name: 'Disassembly', fct: (evt, range) => exportOp('DISASM', range, 'pD', 'disasm') },
+			{ name: 'Hexpairs', fct: (evt, range) => exportOp('HEXPAIRS', range, 'p8', 'disasm') },
+			{ name: 'Base64 Encode', fct: (evt, range) => exportOp('b64e', range, 'p6e', 'disasm') },
+			{ name: 'Base64 Decode', fct: (evt, range) => exportOp('b64d', range, 'p6d', 'disasm') },
+			{ name: 'Binary', fct: (evt, range) => { bytes = new Uint8Array(this.nav.getBytes(range));
 				var blob = new Blob([bytes], {type: 'application/octet-stream'});
 				var fileName;
-				r2.cmdj('ij', function(d) {
-					fileName = basename(d.core.file);
-				});
+				r2.cmdj('ij', (d) => { fileName = basename(d.core.file); });
 				fileName += '_0x' + range.from.toString(16) + '-0x' + range.to.toString(16) + '.bin';
 				saveAs(blob, fileName);
 			} },
-			{ name: 'C', fct: function(evt, range) { return exportOp('C', range, 'pc', 'c'); } },
-			{ name: 'C half-words (2 bytes)', fct: function(evt, range) { return exportOp('C', range, 'pch', 'c'); } },
-			{ name: 'C words (4 bytes)', fct: function(evt, range) { return exportOp('C', range, 'pcw', 'c'); } },
-			{ name: 'C dwords (8 bytes)', fct: function(evt, range) { return exportOp('C', range, 'pcd', 'c'); } },
-			{ name: 'JavaScript', fct: function(evt, range) { return exportOp('JS', range, 'pcJ', 'js'); } },
-			{ name: 'JSON', fct: function(evt, range) { return exportOp('JSON', range, 'pcj', 'json'); } },
-			{ name: 'Python', fct: function(evt, range) { return exportOp('Python', range, 'pcp', 'py'); } },
-			{ name: 'R2 commands', fct: function(evt, range) { return exportOp('R2 cmd', range, 'pc*', 'r2'); } },
-			{ name: 'Shell script', fct: function(evt, range) { return exportOp('Shell script', range, 'pcS', 'txt'); } },
-			{ name: 'String', fct: function(evt, range) { return exportOp('string', range, 'pcs', 'txt'); } }
+			{ name: 'C', fct: (evt, range) => exportOp('C', range, 'pc', 'c') },
+			{ name: 'C half-words (2 bytes)', fct: (evt, range) => exportOp('C', range, 'pch', 'c') },
+			{ name: 'C words (4 bytes)', fct: (evt, range) => exportOp('C', range, 'pcw', 'c') },
+			{ name: 'C dwords (8 bytes)', fct: (evt, range) => exportOp('C', range, 'pcd', 'c') },
+			{ name: 'JavaScript', fct: (evt, range) => exportOp('JS', range, 'pcJ', 'js') },
+			{ name: 'JSON', fct: (evt, range) => exportOp('JSON', range, 'pcj', 'json') },
+			{ name: 'Python', fct: (evt, range) => exportOp('Python', range, 'pcp', 'py') },
+			{ name: 'R2 commands', fct: (evt, range) => exportOp('R2 cmd', range, 'pc*', 'r2') },
+			{ name: 'Shell script', fct: (evt, range) => exportOp('Shell script', range, 'pcS', 'txt') },
+			{ name: 'String', fct: (evt, range) => exportOp('string', range, 'pcs', 'txt') }
 		];
-		var applyOp = function(range, operande) {
+		var applyOp = (range, operande) => {
 			var val = prompt('Value (valid hexpair):');
 			var op = operande + ' ' + val + ' ' + (range.to - range.from) + ' @' + range.from;
-			r2.cmd(op, function() {
-				console.log('Call: ' + op);
-			});
-
-			_this.nav.updateModifications();
+			r2.cmd(op, () => console.log('Call: ' + op));
+			this.nav.updateModifications();
 
 			// Send modifications and reload
-			_this.nav.refreshCurrent(function() {
-				_this.draw();
-			});
+			this.nav.refreshCurrent(() => this.draw());
 		};
 		var operations = [
-			{ name: 'addition', fct: function(evt, range) { return applyOp(range, 'woa'); } },
-			{ name: 'and', fct: function(evt, range) { return applyOp(range, 'woA'); } },
-			{ name: 'divide', fct: function(evt, range) { return applyOp(range, 'wod'); } },
-			{ name: 'shift left', fct: function(evt, range) { return applyOp(range, 'wol'); } },
-			{ name: 'multiply', fct: function(evt, range) { return applyOp(range, 'wom'); } },
-			{ name: 'or', fct: function(evt, range) { return applyOp(range, 'woo'); } },
-			{ name: 'shift right', fct: function(evt, range) { return applyOp(range, 'wor'); } },
-			{ name: 'substraction', fct: function(evt, range) { return applyOp(range, 'wos'); } },
-			{ name: 'write looped', fct: function(evt, range) { return applyOp(range, 'wow'); } },
-			{ name: 'xor', fct: function(evt, range) { return applyOp(range, 'wox'); } },
-			{ name: '2 byte endian swap', fct: function(evt, range) { return applyOp(range, 'wo2'); } },
-			{ name: '4 byte endian swap', fct: function(evt, range) { return applyOp(range, 'wo4'); } }
+			{ name: 'addition', fct: (evt, range) => applyOp(range, 'woa') },
+			{ name: 'and', fct: (evt, range) => applyOp(range, 'woA') },
+			{ name: 'divide', fct: (evt, range) => applyOp(range, 'wod') },
+			{ name: 'shift left', fct: (evt, range) => applyOp(range, 'wol') },
+			{ name: 'multiply', fct: (evt, range) => applyOp(range, 'wom') },
+			{ name: 'or', fct: (evt, range) => applyOp(range, 'woo') },
+			{ name: 'shift right', fct: (evt, range) => applyOp(range, 'wor') },
+			{ name: 'substraction', fct: (evt, range) => applyOp(range, 'wos') },
+			{ name: 'write looped', fct: (evt, range) => applyOp(range, 'wow') },
+			{ name: 'xor', fct: (evt, range) => applyOp(range, 'wox') },
+			{ name: '2 byte endian swap', fct: (evt, range) => applyOp(range, 'wo2') },
+			{ name: '4 byte endian swap', fct: (evt, range) => applyOp(range, 'wo4') }
 		];
 
 		var items = [
@@ -820,13 +786,19 @@ export class Hexdump extends RadareInfiniteBlock {
 				}
 			},*/
 			{
+				name: 'Select line',
+				fct: (evt, range) => {
+					this.selectionFirst = this.currentLine.children[1].children[0];
+					this.selectionEnd = this.currentLine.children[1].children[this.currentLine.children[1].children.length - 1];
+					this.processSelection(true);
+				}
+			},
+			{
 				name: 'Set flag',
-				fct: function(evt, range) {
+				fct: (evt, range) => {
 					var name = prompt('Flag\'s name:');
-					r2.cmd('f ' + name + ' ' + (range.to - range.from + 1) + ' @' + range.from, function() {
-						_this.nav.refreshCurrent(function() {
-							_this.draw();
-						});
+					r2.cmd('f ' + name + ' ' + (range.to - range.from + 1) + ' @' + range.from, () => {
+						this.nav.refreshCurrent(() => this.draw());
 					});
 				}
 			},
@@ -849,13 +821,18 @@ export class Hexdump extends RadareInfiniteBlock {
 		var ul = document.createElement('ul');
 		menu.appendChild(ul);
 
-		var _this = this;
-		var bindAction = function(element, action) {
-			element.addEventListener('mousedown', (function(fct) {
-				return function(evt) {
-					fct(evt, _this.getCurrentSelection());
-				};
-			}(action)));
+		// var bindAction = function(element, action) {
+		// 	element.addEventListener('mousedown', (function(fct) {
+		// 		return function(evt) {
+		// 			fct(evt, _this.getCurrentSelection());
+		// 		};
+		// 	}(action)));
+		// };
+
+		var bindAction = (element, action) => {
+			element.addEventListener('mousedown', (evt) => {
+				action(evt, this.getCurrentSelection());
+			})
 		};
 
 		for (var i = 0 ; i < items.length ; i++) {
@@ -869,7 +846,7 @@ export class Hexdump extends RadareInfiniteBlock {
 				li.classList.add('writableMenu');
 			}
 
-			li.addEventListener('mouseenter', function(evt) {
+			li.addEventListener('mouseenter', (evt) => {
 				// Cleaning old "active"
 				var subactives = Array.prototype.slice.call(evt.target.parentNode.getElementsByClassName('subactive'));
 				for (var x = 0 ; x < subactives.length ; x++) {
@@ -881,9 +858,9 @@ export class Hexdump extends RadareInfiniteBlock {
 			// expandable menu
 			if (typeof items[i].expand !== 'undefined') {
 				// Make submenu reachable
-				li.addEventListener('mouseenter', function(evt) {
+				li.addEventListener('mouseenter', (evt) => {
 					// If not available on read-only mode
-					if (evt.target.requireWritable && !_this.writable) {
+					if (evt.target.requireWritable && !this.writable) {
 						return;
 					}
 
@@ -922,25 +899,17 @@ export class Hexdump extends RadareInfiniteBlock {
 		document.body.appendChild(menu);
 		componentHandler.upgradeDom();
 
-		var _this = this;
 		this.contextMenuOpen = false;
-		var closeMenu = function() {
-			if (!_this.contextMenuOpen) {
+		var closeMenu = () => {
+			if (!this.contextMenuOpen) {
 				return;
 			}
 			menu.classList.remove('active');
-			_this.contextMenuOpen = false;
+			this.contextMenuOpen = false;
 		};
 
-		window.onkeyup = function(e) {
-			if (e.keyCode === 27) {
-				closeMenu();
-			}
-		};
-
-		document.addEventListener('click', function() {
-			closeMenu();
-		});
+		window.onkeyup = (e) =>  e.keyCode === 27 && closeMenu();
+		document.addEventListener('click', () => closeMenu());
 	}
 
 	/**
@@ -977,7 +946,7 @@ export class Hexdump extends RadareInfiniteBlock {
 		var saveButton = document.createElement('button');
 		saveButton.className = 'mdl-button';
 		saveButton.innerHTML = 'Save';
-		saveButton.addEventListener('click', function() {
+		saveButton.addEventListener('click', () => {
 			dialog.close();
 			dialog.parentNode.removeChild(dialog);
 			save();
@@ -987,7 +956,7 @@ export class Hexdump extends RadareInfiniteBlock {
 		var closeButton = document.createElement('button');
 		closeButton.className = 'mdl-button';
 		closeButton.innerHTML = 'Close';
-		closeButton.addEventListener('click', function() {
+		closeButton.addEventListener('click', () => {
 			dialog.close();
 			dialog.parentNode.removeChild(dialog);
 		});
@@ -1001,7 +970,6 @@ export class Hexdump extends RadareInfiniteBlock {
 	 */
 	drawControls(dom) {
 		dom.innerHTML = '';
-		var _this = this;
 
 		var controlList = document.createElement('ul');
 		controlList.classList.add('controlList');
@@ -1035,27 +1003,25 @@ export class Hexdump extends RadareInfiniteBlock {
 			select.appendChild(option);
 		}
 
-		select.addEventListener('change', function() {
-			_this.hexLength = parseInt(this.value);
-			_this.draw();
+		select.addEventListener('change', (evt) => {
+			this.hexLength = parseInt(evt.target.value);
+			this.draw();
 		}, false);
 
 		// Nb columns
-		var nbCols = document.createElement('input');
+		const nbCols = document.createElement('input');
 		nbCols.className = 'mdl-textfield__input';
 		nbCols.style.width = '26px';
 		nbCols.style.display = 'inline';
 		nbCols.pattern = '[0-9]+';
 		nbCols.value = this.nbColumns;
 
-		var setNbCols = function(dom) {
-			return (cols) => {
-				_this.nbColumns = cols;
-				_this.nav.changeNbCols(cols);
-				_this.draw();
-				dom.value = cols;
-			};
-		}(nbCols);
+		var setNbCols = (dom) => {
+			this.nbColumns = nbCols;
+			this.nav.changeNbCols(nbCols);
+			this.draw();
+			dom.value = nbCols;
+		};
 
 		var selectColumns = document.createElement('span');
 		selectColumns.title = 'Number of columns per line';
@@ -1063,18 +1029,14 @@ export class Hexdump extends RadareInfiniteBlock {
 		var buttonLess = document.createElement('button');
 		buttonLess.className = 'mdl-button mdl-js-button mdl-button--icon';
 		buttonLess.appendChild(document.createTextNode('-'));
-		buttonLess.addEventListener('click', function() {
-			setNbCols(_this.nbColumns - 1);
-		});
+		buttonLess.addEventListener('click', () => setNbCols(this.nbColumns - 1));
 
 		var buttonMore = document.createElement('button');
 		buttonMore.className = 'mdl-button mdl-js-button mdl-button--icon';
 		buttonMore.appendChild(document.createTextNode('+'));
-		buttonMore.addEventListener('click', function() {
-			setNbCols(_this.nbColumns + 1);
-		});
+		buttonMore.addEventListener('click', () => setNbCols(this.nbColumns + 1));
 
-		nbCols.addEventListener('change', function(evt) {
+		nbCols.addEventListener('change', (evt) => {
 			var curVal = parseInt(evt.target.value);
 			setNbCols(curVal);
 		});
@@ -1103,9 +1065,9 @@ export class Hexdump extends RadareInfiniteBlock {
 		labelCheckboxBE.appendChild(checkboxBigEndian);
 		labelCheckboxBE.appendChild(textBigEndian);
 
-		checkboxBigEndian.addEventListener('change', function() {
-			_this.bigEndian = !_this.bigEndian;
-			_this.draw();
+		checkboxBigEndian.addEventListener('change', () => {
+			this.bigEndian = !this.bigEndian;
+			this.draw();
 		});
 
 		// Selection mode
@@ -1128,9 +1090,9 @@ export class Hexdump extends RadareInfiniteBlock {
 			checboxSelection.disabled = true;
 		}
 
-		checboxSelection.addEventListener('change', function() {
-			_this.selectionMode = !_this.selectionMode;
-			_this.draw();
+		checboxSelection.addEventListener('change', () => {
+			this.selectionMode = !this.selectionMode;
+			this.draw();
 		});
 
 		// Big endian
@@ -1150,9 +1112,9 @@ export class Hexdump extends RadareInfiniteBlock {
 		labelFlags.appendChild(checkboxFlags);
 		labelFlags.appendChild(textFlags);
 
-		checkboxFlags.addEventListener('change', function() {
-			_this.showFlags = !_this.showFlags;
-			_this.draw();
+		checkboxFlags.addEventListener('change', () => {
+			this.showFlags = !this.showFlags;
+			this.draw();
 		});
 
 		wordBlock.appendChild(selectWord);
@@ -1266,13 +1228,11 @@ export class Hexdump extends RadareInfiniteBlock {
 			}
 		}
 
-		var _this = this;
-
 		// Retrieving all flags with length greater than 2 sorted (small at end)
-		this.nav.getFlags(2, function(flags) {
+		this.nav.getFlags(2, (flags) => {
 			for (var j = 0 ; j < flags.length ; j++) {
 				var end = false;
-				var initialLine = _this.indexOfLine_(flags[j].start);
+				var initialLine = this.indexOfLine_(flags[j].start);
 				if (initialLine === -1) {
 					console.log('Undefined flag offset');
 					return;
@@ -1295,7 +1255,7 @@ export class Hexdump extends RadareInfiniteBlock {
 							break;
 						}
 						// We color the byte
-						hexList[x].style.backgroundColor = _this.getFlagColor(flags[j].name);
+						hexList[x].style.backgroundColor = this.getFlagColor(flags[j].name);
 					}
 
 					initialByte = 0;
