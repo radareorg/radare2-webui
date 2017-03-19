@@ -4,7 +4,7 @@ build:
 	npm install
 	npm run build
 
-release: node_modules
+dist release: node_modules
 	npm run release
 
 node_modules:

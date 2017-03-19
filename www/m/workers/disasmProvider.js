@@ -1,6 +1,5 @@
 'use strict';
 importScripts('/m/r2.js');
-importScripts('/m/tools.js');
 
 function extractOffset(str) {
 	var res = str.match(/(0x[a-fA-F0-9]+)/);
