@@ -69,7 +69,7 @@ export class DebuggerWidget extends BaseWidget {
 			pre.appendChild(formatOffsets(d));
 			content.appendChild(pre);			
 		});
-		r2.cmd(rcmd + '=;s cur;f-cur;pd 128' + (this.inColor ? '@e:scr.color=1,scr.html=1' : ''), function(d) {
+		r2.cmd(rcmd + '=;s cur;f-cur;pd 128' + (this.inColor ? '|H' : ''), function(d) {
 			const pre = document.createElement('pre');
 			pre.style.color = 'grey';
 			pre.appendChild(formatOffsets(d));

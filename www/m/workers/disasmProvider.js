@@ -44,7 +44,7 @@ function getChunk(where, howManyLines) {
 	var raw;
 
 	// Line retrieved from the current offset
-	r2.cmd('pD ' + howManyLines + '@e:scr.color=1,scr.html=1 @' + where, function(d) {
+	r2.cmd('pD ' + howManyLines + '@' + where + '|H', function(d) {
 		raw = d;
 	});
 

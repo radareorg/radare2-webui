@@ -39,7 +39,7 @@ export class DisassemblyGraphWidget extends BaseWidget {
 			'user-scalable=yes, width=device-width, minimum-scale=1, maximum-scale=1'
 		);
 
-		var tail = inColor ? '@e:scr.color=1,scr.html=1' : '';
+		var tail = inColor ? '|H': '';
 		r2.cmd('agf' + tail, (d) => {
 			const pre = document.createElement('pre');
 			pre.style.color = inColor ? 'white' : 'black';

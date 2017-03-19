@@ -215,7 +215,7 @@ r2.get_disasm = function(offset, length, cb) {
 
 r2.get_disasm_before = function(offset, start, cb) {
 	var before = [];
-	r2.cmd('pdj -' + start + '@' + offset, function(x) {
+	r2.cmd('pdj -' + start + '@' + offset + '|', function(x) {
 		before = JSON.parse(x);
 	});
 	cb(before);
@@ -223,7 +223,7 @@ r2.get_disasm_before = function(offset, start, cb) {
 
 r2.get_disasm_after = function(offset, end, cb) {
 	var after = [];
-	r2.cmd('pdj ' + end + '@' + offset, function(x) {
+	r2.cmd('pdj ' + end + '@' + offset + '|', function(x) {
 		after = JSON.parse(x);
 	});
 	cb(after);
@@ -232,10 +232,10 @@ r2.get_disasm_after = function(offset, end, cb) {
 r2.get_disasm_before_after = function(offset, start, end, cb) {
 	var before = [];
 	var after = [];
-	r2.cmd('pdj ' + start + ' @' + offset, function(x) {
+	r2.cmd('pdj ' + start + ' @' + offset + '|', function(x) {
 		before = JSON.parse(x);
 	});
-	r2.cmd('pdj ' + end + '@' + offset, function(x) {
+	r2.cmd('pdj ' + end + '@' + offset + '|', function(x) {
 		after = JSON.parse(x);
 	});
 	var opcodes = before.concat(after);
@@ -244,7 +244,7 @@ r2.get_disasm_before_after = function(offset, start, end, cb) {
 
 r2.Config = function(k, v, fn) {
 	if (typeof v == 'function' || !v) { // get
-		r2.cmd('e ' + k, fn || v);
+		r2.cmd('e ' + k + '|', fn || v);
 	} else { // set
 		r2.cmd('e ' + k + '=' + v, fn);
 	}
@@ -254,7 +254,7 @@ r2.Config = function(k, v, fn) {
 r2.sections = {};
 
 r2.load_mmap = function() {
-	r2.cmdj('iSj', function(x) {
+	r2.cmdj('iSj|', function(x) {
 		if (x !== undefined && x !== null) {
 			r2.sections = x;
 		}
@@ -336,19 +336,19 @@ r2.set_flag_space = function(ns, fn) {
 };
 
 r2.get_flags = function(fn) {
-	r2.cmd('fj', function(x) {
+	r2.cmd('fj|', function(x) {
 		fn(x ? JSON.parse(x) : []);
 	});
 };
 
 r2.get_opcodes = function(off, n, cb) {
-	r2.cmd('pdj @' + off + '!' + n, function(json) {
+	r2.cmd('pdj @' + off + '!' + n + '|', function(json) {
 		cb(JSON.parse(json));
 	});
 };
 
 r2.get_bytes = function(off, n, cb) {
-	r2.cmd('pcj @' + off + '!' + n, function(json) {
+	r2.cmd('pcj @' + off + '!' + n +'|', function(json) {
 		cb(JSON.parse(json));
 	});
 };
@@ -379,29 +379,29 @@ r2.restore_asm_config = function() {
 };
 
 r2.get_info = function(cb) {
-	r2.cmd('ij', function(json) {
+	r2.cmd('ij|', function(json) {
 		cb(JSON.parse(json));
 	});
 };
 r2.bin_relocs = function(cb) {
-	r2.cmd('irj', function(json) {
+	r2.cmd('irj|', function(json) {
 		cb(JSON.parse(json));
 	});
 };
 r2.bin_imports = function(cb) {
-	r2.cmd('iij', function(json) {
+	r2.cmd('iij|', function(json) {
 		cb(JSON.parse(json));
 	});
 };
 
 r2.bin_symbols = function(cb) {
-	r2.cmd('isj', function(json) {
+	r2.cmd('isj|', function(json) {
 		cb(JSON.parse(json));
 	});
 };
 
 r2.bin_sections = function(cb) {
-	r2.cmd('iSj', function(json) {
+	r2.cmd('iSj|', function(json) {
 		cb(JSON.parse(json));
 	});
 };

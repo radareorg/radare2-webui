@@ -12,7 +12,7 @@ export class DisassemblyDecompileWidget extends BasePreWidget {
 		super(
 			'Decompile',
 			x => formatOffsets(x),
-			'pdc @e:scr.color=1,scr.html=1', // TODO !inColor, 'pdc' only
+			'pdc|H',
 			Inputs.iconButton('undo', 'Back to Disassembly', () => uiContext.navigateTo(Widgets.DISASSEMBLY)));
 	}
 }

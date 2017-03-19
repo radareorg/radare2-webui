@@ -12,7 +12,7 @@ export class DisassemblyBlocksWidget extends BasePreWidget {
 		super(
 			'Blocks',
 			x => formatOffsets(x),
-			'pdr @e:scr.color=1,scr.html=1', // TODO !inColor, 'pdr' only
+			'pdr|H',
 			Inputs.iconButton('undo', 'Back to Disassembly', () => uiContext.navigateTo(Widgets.DISASSEMBLY)));
 	}
 }

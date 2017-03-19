@@ -53,7 +53,7 @@ function ready() {
 	onClick('menu_settings', () => uiContext.navigateTo(Widgets.SETTINGS));
 	onClick('menu_about', () => {
 		r2.cmd('?V', function(version) {
-			alert('radare2 material webui by --pancake @ 2015-2016\n\n' + version.trim());
+			alert('radare2 material webui by --pancake @ 2015-2017\n\n' + version.trim());
 		});
 	});
 	onClick('menu_mail', function() {
