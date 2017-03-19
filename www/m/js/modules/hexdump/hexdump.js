@@ -58,8 +58,8 @@ export class Hexdump extends RadareInfiniteBlock {
 	init() {
 		this.refreshInitialOffset();
 
-		r2.cmdj('ecj', (colors) => { this.colors = colors; });
-		r2.cmdj('ij', (info) => { this.writable = info.core.iorw; });
+		r2.cmdj('ecj|', (colors) => { this.colors = colors; });
+		r2.cmdj('ij|', (info) => { this.writable = info.core.iorw; });
 		this.selectionMode = !this.writable;
 
 		for (var key in this.colors) {
