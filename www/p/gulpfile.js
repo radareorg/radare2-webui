@@ -1,5 +1,6 @@
 var gulp = require('gulp'),
 	uglify = require('gulp-uglify'),
+	merge = require('merge-stream'),
 	cleanCSS = require('gulp-clean-css'),
 	concat = require('gulp-concat'),
 	bower = require('gulp-bower');
@@ -35,6 +36,12 @@ gulp.task('js', function() {
 		.pipe(gulp.dest(paths.dev));
 });
 
+gulp.task('watch', ['default'] , function() {
+	gulp.watch('./*.html', ['html']);
+	gulp.watch(['./lib/js/*.js'], ['js:main']);
+	gulp.watch(['./lib/js/**/*.js'], ['js:app']);
+	gulp.watch(['./lib/css/**/*.css'], ['js:css']);
+});
 
 gulp.task('css', function() {
 
@@ -75,17 +82,27 @@ gulp.task('default', ['vendors', 'js', 'css', 'common'], function() {
 });
 
 gulp.task('release', ['default'], function() {
+	var tasks = merge();
+tasks.add(
 	gulp.src([paths.dev + 'index.html', paths.dev + '*.png'])
-		.pipe(gulp.dest(paths.dist));
+		.pipe(gulp.dest(paths.dist))
+);
 	
+tasks.add(
 	gulp.src([paths.dev + '*.css'])
 		.pipe(cleanCSS())
-		.pipe(gulp.dest(paths.dist));
+		.pipe(gulp.dest(paths.dist))
+);
 
+tasks.add(
 	gulp.src([paths.dev + '*.js'])
 		.pipe(uglify())
-		.pipe(gulp.dest(paths.dist));
+		.pipe(gulp.dest(paths.dist))
+);
 
+tasks.add(
 	gulp.src([paths.dev + 'vendors/*.*'])
-		.pipe(gulp.dest(paths.dist + 'vendors/'));
+		.pipe(gulp.dest(paths.dist + 'vendors/'))
+);
+return tasks;
 });

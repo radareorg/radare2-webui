@@ -2,6 +2,7 @@ var myLayout;
 
 $(document).ready(function() {
 
+	r2.cmd('e scr.html=false');
 	// create tabs FIRST so elems are correct size BEFORE Layout measures them
 	$('#main_panel').tabs({
 		select: function(event, ui) {
@@ -152,7 +153,9 @@ $(document).ready(function() {
 	$('#pnotes').donetyping(function() {
 		r2.cmd('Pnj ' + btoa($('#pnotes').val()));
 		r2.cmd('Po', function(x) {
-			if (x === '') alert('Notes won\'t be persited until a project is opened. Use Project\'s tab or \'Ps name\' to save current project');
+			if (x === '') {
+			alert('Notes won\'t be persited until a project is opened. Use Project\'s tab or \'Ps name\' to save current project');
+			}
 		});
 	});
 

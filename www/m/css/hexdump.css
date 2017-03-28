@@ -48,10 +48,11 @@ ul.offset {
 
 ul.hexpairs {
 	text-align:center;
+	user-select: none;
 }
 
 ul.ascii {
-	margin-left:20px;
+	margin:0 20px 0 20px;
 }
 
 ul.hexpairs li input, ul.ascii li input {
@@ -82,10 +83,7 @@ ul.hexpairs li.active, ul.ascii li.active {
 	border:1px dotted white;
 }
 
-ul.hexpairs.pairs li:nth-child(2n)::after {
-	content: ' ';
+ul.hexpairs.pairs > li:nth-child(2n), ul.hexpairs.words > li:nth-child(n) {
+	margin-right:0.8em;
 }
 
-ul.hexpairs.words li:nth-child(n)::after {
-	content: ' ';
-}

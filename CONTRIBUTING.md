@@ -10,16 +10,18 @@ Fork
 
 Fork the [official repository](https://github.com/radare/radare2-webui) and clone it on your computer:
 
-    $ git clone https://github.com/radare/radare2-webui.git
+    $ git clone https://github.com/<YOU>/radare2-webui.git
 
 Build
 -----
+
+UI can be built in *development* mode or to be released (minified output). This part explain the development building process. 
 
 You can build all UI all at once:
 
     $ make build
 
-It will retrieve all the required dependencies using `npm`, `gulp` and `bower` and placing the right files into the `dist` directory that will be used when we will *run* it.
+It will retrieve all the required dependencies using `npm`, `gulp` and `bower` and placing the right files into the `dev` directory (UI other than `m` will directly use the `dist` folder since they doesn't use a separated dev process at this time) that will be used when we will *run* them.
 
 You can also build them separatly:
 
@@ -37,7 +39,7 @@ If you encounter some problem with a *call method 'join' of undefined* building 
 Run
 ---
 
-You can see them working through this commands.
+Once built, you can see them working through this commands.
 
     $ make runenyo # enyo (mobile)
     $ make runm # material (responsive)
@@ -47,7 +49,9 @@ You can see them working through this commands.
 Work
 ----
 
-You are ready to make your modifications inside the `www` directory.
+You are ready to make your modifications inside the `www` directory. You will find more instructions on the dedicated CONTRIBUTING file for each UI:
+
+* [https://github.com/radare/radare2-webui/blob/master/www/m/CONTRIBUTING.md](material)
 
 Contribute
 ----------

@@ -1,0 +1,30 @@
+{
+	"root": true,
+	"env": {
+		"browser": true,
+		"es6": true
+	},
+	"globals": {
+		"r2": true,
+		"componentHandler": true
+	},
+	"rules": {
+		"indent": ["error", "tab"],
+		"eol-last": ["error", "always"],
+		"no-undefined": 2,
+		"no-undef": 2,
+		"eqeqeq": ["error", "always", {"null": "ignore"}],
+		"quotes": ["warn", "single"],
+		"require-jsdoc": ["warn", {
+			"require": {
+				"FunctionDeclaration": true,
+				"MethodDefinition": true,
+				"ClassDeclaration": true
+			}
+		}]
+	},
+	"parserOptions": {
+        "ecmaVersion": 6,
+        "sourceType": "module"
+	}
+}
