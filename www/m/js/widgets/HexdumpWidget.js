@@ -1,5 +1,5 @@
 import {BaseWidget} from './BaseWidget';
-import {Hexdump} from '../modules/hexdump/Hexdump';
+import {Hexdump} from '../modules/hexdump/hexdump';
 import {r2Wrapper, R2Actions} from '../core/R2Wrapper';
 
 export class HexdumpWidget extends BaseWidget {

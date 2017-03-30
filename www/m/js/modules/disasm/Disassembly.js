@@ -1,6 +1,6 @@
 import {DisassemblyNavigator} from './DisassemblyNavigator';
 import {RadareInfiniteBlock} from '../../layout/RadareInfiniteBlock';
-import {FlexContainer} from '../../layout/FlexContainer';
+import {FlexContainer} from '../../layout/flexContainer';
 
 import {uiContext} from '../../core/UIContext';
 import {Widgets} from '../../widgets/Widgets';
@@ -151,6 +151,16 @@ export class Disassembly extends RadareInfiniteBlock {
 				} else {
 					r2.cmd('e anal.calls=false');
 				}
+			}
+		},{
+			name: 'Analyse reference',
+			ugly: 'ref',
+			active: false,
+			action: function(active) {
+				if (!active) {
+					return;
+				}
+				r2.cmd('aar');
 			}
 		},{
 			name: 'Emulate code',

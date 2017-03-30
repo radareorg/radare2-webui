@@ -1,4 +1,4 @@
-import {BlockNavigator} from '../../core/BlockNavigator';
+import {BlockNavigator} from '../../core/blocknavigator';
 import {ChunkStatus} from '../../core/ChunkStatus';
 
 // Should refactor with HexPairNav and go/get methods

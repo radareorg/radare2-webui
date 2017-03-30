@@ -6,6 +6,7 @@ export class AnalysisCard {
 	constructor() {
 		this.analysisMethods = [
 			{ id: 'symbols', name: 'Analyse symbols', cmd: 'aa' },
+			{ id: 'ref', name: 'Analyse References', cmd: 'aar' },
 			{ id: 'calls', name: 'Analyse calls', cmd: 'e anal.calls=true;aac', disabledCmd: 'e anal.calls=false'  },
 			{ id: 'emu', name: 'Emulate code', cmd: 'e asm.emu=1;aae;e asm.emu=0', disabledCmd: 'e asm.emu=false' },
 			{ id: 'prelude', name: 'Find preludes', cmd: 'aap' },
