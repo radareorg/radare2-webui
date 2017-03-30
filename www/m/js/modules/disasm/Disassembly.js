@@ -153,6 +153,16 @@ export class Disassembly extends RadareInfiniteBlock {
 				}
 			}
 		},{
+			name: 'Analyse reference',
+			ugly: 'ref',
+			active: false,
+			action: function(active) {
+				if (!active) {
+					return;
+				}
+				r2.cmd('aar');
+			}
+		},{
 			name: 'Emulate code',
 			ugly: 'code',
 			active: false,
@@ -168,9 +178,6 @@ export class Disassembly extends RadareInfiniteBlock {
 			ugly: 'preludes',
 			active: false,
 			action: function(active) {
-				if (!active) {
-					return;
-				}
 				r2.cmd('aap');
 			}
 		},{

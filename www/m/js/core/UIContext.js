@@ -1,5 +1,5 @@
 import {Layouts} from '../layout/Layouts';
-import {Ruler} from '../layout/ruler';
+import {Ruler} from '../layout/Ruler';
 
 // Determine maximum widget displayable at same time
 const MAX_WIDGETS = 2;
