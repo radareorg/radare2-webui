@@ -1,5 +1,5 @@
 import {NavigatorDirection} from '../core/NavigatorDirection';
-import {InfiniteScrolling} from '../helpers/infiniteScrolling';
+import {InfiniteScrolling} from '../helpers/InfiniteScrolling';
 
 /**  How many screen we want to retrieve in one round-trip with r2 */
 export const defaultHeightProvisioning = 3;

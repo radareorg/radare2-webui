@@ -1,7 +1,7 @@
-import {HexPairNavigator} from './hexpairnavigator';
+import {HexPairNavigator} from './HexPairNavigator';
 import {NavigatorDirection} from '../../core/NavigatorDirection';
 import {RadareInfiniteBlock} from '../../layout/RadareInfiniteBlock';
-import {FlexContainer} from '../../layout/flexContainer';
+import {FlexContainer} from '../../layout/FlexContainer';
 import {WordSizes} from './WordSizes';
 
 import {uiContext} from '../../core/UIContext';

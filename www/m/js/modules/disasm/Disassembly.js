@@ -1,6 +1,6 @@
 import {DisassemblyNavigator} from './DisassemblyNavigator';
 import {RadareInfiniteBlock} from '../../layout/RadareInfiniteBlock';
-import {FlexContainer} from '../../layout/flexContainer';
+import {FlexContainer} from '../../layout/FlexContainer';
 
 import {uiContext} from '../../core/UIContext';
 import {Widgets} from '../../widgets/Widgets';

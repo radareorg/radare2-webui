@@ -1,4 +1,4 @@
-import {BlockNavigator} from '../../core/blocknavigator';
+import {BlockNavigator} from '../../core/BlockNavigator';
 import {NavigatorDirection} from '../../core/NavigatorDirection';
 
 /**
