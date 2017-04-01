@@ -178,9 +178,6 @@ export class Disassembly extends RadareInfiniteBlock {
 			ugly: 'preludes',
 			active: false,
 			action: function(active) {
-				if (!active) {
-					return;
-				}
 				r2.cmd('aap');
 			}
 		},{
