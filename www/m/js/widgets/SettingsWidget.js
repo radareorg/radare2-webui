@@ -86,7 +86,7 @@ export class SettingsWidget extends BaseWidget {
 	}
 
 	drawCoreIO(dom) {
-		var mode = ['PA', 'VA', 'Debug'];
+		var mode = ['PA', 'VA', 'PAVA', 'Debug'];
 		uiSelect(dom, 'Mode', mode, mode.indexOf(r2Settings.getItem(r2Settings.keys.MODE)), function(item) {
 			r2Settings.setItem(r2Settings.keys.MODE, item);
 		});

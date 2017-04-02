@@ -140,13 +140,19 @@ r2Conf[SettingItems.MODE] = { name: 'mode', defVal: 'PA', apply: function(p) {
 	switch (p) {
 	case 'PA':
 		r2.cmd('e io.va=false');
+		r2.cmd('e io.pava=false');
 		break;
 	case 'VA':
 		r2.cmd('e io.va=true');
+		r2.cmd('e io.pava=false');
+		break;
+	case 'PAVA':
+		r2.cmd('e io.pava=true');
 		break;
 	case 'Debug':
 		r2.cmd('e io.va=true');
 		r2.cmd('e io.debug=true');
+		r2.cmd('e io.pava=false');
 		break;
 	};
 }};
