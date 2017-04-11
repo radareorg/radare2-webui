@@ -82,7 +82,9 @@ const SettingItems = {
 	ANAL_NON_CODE: 'analNonCode',
 	COLORS: 'colors',
 	USE_TTS: 'useTTS',
-	THEME: 'theme'
+	THEME: 'theme',
+	ASMEMU: 'asmemu',
+	ASMEMUSTR: 'asmemustr'
 };
 
 
@@ -95,6 +97,8 @@ r2Conf[SettingItems.UCASE] = { name: 'ucase', defVal: 'false', apply: function(p
 r2Conf[SettingItems.DESCRIBE] = { name: 'describe', defVal: 'false', apply: function(p) { r2.cmd('e asm.describe=' + p); } };
 r2Conf[SettingItems.BYTES] = { name: 'bytes', defVal: 'false', apply: function(p) { r2.cmd('e asm.bytes=' + p); } };
 r2Conf[SettingItems.OS] = { name: 'os', defVal: 'Linux', apply: function(p) { console.log('OS is now: ' + p); } }; // missing
+r2Conf[SettingItems.ASMEMU] = { name: 'asmemu', defVal: 'false', apply: function(p) {  r2.cmd('e asm.emu=' + p); } };
+r2Conf[SettingItems.ASMEMUSTR] = { name: 'asmemustr', defVal: 'false', apply: function(p) { r2.cmd('e asm.emustr=' + p); } };
 r2Conf[SettingItems.SIZE] = { name: 'size', defVal: 'S', apply: function(p) {
 	switch (p) {
 	case 'S':
@@ -136,13 +140,19 @@ r2Conf[SettingItems.MODE] = { name: 'mode', defVal: 'PA', apply: function(p) {
 	switch (p) {
 	case 'PA':
 		r2.cmd('e io.va=false');
+		r2.cmd('e io.pava=false');
 		break;
 	case 'VA':
 		r2.cmd('e io.va=true');
+		r2.cmd('e io.pava=false');
+		break;
+	case 'PAVA':
+		r2.cmd('e io.pava=true');
 		break;
 	case 'Debug':
 		r2.cmd('e io.va=true');
 		r2.cmd('e io.debug=true');
+		r2.cmd('e io.pava=false');
 		break;
 	};
 }};

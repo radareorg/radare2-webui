@@ -28,6 +28,7 @@ export class SettingsWidget extends BaseWidget {
 		this.addGrid('Colors', (dom) => this.drawColors(dom));
 		this.addGrid('TTS', (dom) => this.drawTTS(dom));
 		this.addGrid('Reset configuration', (dom) => this.drawReset(dom));
+		this.addGrid('Emulator', (dom) => this.drawEmulator(dom));
 
 		componentHandler.upgradeDom();
 	}
@@ -75,8 +76,17 @@ export class SettingsWidget extends BaseWidget {
 		});
 	}
 
+	drawEmulator(dom){
+		uiSwitch(dom, 'Enable ESIL', r2Settings.getItem(r2Settings.keys.ASMEMU), function(param, state) {
+			r2Settings.setItem(r2Settings.keys.ASMEMU, state);
+		});
+		uiSwitch(dom, 'Enable ESIL (Lesser Verbose)', r2Settings.getItem(r2Settings.keys.ASMEMUSTR), function(param, state) {
+			r2Settings.setItem(r2Settings.keys.ASMEMUSTR, state);
+		});
+	}
+
 	drawCoreIO(dom) {
-		var mode = ['PA', 'VA', 'Debug'];
+		var mode = ['PA', 'VA', 'PAVA', 'Debug'];
 		uiSelect(dom, 'Mode', mode, mode.indexOf(r2Settings.getItem(r2Settings.keys.MODE)), function(item) {
 			r2Settings.setItem(r2Settings.keys.MODE, item);
 		});

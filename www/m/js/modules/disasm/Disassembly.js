@@ -153,6 +153,16 @@ export class Disassembly extends RadareInfiniteBlock {
 				}
 			}
 		},{
+			name: 'Analyse reference',
+			ugly: 'ref',
+			active: false,
+			action: function(active) {
+				if (!active) {
+					return;
+				}
+				r2.cmd('aar');
+			}
+		},{
 			name: 'Emulate code',
 			ugly: 'code',
 			active: false,
@@ -168,9 +178,6 @@ export class Disassembly extends RadareInfiniteBlock {
 			ugly: 'preludes',
 			active: false,
 			action: function(active) {
-				if (!active) {
-					return;
-				}
 				r2.cmd('aap');
 			}
 		},{
@@ -625,6 +632,7 @@ export class Disassembly extends RadareInfiniteBlock {
 			// { name: 'define flag color (fc)', shortcut: 'C', fct: function(evt, offset) { return applyOp(offset, 'C'); } },
 			// { name: 'set as data', shortcut: 'd', fct: function(evt, offset) { return applyOp(offset, 'd'); } },
 			// { name: 'end of function', shortcut: 'e', fct: function(evt, offset) { return applyOp(offset, 'e'); } },
+			{ aoj: false, name: 'view graph', shortcut: 'G', fct: function loadgraph() { return uiContext.navigateTo(Widgets.DISASSEMBLY_GRAPH);}},
 			{ aoj: false, name: 'analyze function', shortcut: 'F', fct: function(evt, offset) { return applyOp(offset, 'af'); } },
 			// { name: 'format', shortcut: 'F', fct: function(evt, offset) { return applyOp(offset, 'F'); } },
 			{ aoj: true, name: 'immediate base...', shortcut: 'i', expand: [
