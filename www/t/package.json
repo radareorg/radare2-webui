@@ -25,7 +25,7 @@
   "version": "0.10.2",
   "devDependencies": {
     "gulp": "^3.9.1",
-    "gulp-clean-css": "^2.0.12",
+    "gulp-clean-css": "^4.x",
     "gulp-concat": "^2.6.0",
     "gulp-uglify": "^2.0.0",
     "gulp-tar": "^1.9.0",
