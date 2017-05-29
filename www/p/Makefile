@@ -4,7 +4,7 @@ build: node_modules
 node_modules:
 	npm install
 
-release:
+dist release:
 	npm install
 	$(shell npm bin)/gulp release
 
