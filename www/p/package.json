@@ -24,12 +24,12 @@
   "scripts": {},
   "version": "0.10.2",
   "devDependencies": {
-    "bower": "1.7.9",
+    "bower": "^1.8.0",
     "gulp": "^3.9.1",
     "gulp-bower": "0.0.13",
-    "gulp-clean-css": "^4.x",
+    "gulp-clean-css": "^3.4.0",
     "merge-stream": "^1.0.0",
     "gulp-concat": "^2.6.0",
-    "gulp-uglify": "^2.0.0"
+    "gulp-uglify": "^3.0.0"
   }
 }
