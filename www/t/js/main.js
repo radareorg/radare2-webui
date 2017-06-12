@@ -27,7 +27,7 @@ window.onload = function() {
 					});
 				};
 			}, 1);
-			const hlpmsg = 'This is the new and experimental tiled webui for r2\n\n' +
+			var hlpmsg = 'This is the new and experimental tiled webui for r2\n\n' +
 			'Press the \'alt\' key and the following key:\n\n' +
 			'  hjkl - move left,down,up,right around\n' +
 			'  x    - spawn an hexdump\n' +

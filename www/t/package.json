@@ -6,7 +6,9 @@
   "bugs": {
     "url": "https://github.com/radare/radare2-webui"
   },
-  "dependencies": {},
+  "dependencies": {
+    "source-map": "*"
+  },
   "description": "Tiles UI for radare2",
   "homepage": "https://radare.org",
   "license": "MIT",
@@ -24,11 +26,11 @@
   "scripts": {},
   "version": "0.10.2",
   "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-clean-css": "^3.4.x",
+    "gulp": "latest",
+    "gulp-clean-css": "^3.4.1",
     "gulp-concat": "^2.6.0",
     "gulp-uglify": "^3.0.0",
-    "gulp-tar": "^1.9.0",
+    "gulp-tar": "^2.0.0",
     "gulp-gzip": "^1.4.0",
     "gulp-replace": "^0.5.4"
   }

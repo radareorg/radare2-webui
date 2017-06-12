@@ -5,12 +5,15 @@ var gulp = require('gulp'),
 	cleanCSS = require('gulp-clean-css'),
 	concat = require('gulp-concat');
 
+var gulpUtil = require('gulp-util');
+
 var R2 = '../lib/';
 var DEST = '../../dist/t/'
 
 gulp.task('default', function() {
 	gulp.src(['js/tiled.js', R2+'r2.js', 'js/main.js', 'vendors/material-design-lite/material.min.js'])
-		.pipe(uglify())
+		// .pipe(uglify())
+		.pipe(uglify().on('error', gulpUtil.log))
 		.pipe(concat('app.js'))
 		.pipe(gulp.dest(DEST));
 
