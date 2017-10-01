@@ -27,11 +27,11 @@
   "version": "0.10.2",
   "devDependencies": {
     "gulp": "latest",
-    "gulp-clean-css": "^3.4.1",
-    "gulp-concat": "^2.6.0",
+    "gulp-clean-css": "^3.9.0",
+    "gulp-concat": "^2.6.1",
     "gulp-uglify": "^3.0.0",
     "gulp-tar": "^2.0.0",
     "gulp-gzip": "^1.4.0",
-    "gulp-replace": "^0.5.4"
+    "gulp-replace": "^0.6.1"
   }
 }
