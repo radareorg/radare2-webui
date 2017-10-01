@@ -27,9 +27,9 @@
     "bower": "*",
     "gulp": "^3.9.1",
     "gulp-bower": "0.0.13",
-    "gulp-clean-css": "^3.4.x",
-    "gulp-concat": "^2.6.0",
-    "gulp-replace": "^0.5.4",
+    "gulp-clean-css": "^3.9.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-replace": "^0.6.1",
     "gulp-uglify": "^3.0.0"
   }
 }
