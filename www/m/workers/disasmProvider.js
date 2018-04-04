@@ -1,5 +1,7 @@
 'use strict';
-importScripts('/m/r2.js');
+
+var m_root = self.location.pathname.split("/").slice(0, -1).join("/");
+importScripts(m_root + '/r2.js');
 
 function extractOffset(str) {
 	var res = str.match(/(0x[a-fA-F0-9]+)/);
