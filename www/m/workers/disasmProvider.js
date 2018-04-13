@@ -1,6 +1,6 @@
 'use strict';
 
-var m_root = self.location.pathname.split("/").slice(0, -1).join("/");
+const m_root = self.location.pathname.split('/').slice(0, -1).join('/');
 importScripts(m_root + '/r2.js');
 
 function extractOffset(str) {

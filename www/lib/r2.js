@@ -9,7 +9,7 @@ var next_lastoff = 0;
 var prev_curoff = 0;
 var prev_lastoff = 0;
 var hascmd = false;
-var r2_root = self.location.pathname.split("/").slice(0, -2).join("/");
+const r2_root = self.location.pathname.split('/').slice(0, -2).join('/');
 
 function isFirefoxOS() {
 	if (typeof locationbar !== 'undefined' && !locationbar.visible) {
