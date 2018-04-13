@@ -9,6 +9,7 @@ var next_lastoff = 0;
 var prev_curoff = 0;
 var prev_lastoff = 0;
 var hascmd = false;
+const r2_root = self.location.pathname.split('/').slice(0, -2).join('/');
 
 function isFirefoxOS() {
 	if (typeof locationbar !== 'undefined' && !locationbar.visible) {
@@ -29,7 +30,7 @@ if (isFirefoxOS()) {
 	/* Requires CORS or SystemXHR */
 	r2.root = 'http://cloud.radare.org';
 } else {
-	r2.root = '';
+	r2.root = r2_root;
 }
 
 // async helper
@@ -87,7 +88,7 @@ try {
 	}
 } catch (e) {}
 
-r2.root = ''; // prefix path
+r2.root = r2_root; // prefix path
 
 /* helpers */
 function dump(obj) {

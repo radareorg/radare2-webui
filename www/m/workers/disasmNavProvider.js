@@ -1,5 +1,7 @@
 'use strict';
-importScripts('/m/r2.js');
+
+const m_root = self.location.pathname.split('/').slice(0, -1).join('/');
+importScripts(m_root + '/r2.js');
 
 var LINES = 80;
 var MAXLINES = Math.round(LINES * 1.20); // +20%
