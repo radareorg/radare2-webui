@@ -8,7 +8,7 @@
   },
   "description": "Material Lite interface for radare2",
   "homepage": "https://radare.org",
-  "license": "MIT",
+  "license": "LGPL-3.0",
   "maintainers": [
     {
       "name": "pancake",
@@ -21,14 +21,15 @@
     "url": "git://github.com/radare/radare2-webui.git"
   },
   "scripts": {
-    "build": "gulp",
-    "watch": "gulp watch",
-    "release": "gulp release",
+    "build": "yarn",
+    "watch": "yarn watch",
+    "release": "yarn release",
     "test": "mocha --require test/specs/helpers/chai.js",
-    "testbrowser": "gulp test",
-    "checkstyle": "gulp checkstyle"
+    "testbrowser": "yarn test",
+    "checkstyle": "yarn checkstyle",
+    "postinstall": "node -e \"try { require('fs').symlinkSync(require('path').resolve('node_modules/@bower_components'), 'vendors', 'junction') } catch (e) { }\""
   },
-  "version": "0.10.2",
+  "version": "0.10.3",
   "devDependencies": {
     "babel-eslint": "^8.0.1",
     "babel-plugin-transform-es2015-modules-systemjs": "^6.19.0",
@@ -61,5 +62,19 @@
     "sinon-chai": "^2.14.0",
     "through2": "^2.0.3",
     "vinyl-source-stream": "^1.1.0"
+  },
+  "dependencies": {
+    "@bower_components/datatables.net": "DataTables/Dist-DataTables#^1.10.16",
+    "@bower_components/datatables.net-dt": "DataTables/Dist-DataTables-DataTables#^1.10.16",
+    "@bower_components/dialog-polyfill": "GoogleChrome/dialog-polyfill#^0.4.9",
+    "@bower_components/file-saver": "eligrey/FileSaver.js#^1.3.3",
+    "@bower_components/jquery": "jquery/jquery-dist#^2.2.4",
+    "@bower_components/material-design-icons-iconfont": "Jossef/material-design-icons-iconfont#^3.0.3",
+    "@bower_components/material-design-lite": "google/material-design-lite#1.1.3",
+    "@bower_components/mdl-selectfield": "mebibou/mdl-selectfield#^1.0.4",
+    "infinite-scroll": "^3.0.5"
+  },
+  "engines": {
+    "yarn": ">= 1.0.0"
   }
 }

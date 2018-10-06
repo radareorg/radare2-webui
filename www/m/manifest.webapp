@@ -1,7 +1,7 @@
 {
    "name" : "radare2",
    "description": "Material Remote Web UI for radare2",
-   "version" : "0.1",
+   "version" : "0.2",
    "default_locale" : "en",
    "type" : "privileged",
    "developer" : {
