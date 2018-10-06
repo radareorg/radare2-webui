@@ -1,5 +1,6 @@
 node_modules/
 vendors/
+www/m/vendors
 dev/
 dist/
 .config

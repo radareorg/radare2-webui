@@ -1,23 +1,23 @@
 all: build
 
 build:
-	npm install
+	yarn
 	npm run build
 
 dist release: node_modules
-	npm run release
+	yarn run release
 
 node_modules:
-	npm install
+	yarn install --flat --prod
 
 run:
 	r2 -q -e http.sandbox=false -e http.root=$$PWD/../../dev -e http.ui=m -c=H /bin/ls
 
 watch:
-	npm run watch
+	yarn run watch
 
 tests:
-	npm run test
+	yarn run test
 
 r:
 	r2 -qe http.root=$$PWD/../../dist -e http.ui=m -c=H /bin/ls
