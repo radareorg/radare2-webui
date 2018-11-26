@@ -3,7 +3,7 @@ all: build
 node_modules:
 	npm install
 
-build: node_modules
+dist release build: node_modules
 	mkdir -p dist
 	$(shell npm bin)/gulp
 

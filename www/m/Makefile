@@ -1,26 +1,31 @@
+YARN=$(shell npm bin)/yarn
+
 all: build
 
 build:
-	yarn
+	$(YARN)
 	npm run build
 
 dist release: node_modules
-	yarn run release
+	cp -f index.html dist/index.html
+	cp -rf css dist
+	$(shell npm bin)/webpack-cli js/app.js
+	#$(shell npm bin)/gulp release
 
 node_modules:
-	yarn install --flat --prod
-
-run:
-	r2 -q -e http.sandbox=false -e http.root=$$PWD/../../dev -e http.ui=m -c=H /bin/ls
+	$(YARN) install --flat --prod
 
 watch:
-	yarn run watch
+	$(YARN) run watch
 
 tests:
-	yarn run test
+	$(YARN) run test
 
 r:
 	r2 -qe http.root=$$PWD/../../dist -e http.ui=m -c=H /bin/ls
+
+run:
+	r2 -q -e http.sandbox=false -e http.root=$$PWD/../../dev -e http.ui=m -c=H /bin/ls
 
 FILES=$(shell git ls-files .)
 
@@ -30,4 +35,4 @@ zip: clean
 clean:
 	rm -f *.gz *.zip
 
-.PHONY: zip sync up update all clean
+.PHONY: zip sync up update all clean dist release
