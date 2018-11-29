@@ -62,7 +62,7 @@
     "sinon": "*",
     "sinon-chai": "*",
     "through2": "^3.0.0",
-    "vinyl-source-stream": "*",
+    "vinyl-source-stream": "2.0.0",
     "yarn": "^1.12.3"
   },
   "dependencies": {
