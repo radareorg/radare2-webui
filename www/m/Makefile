@@ -7,6 +7,8 @@ build:
 	npm run build
 
 dist release: node_modules
+	mkdir -p ../../dist/m
+	ln -fs ../../dist/m dist
 	cp -f index.html dist/index.html
 	cp -rf css dist
 	$(shell npm bin)/webpack-cli js/app.js

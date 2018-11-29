@@ -4,7 +4,7 @@ node_modules:
 	npm install
 
 dist release build: node_modules
-	mkdir -p dist
+	ln -fs ../../dist/t dist
 	$(shell npm bin)/gulp
 
 run:
