@@ -31,7 +31,7 @@
   "version": "3.1.0",
   "devDependencies": {
     "@babel/core": "^7.1.6",
-    "acorn": "^6.0.4",
+    "acorn": "^6.4.1",
     "babel-eslint": "*",
     "babel-plugin-transform-es2015-modules-systemjs": "*",
     "babel-preset-env": "^1.7.0",
