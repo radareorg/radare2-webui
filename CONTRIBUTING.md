@@ -51,7 +51,7 @@ Work
 
 You are ready to make your modifications inside the `www` directory. You will find more instructions on the dedicated CONTRIBUTING file for each UI:
 
-* [material](https://github.com/radare/radare2-webui/blob/master/www/m/CONTRIBUTING.md)
+* [material](https://github.com/radareorg/radare2-webui/blob/master/www/m/CONTRIBUTING.md)
 
 Contribute
 ----------
