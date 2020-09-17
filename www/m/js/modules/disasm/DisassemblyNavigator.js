@@ -88,14 +88,11 @@ export class DisassemblyNavigator extends BlockNavigator {
 	}
 
 	getOverlappingIntervals(start, end) {
-		var intervals = [];
-		for (var offset in this.navigationData) {
-			var startInterval = offset;
-			var endInterval = offset + this.navigationData[offset].size;
-			if ((startInterval <= start && endInterval >= end) || // all-incl
-				(startInterval <= start && endInterval >= start) || // before-overlap
-				(startInterval <= end && endInterval >= end) || // after-overlap
-				(startInterval >= start && endInterval <= end)) { // included
+		let intervals = [];
+		for (let offset in this.navigationData) {
+			const startInterval = offset;
+			const endInterval = offset + this.navigationData[offset].size;
+			if (startInterval <= end && start <= endInterval) {
 				intervals.push(offset);
 			}
 		}
