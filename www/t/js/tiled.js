@@ -32,6 +32,30 @@ var Tiled = function(id) {
 	};
 	this.ctr2 = 0;
 	this.tile = function() {
+		if (this.modal) {
+			var mtop = topmargin;
+			var left = 0;
+			var width = w - (w/20);
+			var height = h - mtop;
+
+			var f = this.curframe[0];
+			f.obj.style.position = 'absolute';
+			f.obj.style.top = '10%';
+			f.obj.style.bottom = '20%';
+			f.obj.style.left = '20%';
+			f.obj.style.right = '20%';
+			f.obj.style['z-index'] = 1000;
+			// always on top.. or hide all the frames
+			f.obj.style.zIndex = 99999 + this.ctr2++;
+			// TODO: add proportions
+			f.obj.style.width = width;
+			f.obj.style.height = height;
+			//f.obj.style.backgroundColor = "green";
+			//f.obj.innerHTML =" FUCK";
+			if (f.update)
+				f.update(f.obj);
+			return;
+		}
 		if (this.maximize && this.curframe) {
 			var mtop = topmargin;
 			var left = 0;
@@ -154,18 +178,13 @@ var Tiled = function(id) {
 		case 'right':
 			if (col == this.frames.length - 1)
 				return false;
-			alert('moveright Col is ' + col);
 			// AAAA B C DDD
 			var b, c, d;
 			b = this.frames[col];
 			c = this.frames.splice(col);
 			d = c.splice(1).slice(1);
-			alert('AAAA ' + this.frames.length);
-			alert('C ' + c.length);
-			alert('D ' + d.length);
 			if (b) this.frames.push(b);
 			if (c.length > 0) {
-				alert('SET COL ' + this.frames.length);
 				this.frames.push(c);
 			}
 			for (var i = 0; i < d.length; i++)
@@ -245,12 +264,12 @@ var Tiled = function(id) {
 			for (var row in this.frames[col]) {
 				var f = this.frames[col][row];
 				if (f.name === name) {
-					_('frame_' + f.name).style.backgroundColor = 'black';
+					_('frame_' + f.name).style.backgroundColor = '#2060b0';
 					f.selected = true;
 					f.mw = true;
 					ret = this.curframe = [f,col,row];
 				} else {
-					_('frame_' + f.name).style.backgroundColor = '#c0c0c0';
+					_('frame_' + f.name).style.backgroundColor = '#104080';
 					f.mw = false;
 					f.selected = false;
 				}
@@ -258,6 +277,70 @@ var Tiled = function(id) {
 		}
 		this.tile();
 		return ret;
+	};
+	this.new_modal = function(name, body, items, cb) {
+		var nf = {};
+		nf.name = name = name || this.defname();
+
+		var obj_title = document.createElement('div');
+		obj_title.className = 'frame_title';
+		obj_title.id = 'frame_' + name;
+		var d = document.createElement('div');
+		d.style.backgroundColor = '#c0c0c0';
+		d.style['overflow-x'] = 'hidden';
+
+		var x = document.createElement('a');
+		x.innerHTML = '[x]';
+		x.href = '#';
+		(function(self, name) {
+				x.onclick = function() {
+					//alert ("clicked "+name);
+					self.del_frame(name);
+					self.modal = null;
+				};
+			})(this, name);
+		d.appendChild(x);
+
+		var a = document.createElement('a');
+		a.innerHTML = name;
+		a.href = '#';
+		d.appendChild(a);
+
+		/*
+					var inp = document.createElement ('input');
+					inp.value = "entry0";
+					inp.href='#';
+					d.appendChild (inp);
+		*/
+
+		obj_title.appendChild(d);
+		(function() {
+				a.onclick = function() {
+					//alert ("clicked "+name);
+					var newname = prompt('title');
+					//		 self.del_frame (name);
+				};
+			})(this, name);
+		if (typeof (update) === 'string') {
+			pos = update;
+			update = undefined;
+		}
+		nf.update = update;
+		nf.obj = document.createElement('div');
+		var title = obj_title.outerHTML;
+		nf.obj.className = 'frame';
+		nf.obj.id = nf.name;
+		nf.obj.appendChild(obj_title);
+		var x = document.createElement('p');
+		x.innerHTML = body;
+		nf.obj.appendChild(obj_title);
+		nf.obj.appendChild(x);
+		obj.appendChild(nf.obj);
+		this.modal = nf;
+		if (cb) {
+			cb(self, nf);
+		}
+		return nf;
 	};
 	this.new_frame = function(name, body, update, pos, cb) {
 		var nf = {};
@@ -267,7 +350,6 @@ var Tiled = function(id) {
 		obj_title.className = 'frame_title';
 		obj_title.id = 'frame_' + name;
 		var d = document.createElement('div');
-		d.style.backgroundColor = '#c0c0c0';
 		d.style['overflow-x'] = 'hidden';
 
 		var x = document.createElement('a');
@@ -377,7 +459,7 @@ var Tiled = function(id) {
 			f.onmouseup = function() {
 				var f = self.select_frame(name);
 				if (f) {
-					//				f[0].obj.innerHTML = f[0].obj.innerHTML+"<br />"; //"pop";
+					//f[0].obj.innerHTML = f[0].obj.innerHTML+"<br />"; //"pop";
 					//alert (f[0].obj.style.backgroundColor);
 				} else alert('Cant find frame for ' + name);
 			};
@@ -389,6 +471,9 @@ var Tiled = function(id) {
 			for (var row in this.frames[col]) {
 				this.frames[col][row].refresh();
 			}
+		}
+		if (this.modal) {
+			this.modal.refresh();
 		}
 	};
 	this.del_frame = function(name) {

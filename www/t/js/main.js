@@ -12,10 +12,57 @@ function findPos(obj) {
 	return [curleft,curtop];
 }
 
+var navigationMode = true;
+
 window.onload = function() {
 	var position = 'right';
 	var t = new Tiled('canvas');
 	var ctr = 0;
+	r2.cmd('e scr.color=true;e scr.html=true', function() {
+		t.update_all();
+	});
+
+	document.onkeydown = function(evt) {
+		evt = evt || window.event;
+		var isEscape = false;
+		if ("key" in evt) {
+			isEscape = (evt.key === "Escape" || evt.key === "Esc");
+			if (evt.key == "_") {
+				closeCurrentPanel(t);
+			}
+		} else {
+			isEscape = (evt.keyCode === 27);
+		}
+		if (isEscape) {
+			t.new_modal('Escape', 'body', ['items']);
+		}
+		if (navigationMode) {
+			switch (evt.key) {
+			case 'h':/*h*/ t.other_frame('left'); break;
+			case 74:/*j*/ t.other_frame('down'); break;
+			case 75:/*k*/ t.other_frame('up'); break;
+			case 76:/*l*/ t.other_frame('right'); break;
+			case 189:
+			case '-':/*-*/ addPanel('bottom'); break;
+			case 220: // chrome
+			case 49:/*|*/ addPanel('right'); break;
+case 'x':
+case 88: /*x*/
+		case 67:/*c*/
+			closeCurrentPanel(t)
+			break;
+			}
+		}
+	};
+	function closeCurrentPanel(t) {
+		if (t.curframe) {
+			t.oldframe = t.curframe;
+		}
+		t.del_frame();
+		t.run();
+		t.other_frame ('right')
+		t.other_frame ('left')
+	}
 	function newHelpFrame() {
 		var n = t.defname('help');
 		function newthing(name) {
@@ -194,7 +241,7 @@ window.onload = function() {
 			frame = nf;
 			function calc() {
 				var off = frame.offset || 0;
-				r2.cmd('px 1024 @ ' + off, function(x) {
+				r2.cmd('pxa 1024 @ ' + off, function(x) {
 					var id_prev = n + '_hexdump_hex_prev';
 					var id_next = n + '_hexdump_hex_next';
 					var id_goto = n + '_hexdump_hex_goto';
@@ -327,12 +374,13 @@ window.onload = function() {
 	function addPanel(pos) {
 		ctr++;
 		position = pos;
-		t.new_frame('window_' + ctr, '<div id=\'div_' + ctr + '\'><a href=\'#\' id=\'cmd_' + ctr + '\'>cmd</a><input></input></div>', pos);
+		var body = '<div id=\'div_' + ctr + '\'><a href=\'#\' id=\'cmd_' + ctr + '\'>cmd</a></div>';
+		t.new_frame('window_' + ctr, body, pos);
 		t.run();
 		t.update = function() {
 			r2.cmd(t.cmd, function(x) {
 				_(t.key).innerHTML =
-			'<div class=\'frame_body\'><pre>' + x + '</pre></div>';
+			'<div class=\'frame_body\'><a href=\'#\' id=\'cmd_' + ctr + '\'>cmd</a><pre>' + x + '</pre></div>';
 			});
 		};
 		_('cmd_' + ctr).onclick = function() {
@@ -383,12 +431,14 @@ window.onload = function() {
 	_('body').onkeyup = function(e) {
 		var key = String.fromCharCode(e.keyCode);
 		//if (!key.altKey) return;
-		if (!e.altKey)
+		if (!e.altKey) {
 			return;
+		}
 		key = e.keyCode;
 		switch (key) {
-		case 67:/*c*/ if (t.curframe) {t.oldframe = t.curframe; }
-			t.del_frame(); t.run();break;
+		case 67:/*c*/
+			closeCurrentPanel(t)
+			break;
 		case 189: // chrome
 		case 173:/*-*/ addPanel('bottom'); break;
 		case 220: // chrome
@@ -398,16 +448,26 @@ window.onload = function() {
 		case 74:/*j*/ t.other_frame('down'); break;
 		case 75:/*k*/ t.other_frame('up'); break;
 		case 76:/*l*/ t.other_frame('right'); break;
+		case ':':
+			promptCommand(); break;
+			break;
 		case 88:
-		case 'x': newHexdumpFrame(); break;
+		case 'X':
+			newHexdumpFrame();
+			break;
+		case 'x':
+			closeCurrentPanel(t)
+			break;
 		case 68:
-		case 'd': newDisasmFrame(); break;
-		/*
-				case 'h': t.move_frame ('left'); break;
-				case 'j': t.move_frame ('down'); break;
-				case 'k': t.move_frame ('up'); break;
-				case 'l': t.move_frame ('right'); break;
-		*/
+		case 'd':
+			newDisasmFrame();
+			break;
+/*
+		case 'H': t.move_frame ('left'); break;
+		case 'J': t.move_frame ('down'); break;
+		case 'K': t.move_frame ('up'); break;
+		case 'L': t.move_frame ('right'); break;
+*/
 		case 'i':
 			r2.cmd('pi 2', function(x) {alert(x);});
 			break;

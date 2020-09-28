@@ -8,7 +8,8 @@ dist release build: node_modules
 	$(shell npm bin)/gulp
 
 run:
-	r2 -e http.ui=dist -e http.root=$$PWD -qc=H /bin/ls
+#	r2 -e http.ui=dist -e http.root=$$PWD -qc=H /bin/ls
+	r2 -qcq -e http.verbose=true -e http.root=$$PWD/dist -e http.ui=t -e http.sandbox=0 -c=H /bin/ls
 
 watch:
 	$(shell npm bin)/gulp watch
@@ -18,3 +19,4 @@ clean:
 
 mrproper: clean
 	rm -rf node_modules
+
