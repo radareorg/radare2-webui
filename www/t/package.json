@@ -26,12 +26,12 @@
   "scripts": {},
   "version": "0.10.2",
   "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-clean-css": "^4.0.0",
+    "gulp": "^4.0.2",
+    "gulp-clean-css": "^4.3.0",
     "gulp-concat": "^2.6.1",
     "gulp-gzip": "^1.4.0",
     "gulp-replace": "^1.0.0",
-    "gulp-tar": "^2.0.0",
-    "gulp-uglify": "^3.0.0"
+    "gulp-tar": "^3.1.0",
+    "gulp-uglify": "^3.0.2"
   }
 }
