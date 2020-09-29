@@ -1,7 +1,56 @@
 function _(x) { return document.getElementById(x); }
 
+var html = {
+	text: function(text) {
+		var o = document.createElement('font');
+		text.innerHTML = text;
+		return o;
+	},
+	input: function(id, value, action) {
+		var o = document.createElement('input');
+		o.id = id;
+		o.value = value;
+		o.focus();
+		o.onkeyup = function(ev) {
+			if (ev.keyCode == 13) {
+				action (o.value);
+			}
+		};
+		return o;
+	},
+	a: function(text, action) {
+		var o = document.createElement('a');
+		o.innerHTML = text;
+		if (typeof action === 'string') {
+			o.href = action;
+		} else {
+			o.href = '#';
+			// assume function
+			o.onclick = action;
+		}
+		return o;
+	},
+	div: function(id, css, style) {
+		var o = document.createElement('div');
+		if (id) {
+			o.id = id;
+		}
+		if (css) {
+			o.className = css;
+		}
+		if (style) {
+			for (var k in Object.keys(style)) {
+				o.style[k] = style[k];
+			}
+		}
+		return o;
+	}
+};
+
 var Tiled = function(id) {
 	var obj = document.getElementById(id);
+	var self = this;
+	this.modal = null;
 	this.curframe = undefined;
 	this.frames = [];
 	var topmargin = 20;
@@ -35,26 +84,31 @@ var Tiled = function(id) {
 		if (this.modal) {
 			var mtop = topmargin;
 			var left = 0;
-			var width = w - (w/20);
+			var width = w - (w / 20);
 			var height = h - mtop;
 
 			var f = this.curframe[0];
-			f.obj.style.position = 'absolute';
-			f.obj.style.top = '10%';
-			f.obj.style.bottom = '20%';
-			f.obj.style.left = '20%';
-			f.obj.style.right = '20%';
-			f.obj.style['z-index'] = 1000;
-			// always on top.. or hide all the frames
-			f.obj.style.zIndex = 99999 + this.ctr2++;
-			// TODO: add proportions
-			f.obj.style.width = width;
-			f.obj.style.height = height;
-			//f.obj.style.backgroundColor = "green";
-			//f.obj.innerHTML =" FUCK";
-			if (f.update)
-				f.update(f.obj);
-			return;
+			if (f != this.modal) {
+				f.obj.style['z-index'] = 0;
+			} else {
+				f.obj.style.position = 'absolute';
+				f.obj.style['z-index'] = 1000;
+				f.obj.style.zIndex = 100;
+				f.style.zIndex = 100;
+				f.obj.style.top = '10%';
+				f.obj.style.bottom = '20%';
+				f.obj.style.left = '20%';
+				f.obj.style.right = '20%';
+				// always on top.. or hide all the frames
+				// TODO: add proportions
+				//f.obj.style.width = width;
+				//f.obj.style.height = height;
+				f.obj.style.backgroundColor = "green";
+				//f.obj.innerHTML =" blabla";
+				if (f.update)
+					f.update(f.obj);
+				return;
+			}
 		}
 		if (this.maximize && this.curframe) {
 			var mtop = topmargin;
@@ -163,8 +217,9 @@ var Tiled = function(id) {
 		}
 	};
 	this.move_frame = function(dir) {
-		if (!this.curframe)
+		if (!this.curframe) {
 			return;
+		}
 		var col = this.curframe[1];
 		switch (dir) {
 		case 'up':
@@ -197,8 +252,9 @@ var Tiled = function(id) {
 	};
 
 	this.other_frame = function(dir) {
-		if (!this.curframe)
+		if (!this.curframe) {
 			return;
+		}
 		switch (dir) {
 		case 'up':
 			var col = +this.curframe[1];
@@ -279,68 +335,40 @@ var Tiled = function(id) {
 		return ret;
 	};
 	this.new_modal = function(name, body, items, cb) {
-		var nf = {};
-		nf.name = name = name || this.defname();
+		var title = name || this.defname();
 
-		var obj_title = document.createElement('div');
-		obj_title.className = 'frame_title';
-		obj_title.id = 'frame_' + name;
-		var d = document.createElement('div');
-		d.style.backgroundColor = '#c0c0c0';
-		d.style['overflow-x'] = 'hidden';
+		var title = html.div('modal_title', 'modal_title', {
+			backgroundColor: '#c0c0c0',
+ 			display: 'inline',
+			overflowX: 'hidden'
+		});
 
-		var x = document.createElement('a');
-		x.innerHTML = '[x]';
-		x.href = '#';
-		(function(self, name) {
-				x.onclick = function() {
-					//alert ("clicked "+name);
-					self.del_frame(name);
-					self.modal = null;
-				};
-			})(this, name);
-		d.appendChild(x);
+		/// title.appendChild(html.text('Shell'));
 
-		var a = document.createElement('a');
-		a.innerHTML = name;
-		a.href = '#';
-		d.appendChild(a);
+		title.appendChild(html.a('[x] ' + name, function (element) {
+			self.del_frame('modal');
+			obj.removeChild(element);
+			self.modal = null;
+		}));
 
-		/*
-					var inp = document.createElement ('input');
-					inp.value = "entry0";
-					inp.href='#';
-					d.appendChild (inp);
-		*/
-
-		obj_title.appendChild(d);
-		(function() {
-				a.onclick = function() {
-					//alert ("clicked "+name);
-					var newname = prompt('title');
-					//		 self.del_frame (name);
-				};
-			})(this, name);
-		if (typeof (update) === 'string') {
-			pos = update;
-			update = undefined;
+		var o = html.div('modal', 'modal', {
+		});
+		// frame body
+		var p = document.createElement('p');
+		if (typeof p === 'string') {
+			p.innerHTML = body;
+		} else {
+			p.appendChild(body);
 		}
-		nf.update = update;
-		nf.obj = document.createElement('div');
-		var title = obj_title.outerHTML;
-		nf.obj.className = 'frame';
-		nf.obj.id = nf.name;
-		nf.obj.appendChild(obj_title);
-		var x = document.createElement('p');
-		x.innerHTML = body;
-		nf.obj.appendChild(obj_title);
-		nf.obj.appendChild(x);
-		obj.appendChild(nf.obj);
-		this.modal = nf;
+		o.appendChild(title);
+		o.appendChild(p);
+
+		obj.appendChild(o);
+		this.modal = o;
 		if (cb) {
-			cb(self, nf);
+			cb(self, o);
 		}
-		return nf;
+		return o;
 	};
 	this.new_frame = function(name, body, update, pos, cb) {
 		var nf = {};
@@ -356,11 +384,11 @@ var Tiled = function(id) {
 		x.innerHTML = '[x]';
 		x.href = '#';
 		(function(self, name) {
-				x.onclick = function() {
-					//alert ("clicked "+name);
-					self.del_frame(name);
-				};
-			})(this, name);
+		 x.onclick = function() {
+		 //alert ("clicked "+name);
+		 self.del_frame(name);
+		 };
+		 })(this, name);
 		d.appendChild(x);
 
 		var b2 = document.createElement('a');
@@ -379,8 +407,8 @@ var Tiled = function(id) {
 				if (cb) {
 					cb(self, nf);
 					b2.ival = setInterval(function() {
-						cb(self, nf);
-					}, 1000);
+							cb(self, nf);
+							}, 1000);
 				}
 			}
 		};
@@ -403,7 +431,7 @@ var Tiled = function(id) {
 		d.appendChild(a);
 
 		/*
-					var inp = document.createElement ('input');
+		   var inp = document.createElement ('input');
 					inp.value = "entry0";
 					inp.href='#';
 					d.appendChild (inp);
@@ -461,7 +489,9 @@ var Tiled = function(id) {
 				if (f) {
 					//f[0].obj.innerHTML = f[0].obj.innerHTML+"<br />"; //"pop";
 					//alert (f[0].obj.style.backgroundColor);
-				} else alert('Cant find frame for ' + name);
+				} else {
+					alert('Cant find frame for ' + name);
+				}
 			};
 		})(this, name);
 		return nf;
@@ -473,13 +503,22 @@ var Tiled = function(id) {
 			}
 		}
 		if (this.modal) {
+			this.modal.tile();
 			this.modal.refresh();
 		}
+		this.run();
 	};
 	this.del_frame = function(name) {
 		var prev = undefined;
 		if (!name && this.curframe) {
 			name = this.curframe[0].name;
+		}
+			
+		if (self.modal == this.curframe) {
+			obj.removeChild(self.modal);
+			this.modal = null;
+			run();
+			return;
 		}
 		for (var col in this.frames) {
 			for (var row in this.frames[col]) {

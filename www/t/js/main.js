@@ -13,6 +13,61 @@ function findPos(obj) {
 }
 
 var navigationMode = true;
+var r2ui = {};
+var seekAction = function (addr) {
+	return false;
+};
+
+r2ui.seek = function (addr) {
+	r2.cmd('s ' + addr);
+	if (seekAction) {
+		seekAction (addr);
+	}
+};
+var seekCommand = '';
+
+function modalShell() {
+	var body = html.div('modal_body');
+	var out = html.div('modal_output', '', { 
+		overflow: 'hidden',
+		backgroundColor: 'red',
+		height: '100px',
+	border: '10px solid red'
+	});
+	var back = html.a('back', function() {
+		r2.cmd('s-;s', function(res) {
+			r2ui.seek(res);
+		});
+	});
+	var inp = html.input('input', '', function() {
+		seekCommand = inp.value;
+		seekAction = function (addr) {
+			r2.cmd (inp.value, function (res) {
+				function fill(res) {
+					var txt = r2.filter_asm(res, 'pd');
+					out.innerHTML = txt;
+				}
+				if (res === '') {
+					if (promptCommand !== '') {
+						r2.cmd (promptCommand, fill);
+					}
+				} else {
+					fill(res);
+					promptCommand = inp.value;
+				}
+				inp.value = '';
+			});
+		}
+		seekAction();
+	});
+	body.appendChild(back);
+	body.appendChild(inp);
+	out.style.overflow='scroll';
+	out.style.height='100%';
+	body.appendChild(out);
+	body.input = inp;
+	return body;
+}
 
 window.onload = function() {
 	var position = 'right';
@@ -27,17 +82,36 @@ window.onload = function() {
 		var isEscape = false;
 		if ("key" in evt) {
 			isEscape = (evt.key === "Escape" || evt.key === "Esc");
-			if (evt.key == "_") {
-				closeCurrentPanel(t);
-			}
 		} else {
 			isEscape = (evt.keyCode === 27);
 		}
 		if (isEscape) {
-			t.new_modal('Escape', 'body', ['items']);
+			if (t.modal) {
+				t.modal.style.visibility = 'hidden';
+				t.del_frame('modal');
+				delete t.modal;
+				// t.modal = undefined;
+				t.refresh();
+				t.run();
+				navigationMode = true;
+			} else {
+				var body = modalShell();
+				t.modal = t.new_modal('Shell', body, ['items']);
+				body.input.focus();
+				navigationMode = false;
+			}
+			return;
 		}
 		if (navigationMode) {
+console.log(evt.key);
+			if (evt.key == "x") {
+				closeCurrentPanel(t);
+			}
 			switch (evt.key) {
+			case 'ArrowLeft':/*h*/ t.other_frame('left'); break;
+			case 'ArrowDown':/*j*/ t.other_frame('down'); break;
+			case 'ArrowUp':/*k*/ t.other_frame('up'); break;
+			case 'ArrowRight':/*l*/ t.other_frame('right'); break;
 			case 'h':/*h*/ t.other_frame('left'); break;
 			case 74:/*j*/ t.other_frame('down'); break;
 			case 75:/*k*/ t.other_frame('up'); break;
@@ -54,14 +128,15 @@ case 88: /*x*/
 			}
 		}
 	};
-	function closeCurrentPanel(t) {
+	function closeCurrentPanel(p) {
+		if (!p) p = t;
 		if (t.curframe) {
 			t.oldframe = t.curframe;
 		}
-		t.del_frame();
-		t.run();
-		t.other_frame ('right')
-		t.other_frame ('left')
+		p.del_frame();
+		p.run();
+		p.other_frame ('right')
+		p.other_frame ('left')
 	}
 	function newHelpFrame() {
 		var n = t.defname('help');
@@ -237,52 +312,70 @@ case 88: /*x*/
 				code.style.width = obj.style.width - pos[0];
 			}
 		}, position, function(frame, nf) {
-			//frame = frame.curframe[0];
+			// frame = frame.curframe[0];
 			frame = nf;
-			function calc() {
-				var off = frame.offset || 0;
-				r2.cmd('pxa 1024 @ ' + off, function(x) {
-					var id_prev = n + '_hexdump_hex_prev';
-					var id_next = n + '_hexdump_hex_next';
-					var id_goto = n + '_hexdump_hex_goto';
-					_(n + '_hexdump').innerHTML =
+			if (!frame.offset) {
+				r2.cmd('s', function(x){
+					frame.offset = x.trim();
+				});
+			}
+			function calc(addr) {
+				if (addr) {
+					frame.offset = addr;
+				}
+				var off = frame.offset || '0';
+				r2.cmd('s=', function(x) {
+					x = r2.filter_asm (x, 'pd');
+					seekbar = x;
+					r2.cmd('pxa 1024+128 @ ' + off, function(x) {
+						x = r2.filter_asm(x, 'pd');
+						var id_prev = n + '_hexdump_hex_prev';
+						var id_next = n + '_hexdump_hex_next';
+						var id_goto = n + '_hexdump_hex_goto';
+						_(n + '_hexdump').innerHTML = seekbar +
 						'<br /><center><a class=link href=\'#\' id=' + id_prev + '>[PREV]</a>' +
 						'<a class=link href=\'#\' id=' + id_goto + '>[GOTO]</a>' +
 						'<a class=link href=\'#\' id=' + id_next + '>[NEXT]</a></center>' +
 						'<pre>' + x + '</pre>'
-					;
-					//var q = document.getElementById(n+'_hexdump_hex_prev');
-					var q = document.getElementById(id_prev);
-					q.onclick = function() {
-						frame.offset = frame.offset | 0;
-						frame.offset -= 512;
-						frame.refresh();
-					};
-					var q = document.getElementById(id_next);
-					q.onclick = function() {
-						frame.offset = frame.offset | 0;
-						frame.offset += 512;
-						frame.refresh();
-					};
-					var q = document.getElementById(id_goto);
-					q.onclick = function() {
-						var newoff = prompt('Goto');
-						if (newoff) {
-							r2.cmd('?v ' + newoff, function(val) {
-								frame.offset = +val | 0;
+						;
+						//var q = document.getElementById(n+'_hexdump_hex_prev');
+						var q = document.getElementById(id_prev);
+						q.onclick = function() {
+							r2.cmd('s-512;s', function(res) {
+								frame.offset = res.trim();
+								calc();
 								frame.refresh();
 							});
-						}
-					};
+						};
+						var Q = document.getElementById(id_next);
+						Q.onclick = function() {
+							r2.cmd('s+512;s', function(res) {
+								frame.offset = res.trim();
+								calc();
+								frame.refresh();
+							});
+						};
+						var q = document.getElementById(id_goto);
+						q.onclick = function() {
+							var newoff = prompt('Goto');
+							if (newoff) {
+								r2.cmd('?v ' + newoff, function(val) {
+									frame.offset = val || 0;
+									frame.refresh();
+								});
+							}
+						};
+					});
 				});
 			}
+seekAction = calc;
 			if (!frame.offset) {
 				r2.cmd('?v entry0', function(val) {
 					frame.offset = +val;
-					calc(frame);
+					calc();
 				});
 			} else {
-				calc(frame);
+				calc();
 			}
 		});
 	}
@@ -333,31 +426,49 @@ case 88: /*x*/
 			}
 		}, position, function(frame, nf) {
 			frame = frame.curframe[0];
+			var seekbar = '';
 			frame = nf;
+				if (!frame.offset) {
+					r2.cmd('s', function(x){
+						frame.offset = x;
+					});
+				}
+				r2.cmd('s=', function(x) {
+					x = r2.filter_asm (x, 'pd');
+					seekbar = x;
+				});
 			var off = frame.offset || 'entry0';
+			seekAction = function (addr) {
+				if (addr) {
+					off = addr;
+					frame.offset = off;
+				}
 			r2.cmd('pd 200 @ ' + off, function(x) {
+				x = r2.filter_asm (x, 'pd');
 				var id_prev = n + '_code_prev';
 				var id_next = n + '_code_next';
 				var id_goto = n + '_code_goto';
-				_(n + '_code').innerHTML =
+				_(n + '_code').innerHTML =seekbar +
 					'<br /><center><a class=link href=\'#\' id=' + id_prev + '>[PREV]</a>' +
 					'<a class=link href=\'#\' id=' + id_goto + '>[GOTO]</a>' +
 					'<a class=link href=\'#\' id=' + id_next + '>[NEXT]</a></center>' +
 					'<pre>' + x + '</pre>';
 				var q = document.getElementById(id_prev);
 				q.onclick = function() {
-					frame.offset = frame.offset | 0;
-					frame.offset -= 512;
-					frame.refresh();
+					r2.cmd('s-512;s', function(res) {
+						frame.offset = res.trim();
+						frame.refresh();
+					});
 				};
-				var q = document.getElementById(id_next);
-				q.onclick = function() {
-					frame.offset = frame.offset | 0;
-					frame.offset += 512;
-					frame.refresh();
+				var q2 = document.getElementById(id_next);
+				q2.onclick = function() {
+					r2.cmd('s+512;s',function(res) {
+						frame.offset = res.trim();
+						frame.refresh();
+					});
 				};
-				var q = document.getElementById(id_goto);
-				q.onclick = function() {
+				var q3 = document.getElementById(id_goto);
+				q3.onclick = function() {
 					var newoff = prompt('Goto');
 					if (newoff) {
 						r2.cmd('?v ' + newoff, function(val) {
@@ -369,6 +480,13 @@ case 88: /*x*/
 					}
 				};
 			});
+			};
+		});
+seekAction();
+		r2.cmd('s',function(res) {
+			frame.offset = res.trim();
+			seekAction();
+			frame.refresh();
 		});
 	}
 	function addPanel(pos) {
@@ -379,6 +497,7 @@ case 88: /*x*/
 		t.run();
 		t.update = function() {
 			r2.cmd(t.cmd, function(x) {
+x=r2.filter_asm(x, 'pd');
 				_(t.key).innerHTML =
 			'<div class=\'frame_body\'><a href=\'#\' id=\'cmd_' + ctr + '\'>cmd</a><pre>' + x + '</pre></div>';
 			});
@@ -410,6 +529,7 @@ case 88: /*x*/
 		t.run();
 		t.update = function() {
 			r2.cmd(t.cmd, function(x) {
+				x = r2.filter_asm(x);
 				_(t.key).innerHTML =
 				'<div class=\'frame_body\'><pre>' + x + '</pre></div>';
 			});
@@ -429,6 +549,9 @@ case 88: /*x*/
 	document.t = t;
 
 	_('body').onkeyup = function(e) {
+		if (!navigationMode) {
+return;
+}
 		var key = String.fromCharCode(e.keyCode);
 		//if (!key.altKey) return;
 		if (!e.altKey) {

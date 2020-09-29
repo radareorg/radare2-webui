@@ -29,6 +29,40 @@ iframe {
 	width:100%;
 	border: 1px solid black;
 }
+@keyframes fadeInOpacity {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+.modal {
+	font-family: monospace;
+	border: 3px solid black;
+
+	left:10%;
+	top:10%;
+	right:10%;
+	border-radius: 1em;
+	padding-top:20px;
+	bottom:10%;
+	background-color: #2020a0;
+	color: #e0e0e0;
+	position:absolute;
+	z-index: 10000 !important;
+}
+.modal_title {
+	position:absolute;
+	background-color:black;
+	color:#e0e0e0;
+	padding:0px;
+	top:0px;
+	height:20px;
+	font-family: monospace;
+	width:100%;
+	z-index:10001;
+}
 .frame {
 	font-family: monospace;
 	border: 1px solid black;
@@ -60,8 +94,10 @@ iframe {
 	font-family:monospace;
 }
 input {
+	width: 98%;
 	border: 1px solid black;
-	text-align:right;
+	text-align:left;
+	margin:5px;
 	background-color: rgba(0,0,0,0.3);
 	overflow:hidden;
 	color: white;
