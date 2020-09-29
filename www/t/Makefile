@@ -1,3 +1,12 @@
+GLOBALS=
+GLOBALS+=--global _
+GLOBALS+=--global r2
+GLOBALS+=--global alert
+GLOBALS+=--global prompt
+GLOBALS+=--global Tiled
+GLOBALS+=--global html
+
+
 all: build
 
 node_modules:
@@ -20,3 +29,6 @@ clean:
 mrproper: clean
 	rm -rf node_modules
 
+
+indent:
+	node_modules/.bin/semistandard $(GLOBALS) --fix js/*.js

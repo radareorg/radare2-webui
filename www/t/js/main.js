@@ -1,18 +1,19 @@
 
 function findPos (obj) {
-  var curleft = curtop = 0;
+  var curtop = 0;
+  var curleft = 0;
   if (obj.offsetParent) {
     curleft = obj.offsetLeft;
     curtop = obj.offsetTop;
-    while (obj = obj.offsetParent) {
+    while (obj.offsetParent) {
       curleft += obj.offsetLeft;
       curtop += obj.offsetTop;
+      obj = obj.offsetParent;
     }
   }
   return [curleft, curtop];
 }
 
-var navigationMode = true;
 var r2ui = {};
 var seekAction = function (addr) {
   return false;
@@ -24,7 +25,6 @@ r2ui.seek = function (addr) {
     seekAction(addr);
   }
 };
-var seekCommand = '';
 
 function modalShell () {
   var body = html.div('modal_body');
@@ -40,7 +40,6 @@ function modalShell () {
     });
   });
   var inp = html.input('input', '', function () {
-    seekCommand = inp.value;
     seekAction = function (addr) {
       r2.cmd(inp.value, function (res) {
         function fill (res) {
@@ -93,29 +92,24 @@ window.onload = function () {
         // t.modal = undefined;
         t.refresh();
         t.run();
-        navigationMode = true;
       } else {
         var body = modalShell();
         t.modal = t.new_modal('Shell', body, ['items']);
         body.input.focus();
-        navigationMode = false;
       }
       return;
     }
-    if (navigationMode) {
+    if (!t.modal) {
       console.log(evt.key);
-      if (evt.key == 'x') {
-        closeCurrentPanel(t);
-      }
       switch (evt.key) {
-        case 'ArrowLeft':/* h */ t.other_frame('left'); break;
-        case 'ArrowDown':/* j */ t.other_frame('down'); break;
-        case 'ArrowUp':/* k */ t.other_frame('up'); break;
-        case 'ArrowRight':/* l */ t.other_frame('right'); break;
-        case 'h':/* h */ t.other_frame('left'); break;
-        case 74:/* j */ t.other_frame('down'); break;
-        case 75:/* k */ t.other_frame('up'); break;
-        case 76:/* l */ t.other_frame('right'); break;
+        case 'ArrowLeft': t.other_frame('left'); break;
+        case 'ArrowDown': t.other_frame('down'); break;
+        case 'ArrowUp': t.other_frame('up'); break;
+        case 'ArrowRight': t.other_frame('right'); break;
+        case 'h': t.other_frame('left'); break;
+        case 'j': t.other_frame('down'); break;
+        case 'k': t.other_frame('up'); break;
+        case 'l': t.other_frame('right'); break;
         case 189:
         case '-':/* - */ addPanel('bottom'); break;
         case 220: // chrome
@@ -194,7 +188,7 @@ window.onload = function () {
     }, position, function () {
       var input = _(n + '_input');
       input.onkeyup = function (ev) {
-        if (ev.keyCode == 13) {
+        if (ev.keyCode === 13) {
           r2.cmd(input.value, function (x) {
             _(n + '_output').innerHTML = '<pre>' + x + '</pre>';
             input.value = '';
@@ -260,8 +254,7 @@ window.onload = function () {
       });
     };
     function newthing () {
-      return '<h2>Debug</h2>' +
-			'<div id=\'' + name + '_frame\' class=\'frame_body\'></div>';
+      return '<h2>Debug</h2><div id=\'' + name + '_frame\' class=\'frame_body\'></div>';
     }
     t.new_frame(n, newthing(n), function (obj) {
       var flags = _(n + '_frame');
@@ -329,17 +322,17 @@ window.onload = function () {
           seekbar = x;
           r2.cmd('pxa 1024+128 @ ' + off, function (x) {
             x = r2.filter_asm(x, 'pd');
-            var id_prev = n + '_hexdump_hex_prev';
-            var id_next = n + '_hexdump_hex_next';
+            var idPrev = n + '_hexdump_hex_prev';
+            var idNext = n + '_hexdump_hex_next';
             var id_goto = n + '_hexdump_hex_goto';
             _(n + '_hexdump').innerHTML = seekbar +
-						'<br /><center><a class=link href=\'#\' id=' + id_prev + '>[PREV]</a>' +
+						'<br /><center><a class=link href=\'#\' id=' + idPrev + '>[PREV]</a>' +
 						'<a class=link href=\'#\' id=' + id_goto + '>[GOTO]</a>' +
-						'<a class=link href=\'#\' id=' + id_next + '>[NEXT]</a></center>' +
+						'<a class=link href=\'#\' id=' + idNext + '>[NEXT]</a></center>' +
 						'<pre>' + x + '</pre>'
             ;
             // var q = document.getElementById(n+'_hexdump_hex_prev');
-            var q = document.getElementById(id_prev);
+            var q = document.getElementById(idPrev);
             q.onclick = function () {
               r2.cmd('s-512;s', function (res) {
                 frame.offset = res.trim();
@@ -347,7 +340,7 @@ window.onload = function () {
                 frame.refresh();
               });
             };
-            var Q = document.getElementById(id_next);
+            var Q = document.getElementById(idNext);
             Q.onclick = function () {
               r2.cmd('s+512;s', function (res) {
                 frame.offset = res.trim();
@@ -445,22 +438,22 @@ window.onload = function () {
         }
         r2.cmd('pd 200 @ ' + off, function (x) {
           x = r2.filter_asm(x, 'pd');
-          var id_prev = n + '_code_prev';
-          var id_next = n + '_code_next';
+          var idPrev = n + '_code_prev';
+          var idNext = n + '_code_next';
           var id_goto = n + '_code_goto';
           _(n + '_code').innerHTML = seekbar +
-					'<br /><center><a class=link href=\'#\' id=' + id_prev + '>[PREV]</a>' +
+					'<br /><center><a class=link href=\'#\' id=' + idPrev + '>[PREV]</a>' +
 					'<a class=link href=\'#\' id=' + id_goto + '>[GOTO]</a>' +
-					'<a class=link href=\'#\' id=' + id_next + '>[NEXT]</a></center>' +
+					'<a class=link href=\'#\' id=' + idNext + '>[NEXT]</a></center>' +
 					'<pre>' + x + '</pre>';
-          var q = document.getElementById(id_prev);
+          var q = document.getElementById(idPrev);
           q.onclick = function () {
             r2.cmd('s-512;s', function (res) {
               frame.offset = res.trim();
               frame.refresh();
             });
           };
-          var q2 = document.getElementById(id_next);
+          var q2 = document.getElementById(idNext);
           q2.onclick = function () {
             r2.cmd('s+512;s', function (res) {
               frame.offset = res.trim();
@@ -549,7 +542,7 @@ window.onload = function () {
   document.t = t;
 
   _('body').onkeyup = function (e) {
-    if (!navigationMode) {
+    if (t.modal) {
       return;
     }
     var key = String.fromCharCode(e.keyCode);
@@ -586,10 +579,10 @@ window.onload = function () {
         newDisasmFrame();
         break;
         /*
-		case 'H': t.move_frame ('left'); break;
-		case 'J': t.move_frame ('down'); break;
-		case 'K': t.move_frame ('up'); break;
-		case 'L': t.move_frame ('right'); break;
+case 'H': t.move_frame ('left'); break;
+case 'J': t.move_frame ('down'); break;
+case 'K': t.move_frame ('up'); break;
+case 'L': t.move_frame ('right'); break;
 */
       case 'i':
         r2.cmd('pi 2', function (x) { alert(x); });

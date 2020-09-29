@@ -12,7 +12,7 @@ var html = {
     o.value = value;
     o.focus();
     o.onkeyup = function (ev) {
-      if (ev.keyCode == 13) {
+      if (ev.keyCode === 13) {
         action(o.value);
       }
     };
@@ -47,7 +47,7 @@ var html = {
   }
 };
 
-var Tiled = function (id) {
+function Tiled (id) {
   var obj = document.getElementById(id);
   var self = this;
   this.modal = null;
@@ -88,7 +88,7 @@ var Tiled = function (id) {
       var height = h - mtop;
 
       var f = this.curframe[0];
-      if (f != this.modal) {
+      if (f !== this.modal) {
         f.obj.style['z-index'] = 0;
       } else {
         f.obj.style.position = 'absolute';
@@ -160,7 +160,7 @@ var Tiled = function (id) {
       var height = (h - topmargin) / rows;
 
       if (this.curframe && hasmaxw && this.frames.length > 1) {
-        if (col == this.curframe[1]) {
+        if (col === this.curframe[1]) {
           width = w / 2;
         } else {
           width = (w / 2) / (cols - 1);
@@ -184,7 +184,7 @@ var Tiled = function (id) {
         f.obj.style.left = left;
         // TODO: add proportions
         f.obj.style.width = width;
-        if (row == 0) {
+        if (row === 0) {
           height -= 22;
         }
         f.obj.style.height = height;
@@ -227,7 +227,7 @@ var Tiled = function (id) {
         // append to previous column
         break;
       case 'right':
-        if (col == this.frames.length - 1) { return false; }
+        if (col === this.frames.length - 1) { return false; }
         // AAAA B C DDD
         var b, c, d;
         b = this.frames[col];
@@ -328,16 +328,11 @@ var Tiled = function (id) {
     return ret;
   };
   this.new_modal = function (name, body, items, cb) {
-    var title = name || this.defname();
-
     var title = html.div('modal_title', 'modal_title', {
       backgroundColor: '#c0c0c0',
- 			display: 'inline',
+      display: 'inline',
       overflowX: 'hidden'
     });
-
-    /// title.appendChild(html.text('Shell'));
-
     title.appendChild(html.a('[x] ' + name, function (element) {
       self.del_frame('modal');
       obj.removeChild(element);
@@ -363,6 +358,7 @@ var Tiled = function (id) {
     }
     return o;
   };
+
   this.new_frame = function (name, body, update, pos, cb) {
     var nf = {};
     nf.name = name = name || this.defname();
@@ -373,23 +369,13 @@ var Tiled = function (id) {
     var d = document.createElement('div');
     d.style['overflow-x'] = 'hidden';
 
-    var x = document.createElement('a');
-    x.innerHTML = '[x]';
-    x.href = '#';
-    (function (self, name) {
-		 x.onclick = function () {
-		 // alert ("clicked "+name);
-		 self.del_frame(name);
-		 };
-		 })(this, name);
+    var x = html.a('[x]', function () {
+      self.del_frame(name);
+    });
     d.appendChild(x);
 
-    var b2 = document.createElement('a');
-    b2.innerHTML = '[r]';
-    b2.href = '#';
-    b2.ival = null;
     var self = this;
-    b2.onclick = function () {
+    var b2 = html.a('[r]', function () {
       // TODO : toggle auto refresh
       if (b2.ival) {
         clearInterval(b2.ival);
@@ -404,40 +390,25 @@ var Tiled = function (id) {
           }, 1000);
         }
       }
-    };
+    });
+    b2.ival = null;
     d.appendChild(b2);
 
-    var b = document.createElement('a');
-    b.innerHTML = '[@] ';
-    b.href = '#';
-    b.onclick = nf.refresh = function () {
+    var b = html.a('[@]', function () {
       if (cb) {
         cb(self, nf);
       }
-    };
+    });
     d.appendChild(b);
     // nf.offset = "entry0"; //0x404981;
 
-    var a = document.createElement('a');
-    a.innerHTML = name;
-    a.href = '#';
-    d.appendChild(a);
-
-    /*
-		   var inp = document.createElement ('input');
-					inp.value = "entry0";
-					inp.href='#';
-					d.appendChild (inp);
-		*/
+    var title_text = html.a(name);
+    d.appendChild(title_text, function () {
+      var newname = prompt('title');
+      title_text.innerHTML = newname;
+    });
 
     obj_title.appendChild(d);
-    (function () {
-      a.onclick = function () {
-        // alert ("clicked "+name);
-        var newname = prompt('title');
-        //		 self.del_frame (name);
-      };
-    })(this, name);
     if (typeof (update) === 'string') {
       pos = update;
       update = undefined;
@@ -507,7 +478,7 @@ var Tiled = function (id) {
       name = this.curframe[0].name;
     }
 
-    if (self.modal == this.curframe) {
+    if (self.modal === this.curframe) {
       obj.removeChild(self.modal);
       this.modal = null;
       run();
@@ -516,9 +487,9 @@ var Tiled = function (id) {
     for (var col in this.frames) {
       for (var row in this.frames[col]) {
         var x = this.frames[col][row];
-        if (x.name == name) {
-          if (x != this.curframe[0]) { return; }
-          if (this.curframe[0] != this.oldframe[0]) { return; }
+        if (x.name === name) {
+          if (x !== this.curframe[0]) { return; }
+          if (this.curframe[0] !== this.oldframe[0]) { return; }
           if (this.frames[col].length > 1) {
             // remove row
             var a = this.frames[col].splice(row).slice(1);
@@ -557,4 +528,4 @@ var Tiled = function (id) {
     obj.style.backgroundColor = '#202020';
     this.tile();
   };
-};
+}
