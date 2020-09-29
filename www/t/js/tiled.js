@@ -6,7 +6,7 @@ var html = {
     text.innerHTML = text;
     return o;
   },
-  input: function (id, value, action) {
+  input: function (id, value, action, onkey) {
     var o = document.createElement('input');
     o.id = id;
     o.value = value;
@@ -14,6 +14,8 @@ var html = {
     o.onkeyup = function (ev) {
       if (ev.keyCode === 13) {
         action(o.value);
+      } else if (onkey) {
+        onkey(o.value);
       }
     };
     return o;
@@ -333,10 +335,13 @@ function Tiled (id) {
       display: 'inline',
       overflowX: 'hidden'
     });
+    var these = this;
     title.appendChild(html.a('[x] ' + name, function (element) {
       self.del_frame('modal');
       obj.removeChild(element);
-      self.modal = null;
+      self.modal.style.visibility = 'hidden';
+      these.modal = null;
+      alert('nul');
     }));
 
     var o = html.div('modal', 'modal', {
@@ -352,6 +357,7 @@ function Tiled (id) {
     o.appendChild(p);
 
     obj.appendChild(o);
+    this.modal = o;
     this.modal = o;
     if (cb) {
       cb(self, o);

@@ -26,48 +26,6 @@ r2ui.seek = function (addr) {
   }
 };
 
-function modalShell () {
-  var body = html.div('modal_body');
-  var out = html.div('modal_output', '', {
-    overflow: 'hidden',
-    backgroundColor: 'red',
-    height: '100px',
-    border: '10px solid red'
-  });
-  var back = html.a('back', function () {
-    r2.cmd('s-;s', function (res) {
-      r2ui.seek(res);
-    });
-  });
-  var inp = html.input('input', '', function () {
-    seekAction = function (addr) {
-      r2.cmd(inp.value, function (res) {
-        function fill (res) {
-          var txt = r2.filter_asm(res, 'pd');
-          out.innerHTML = txt;
-        }
-        if (res === '') {
-          if (promptCommand !== '') {
-            r2.cmd(promptCommand, fill);
-          }
-        } else {
-          fill(res);
-          promptCommand = inp.value;
-        }
-        inp.value = '';
-      });
-    };
-    seekAction();
-  });
-  body.appendChild(back);
-  body.appendChild(inp);
-  out.style.overflow = 'scroll';
-  out.style.height = '100%';
-  body.appendChild(out);
-  body.input = inp;
-  return body;
-}
-
 window.onload = function () {
   var position = 'right';
   var t = new Tiled('canvas');
@@ -93,8 +51,8 @@ window.onload = function () {
         t.refresh();
         t.run();
       } else {
-        var body = modalShell();
-        t.modal = t.new_modal('Shell', body, ['items']);
+        var body = modalMenu();
+        t.modal = t.new_modal('Menu', body, ['items']);
         body.input.focus();
       }
       return;
@@ -110,6 +68,16 @@ window.onload = function () {
         case 'j': t.other_frame('down'); break;
         case 'k': t.other_frame('up'); break;
         case 'l': t.other_frame('right'); break;
+        case ':':
+          var body = modalShell();
+          t.modal = t.new_modal('Shell', body, ['items']);
+          body.input.focus();
+          break;
+        case 'a':
+          var body = modalAssembler();
+          t.modal = t.new_modal('Assembler', body, ['items']);
+          body.input.focus();
+          break;
         case 189:
         case '-':/* - */ addPanel('bottom'); break;
         case 220: // chrome
@@ -144,20 +112,20 @@ window.onload = function () {
         };
       }, 1);
       var hlpmsg = 'This is the new and experimental tiled webui for r2\n\n' +
-			'Press the \'alt\' key and the following key:\n\n' +
-			'  hjkl - move left,down,up,right around\n' +
-			'  x    - spawn an hexdump\n' +
-			'  d    - spawn an disasfm\n' +
-			'  f    - spawn an flags panel\n' +
-			'  c    - close current frame\n' +
-			'  .    - toggle maximize mode\n' +
-			'  -    - horizontal split\n' +
-			'  |    - vertical split\n' +
-			'\n' +
-			// +"Blocksize <input type=''></input><br />"
-			'<input type=\'button\' id=\'randomcolors\' value=\'randomcolors\'></input>';
+      'Press the \'alt\' key and the following key:\n\n' +
+      '  hjkl - move left,down,up,right around\n' +
+      '  x    - spawn an hexdump\n' +
+      '  d    - spawn an disasfm\n' +
+      '  f    - spawn an flags panel\n' +
+      '  c    - close current frame\n' +
+      '  .    - toggle maximize mode\n' +
+      '  -    - horizontal split\n' +
+      '  |    - vertical split\n' +
+      '\n' +
+      // +"Blocksize <input type=''></input><br />"
+      '<input type=\'button\' id=\'randomcolors\' value=\'randomcolors\'></input>';
       return '<h2>Help</h2>' +
-			'<div id=\'' + name + '_help\' style=\'background-color:#304050;overflow:scroll;height:100%\'><pre>' + hlpmsg + '</div>';
+      '<div id=\'' + name + '_help\' style=\'background-color:#304050;overflow:scroll;height:100%\'><pre>' + hlpmsg + '</div>';
     }
     t.new_frame(n, newthing(n), function (obj) {
       var flags = _(n + '_help');
@@ -173,8 +141,8 @@ window.onload = function () {
     var n = t.defname('console');
     function newthing (name) {
       return '<div><input id="' + name + '_input"></input></div>' +
-			'<div id=\'' + name + '_output\' class=\'frame_body\'>' +
-			'</div>';
+      '<div id=\'' + name + '_output\' class=\'frame_body\'>' +
+      '</div>';
     }
 
     t.new_frame(n, newthing(n), function (obj) {
@@ -240,8 +208,8 @@ window.onload = function () {
                 var v = '0x' + (+regs[r]).toString(16);
 
                 str += '<tr><td>' +
-								r + '</td><td>' +
-								'<a href=#>' + v + '</a></td></tr>';
+                r + '</td><td>' +
+                '<a href=#>' + v + '</a></td></tr>';
               }
               str += '</table>';
               str += '<hr />Backtrace:<pre>' + dbt + '</pre>';
@@ -281,7 +249,7 @@ window.onload = function () {
         });
       }, 1);
       return '<h2>Flags</h2>' +
-			'<div id=\'' + name + '_flags\' class=\'frame_body\'></div>';
+      '<div id=\'' + name + '_flags\' class=\'frame_body\'></div>';
     }
     t.new_frame(n, newthing(n), function (obj) {
       var flags = _(n + '_flags');
@@ -326,10 +294,10 @@ window.onload = function () {
             var idNext = n + '_hexdump_hex_next';
             var id_goto = n + '_hexdump_hex_goto';
             _(n + '_hexdump').innerHTML = seekbar +
-						'<br /><center><a class=link href=\'#\' id=' + idPrev + '>[PREV]</a>' +
-						'<a class=link href=\'#\' id=' + id_goto + '>[GOTO]</a>' +
-						'<a class=link href=\'#\' id=' + idNext + '>[NEXT]</a></center>' +
-						'<pre>' + x + '</pre>'
+      '<br /><center><a class=link href=\'#\' id=' + idPrev + '>[PREV]</a>' +
+      '<a class=link href=\'#\' id=' + id_goto + '>[GOTO]</a>' +
+      '<a class=link href=\'#\' id=' + idNext + '>[NEXT]</a></center>' +
+      '<pre>' + x + '</pre>'
             ;
             // var q = document.getElementById(n+'_hexdump_hex_prev');
             var q = document.getElementById(idPrev);
@@ -390,8 +358,8 @@ window.onload = function () {
   function newSettingsFrame () {
     var n = t.defname('settings');
     var settbody = '<div id=\'' + n + '_settings\' class=\'frame_body\'>' +
-			'<input type=button value=RandomColors>' +
-			'</div>';
+      '<input type=button value=RandomColors>' +
+      '</div>';
     t.new_frame(n, settbody, function (obj) {
       var code = _(n + '_settings');
       if (code) {
@@ -442,10 +410,10 @@ window.onload = function () {
           var idNext = n + '_code_next';
           var id_goto = n + '_code_goto';
           _(n + '_code').innerHTML = seekbar +
-					'<br /><center><a class=link href=\'#\' id=' + idPrev + '>[PREV]</a>' +
-					'<a class=link href=\'#\' id=' + id_goto + '>[GOTO]</a>' +
-					'<a class=link href=\'#\' id=' + idNext + '>[NEXT]</a></center>' +
-					'<pre>' + x + '</pre>';
+          '<br /><center><a class=link href=\'#\' id=' + idPrev + '>[PREV]</a>' +
+          '<a class=link href=\'#\' id=' + id_goto + '>[GOTO]</a>' +
+          '<a class=link href=\'#\' id=' + idNext + '>[NEXT]</a></center>' +
+          '<pre>' + x + '</pre>';
           var q = document.getElementById(idPrev);
           q.onclick = function () {
             r2.cmd('s-512;s', function (res) {
@@ -492,7 +460,7 @@ window.onload = function () {
       r2.cmd(t.cmd, function (x) {
         x = r2.filter_asm(x, 'pd');
         _(t.key).innerHTML =
-			'<div class=\'frame_body\'><a href=\'#\' id=\'cmd_' + ctr + '\'>cmd</a><pre>' + x + '</pre></div>';
+      '<div class=\'frame_body\'><a href=\'#\' id=\'cmd_' + ctr + '\'>cmd</a><pre>' + x + '</pre></div>';
       });
     };
     _('cmd_' + ctr).onclick = function () {
@@ -518,13 +486,13 @@ window.onload = function () {
     ctr++;
     position = 'bottom';
     t.new_frame('window_' + ctr, '<div id=\'div_' + ctr + '\'><a href=\'#\' id=\'cmd_' + ctr + '\'>cmd</a></div>', 'bottom');
-    //		t.frames[0].push (t.frames.pop ()[0]);
+    //    t.frames[0].push (t.frames.pop ()[0]);
     t.run();
     t.update = function () {
       r2.cmd(t.cmd, function (x) {
         x = r2.filter_asm(x);
         _(t.key).innerHTML =
-				'<div class=\'frame_body\'><pre>' + x + '</pre></div>';
+        '<div class=\'frame_body\'><pre>' + x + '</pre></div>';
       });
     };
     _('cmd_' + ctr).onclick = function () {
