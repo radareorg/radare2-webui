@@ -76,7 +76,7 @@
     "material-design-icons-iconfont": "github:Jossef/material-design-icons-iconfont",
     "material-design-lite": "google/material-design-lite",
     "mdl-selectfield": "github:mebibou/mdl-selectfield",
-    "webpack": "^5.2.0",
+    "webpack": "^5.3.0",
     "webpack-cli": "^4.1.0"
   },
   "engines": {
