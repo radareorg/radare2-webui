@@ -24,6 +24,7 @@ jobs:
     name: Material
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
     - name: MaterialUI
       run: cd www/m
     - name: Installing dependencies
@@ -35,7 +36,7 @@ jobs:
     - name: Pub
       uses: actions/upload-artifact@v2
       with:
-        path: dist/m/*.deb
+        path: dist/*.zip
   tiled:
     name: Tiled
     runs-on: ubuntu-latest
