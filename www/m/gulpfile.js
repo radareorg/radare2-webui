@@ -5,7 +5,7 @@ var gulp = require('gulp'),
 	bower = require('gulp-bower'),
 	replace = require('gulp-replace'),
 	googleWebFonts = require('gulp-google-webfonts'),
-	jscs = require('gulp-jscs'),
+	eslint = require('gulp-eslint'),
 	livereload = require('gulp-livereload'),
 	uglify = require('gulp-uglify'),
 	uglifycss = require('gulp-uglifycss'),
@@ -18,7 +18,7 @@ var gulp = require('gulp'),
 	babelify = require('babelify'),
 	source = require('vinyl-source-stream');
 
-var babelPresets = ['es2015'];
+var babelPresets = ['@babel/preset-env'];
 
 var paths = {
 	r2: '../lib/',
@@ -42,7 +42,7 @@ gulp.task('dependencies:r2', function() {
 		.pipe(gulp.dest(paths.dev));
 });
 
-gulp.task('dependencies:vendors', ['bower'], function() {
+gulp.task('dependencies:vendors', gulp.series(['bower']), function() {
 	var task1 = gulp.src(
 		'./vendors/dialog-polyfill/dialog-polyfill.js')
 		.pipe(uglify())
@@ -59,14 +59,14 @@ gulp.task('dependencies:vendors', ['bower'], function() {
 	return merge(task1, task2);
 });
 
-gulp.task('dependencies:vendors-srcmaps', ['bower'], function() {
+gulp.task('dependencies:vendors-srcmaps', gulp.parallel(['bower']), function() {
 	return gulp.src([
 		'./vendors/material-design-lite/material.min.js.map',
 		'./vendors/mdl-selectfield/dist/mdl-selectfield.min.js.map'])
 		.pipe(gulp.dest(paths.dev + 'vendors/'));
 })
 
-gulp.task('dependencies:css', ['bower'], function() {
+gulp.task('dependencies:css', gulp.parallel(['bower']), function() {
 	var tasks = merge();
 
 	tasks.add(gulp.src(
@@ -101,20 +101,20 @@ gulp.task('dependencies:css', ['bower'], function() {
 	return tasks;
 });
 
-gulp.task('dependencies:fonts', ['bower'], function() {
+gulp.task('dependencies:fonts', gulp.parallel(['bower']), function() {
 	return gulp.src('./fonts.list')
 		.pipe(googleWebFonts({}))
 		.pipe(gulp.dest(paths.dev + 'vendors/fonts/'));
 });
 
 gulp.task('dependencies',
-	[
+	gulp.parallel([
 		'dependencies:vendors',
 		'dependencies:vendors-srcmaps',
 		'dependencies:r2',
 		'dependencies:css',
 		'dependencies:fonts'
-	]);
+	]));
 
 /**
  * Checkstyle
@@ -143,7 +143,7 @@ gulp.task('js:main', function() {
 gulp.task('js:legacy', function() {
 	return gulp.src('./js/*/**/*.legacy.js')
 	 	.pipe(sourcemaps.init())
-	 	.pipe(babel({presets: babelPresets, compact: false}))
+	 	// .pipe(babel({presets: babelPresets, compact: false}))
 	 	.pipe(concat('legacy.js'))
 	 	.pipe(sourcemaps.write('.'))
 	 	.pipe(gulp.dest(paths.dev))
@@ -152,7 +152,7 @@ gulp.task('js:legacy', function() {
 
 gulp.task('js:app', function() {
 	return browserify({entries: './js/app.js', extensions: ['.js'], debug: true})
-        .transform(babelify, {presets: ["es2015"]})
+        // .transform(babelify, {presets: babelPresets]})
         .bundle()
         .pipe(source('app.js'))
         .pipe(gulp.dest(paths.dev));
@@ -162,18 +162,18 @@ gulp.task('js:app', function() {
  */
 // TODO --
 gulp.task('js:workers', function() {
-	return gulp.src(['./workers/*.js', './js/helpers/tools.js'])
-		.pipe(babel({presets: babelPresets, compact: false}))
+	return gulp.src(['./workers/*.js', './js/helpers/tools.legacy.js'])
+		// .pipe(babel({presets: babelPresets, compact: false}))
 		.pipe(gulp.dest(paths.dev))
 		.pipe(livereload());
 });
 
 gulp.task('js', 
-	[
+	gulp.parallel([
 		'js:app',
 		'js:legacy',
 		'js:workers'
-	]);
+	]));
 
 /**
  * Assets
@@ -193,7 +193,7 @@ gulp.task('css:images', function() {
 });
 
 
-gulp.task('css:fonts', ['bower', 'dependencies:fonts'], function() {
+gulp.task('css:fonts', gulp.parallel(['bower', 'dependencies:fonts']), function() {
 	var task1 = gulp.src(['./fonts/*'])
 		.pipe(gulp.dest(paths.dev + 'vendors/fonts/'));
 
@@ -204,11 +204,11 @@ gulp.task('css:fonts', ['bower', 'dependencies:fonts'], function() {
 });
 
 gulp.task('css', 
-	[
+	gulp.parallel([
 		'css:stylesheets',
 		'css:images',
 		'css:fonts'
-	]);
+	]));
 
 gulp.task('html', function() {
 	return gulp.src(['./index.html'])
@@ -216,20 +216,20 @@ gulp.task('html', function() {
 		.pipe(livereload());
 });
 
-gulp.task('build', 	[
+gulp.task('build', gulp.parallel([
 		'html',
 		'dependencies',
 		'js',
 		'css'
-	]);
+	]));
 
 gulp.task('default',
-	[
+	gulp.parallel([
 		'build',
 //		'checkstyle'
-	]);
+	]));
 
-gulp.task('release', ['build'], function() {
+gulp.task('release', gulp.parallel(['build']), function() {
 	var tasks = merge();
 
 	// Import files from dev
@@ -255,7 +255,7 @@ gulp.task('release', ['build'], function() {
 	return tasks;
 });
 
-gulp.task('watch', ['default'] , function() {
+gulp.task('watch', gulp.parallel(['default']) , function() {
 	livereload.listen();
 	gulp.watch('./*.html', ['html']);
 	gulp.watch('./css/*.css', ['css']);

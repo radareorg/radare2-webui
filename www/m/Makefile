@@ -1,4 +1,5 @@
 YARN=$(shell npm bin)/yarn
+PWD=$(shell pwd)
 
 all: build
 
@@ -11,7 +12,7 @@ dist release: node_modules
 	ln -fs ../../dist/m dist
 	cp -f index.html dist/index.html
 	cp -rf css dist
-	$(shell npm bin)/webpack-cli js/app.js
+	$(shell npm bin)/webpack-cli -o $$PWD/www/ $$PWD/js/app.js
 	#$(shell npm bin)/gulp release
 
 node_modules:

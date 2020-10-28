@@ -37,6 +37,7 @@ function ready() {
 	onClick('menu_hexdump', () => uiContext.navigateTo(Widgets.HEXDUMP));
 	onClick('menu_debug', () => uiContext.navigateTo(Widgets.DEBUGGER));
 	onClick('menu_functions', () => uiContext.navigateTo(Widgets.FUNCTIONS));
+	onClick('menu_classes', () => uiContext.navigateTo(Widgets.CLASSES));
 	onClick('menu_flags', () => uiContext.navigateTo(Widgets.FLAGS));
 	onClick('menu_search', () => uiContext.navigateTo(Widgets.SEARCH));
 	onClick('menu_script', () => uiContext.navigateTo(Widgets.SCRIPTS));

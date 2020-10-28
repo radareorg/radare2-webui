@@ -1,6 +1,8 @@
 radare2-webui
 =============
 
+![ci](https://github.com/radareorg/radare2-webui/workflows/ci/badge.svg)
+![CodeQL](https://github.com/radareorg/radare2-webui/workflows/CodeQL/badge.svg)
 [![Code Climate](https://codeclimate.com/github/radare/radare2-webui/badges/gpa.svg)](https://codeclimate.com/github/radare/radare2-webui)
 
 This repository contains the different WebUIs for radare2:

@@ -10,6 +10,7 @@ export const Widgets = {
 	HEXDUMP: 'hexdump',
 	DEBUGGER: 'debugger',
 	FUNCTIONS: 'functions',
+	CLASSES: 'classes',
 	FLAGS: 'flags',
 	FLAGS_SPACE: 'flags_space',
 	SEARCH: 'search',

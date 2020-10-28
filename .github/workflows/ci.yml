@@ -1,0 +1,94 @@
+# This is a basic workflow that is manually triggered
+
+name: ci
+
+on: push
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+# on:
+#   workflow_dispatch:
+#     # Inputs the workflow accepts.
+#     inputs:
+#       name:
+#         # Friendly description to be shown in the UI instead of 'name'
+#         description: 'Build and test'
+#         # Default value if no value is explicitly provided
+#         default: 'ACR'
+#         # Input has to be provided for the workflow to run
+#         required: true
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    name: Material
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: MaterialUI
+      run: cd www/m
+    - name: Installing dependencies
+      run: npm i
+    - name: Building
+      run: make
+    - name: Install
+      run: make
+    - name: Pub
+      uses: actions/upload-artifact@v2
+      with:
+        path: dist/*.zip
+  tiled:
+    name: Tiled
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: TiledUI
+      run: cd www/t
+    - name: Installing dependencies
+      run: cd www/t && npm i
+    - name: Building
+      run: cd www/t && make build
+    - name: Zipping
+      run: cd www/t && make dist
+    - name: Pub
+      uses: actions/upload-artifact@v2
+      with:
+        path: dist/*.zip
+  panels:
+    name: Panels
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Panels
+      run: cd www/p
+    - name: Installing dependencies
+      run: npm i
+    - name: Building
+      run: make
+    - name: Install
+      run: make dist
+    - name: Zipping
+      run: zip -r radare2-www-t.zip
+    - name: Pub
+      uses: actions/upload-artifact@v2
+      with:
+        path: dist/p
+  enyo:
+    name: Enyo
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: EnyoJS
+      run: cd www/enyo
+    - name: Installing dependencies
+      run: npm i
+    - name: Building
+      run: make
+    - name: Install
+      run: make dist
+    - name: Zipping
+      run: zip -r radare2-www-t.zip
+    - name: Pub
+      uses: actions/upload-artifact@v2
+      with:
+        path: dist/*.zip
