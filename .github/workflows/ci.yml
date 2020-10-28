@@ -54,7 +54,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         path: dist/*.zip
-  tiled:
+  panels:
     name: Panels
     runs-on: ubuntu-latest
     steps:
