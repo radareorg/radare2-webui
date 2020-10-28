@@ -45,11 +45,11 @@ jobs:
     - name: TiledUI
       run: cd www/t
     - name: Installing dependencies
-      run: npm i
+      run: cd www/t && npm i
     - name: Building
-      run: make build
+      run: cd www/t && make build
     - name: Zipping
-      run: make dist
+      run: cd www/t && make dist
     - name: Pub
       uses: actions/upload-artifact@v2
       with:
