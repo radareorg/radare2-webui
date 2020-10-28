@@ -18,7 +18,7 @@ var gulp = require('gulp'),
 	babelify = require('babelify'),
 	source = require('vinyl-source-stream');
 
-var babelPresets = ['es2015'];
+var babelPresets = ['@babel/preset-env'];
 
 var paths = {
 	r2: '../lib/',
