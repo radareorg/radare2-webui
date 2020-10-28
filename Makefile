@@ -3,7 +3,7 @@ VERSION=1.2.0
 all: build
 	$(MAKE) run
 
-# Default UI is Material
+# Default UI is Material
 run: runm
 
 ###############

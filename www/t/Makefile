@@ -1,3 +1,5 @@
+VERSION=0.1.1
+
 GLOBALS=
 GLOBALS+=--global _
 GLOBALS+=--global r2
@@ -6,15 +8,22 @@ GLOBALS+=--global prompt
 GLOBALS+=--global Tiled
 GLOBALS+=--global html
 
+DISTZIP=radare2-webui-t-$(VERSION).zip
 
 all: build
+	$(MAKE) dist
 
 node_modules:
 	npm install
 
-dist release build: node_modules
-	ln -fs ../../dist/t dist
+build: node_modules
+	mkdir -p dist/t
+	rm -rf dist
 	$(shell npm bin)/gulp
+
+dist:
+	rm -f $(DISTZIP)
+	cd ../../dist && zip -r $(DISTZIP) t
 
 run:
 #	r2 -e http.ui=dist -e http.root=$$PWD -qc=H /bin/ls
@@ -22,9 +31,6 @@ run:
 
 watch:
 	$(shell npm bin)/gulp watch
-
-clean:
-	rm -rf dist dist.tar.gz
 
 mrproper: clean
 	rm -rf node_modules

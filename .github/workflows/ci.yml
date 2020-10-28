@@ -41,16 +41,15 @@ jobs:
     name: Tiled
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
     - name: TiledUI
       run: cd www/t
     - name: Installing dependencies
       run: npm i
     - name: Building
-      run: make
-    - name: Install
-      run: make dist
+      run: make build
     - name: Zipping
-      run: zip -r radare2-www-t.zip
+      run: make dist
     - name: Pub
       uses: actions/upload-artifact@v2
       with:
@@ -59,6 +58,7 @@ jobs:
     name: Panels
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
     - name: Panels
       run: cd www/p
     - name: Installing dependencies
@@ -77,6 +77,7 @@ jobs:
     name: Enyo
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
     - name: EnyoJS
       run: cd www/enyo
     - name: Installing dependencies
@@ -90,4 +91,4 @@ jobs:
     - name: Pub
       uses: actions/upload-artifact@v2
       with:
-        path: dist/enyo/*.deb
+        path: dist/*.zip
