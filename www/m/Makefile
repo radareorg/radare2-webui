@@ -3,7 +3,7 @@ PWD=$(shell pwd)
 
 all: build
 
-build:
+build: node_modules
 	$(YARN)
 	npm run build
 

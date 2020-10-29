@@ -143,7 +143,7 @@ gulp.task('js:main', function() {
 gulp.task('js:legacy', function() {
 	return gulp.src('./js/*/**/*.legacy.js')
 	 	.pipe(sourcemaps.init())
-	 	// .pipe(babel({presets: babelPresets, compact: false}))
+	 	.pipe(babel({presets: babelPresets, compact: false}))
 	 	.pipe(concat('legacy.js'))
 	 	.pipe(sourcemaps.write('.'))
 	 	.pipe(gulp.dest(paths.dev))
@@ -152,7 +152,7 @@ gulp.task('js:legacy', function() {
 
 gulp.task('js:app', function() {
 	return browserify({entries: './js/app.js', extensions: ['.js'], debug: true})
-        // .transform(babelify, {presets: babelPresets]})
+        .transform(babelify, {presets: babelPresets})
         .bundle()
         .pipe(source('app.js'))
         .pipe(gulp.dest(paths.dev));
@@ -163,7 +163,7 @@ gulp.task('js:app', function() {
 // TODO --
 gulp.task('js:workers', function() {
 	return gulp.src(['./workers/*.js', './js/helpers/tools.legacy.js'])
-		// .pipe(babel({presets: babelPresets, compact: false}))
+		.pipe(babel({presets: babelPresets, compact: false}))
 		.pipe(gulp.dest(paths.dev))
 		.pipe(livereload());
 });
@@ -229,7 +229,7 @@ gulp.task('default',
 //		'checkstyle'
 	]));
 
-gulp.task('release', gulp.parallel(['build']), function() {
+gulp.task('release', gulp.series(['build']), function() {
 	var tasks = merge();
 
 	// Import files from dev
@@ -255,7 +255,7 @@ gulp.task('release', gulp.parallel(['build']), function() {
 	return tasks;
 });
 
-gulp.task('watch', gulp.parallel(['default']) , function() {
+gulp.task('watch', gulp.series(['default']) , function() {
 	livereload.listen();
 	gulp.watch('./*.html', ['html']);
 	gulp.watch('./css/*.css', ['css']);
