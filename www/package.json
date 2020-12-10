@@ -16,16 +16,17 @@
       "email": "pancake@nopcode.org"
     }
   ],
-  "name": "radare2-webui-enyo",
+  "name": "radare2-webui",
   "repository": {
     "type": "git",
     "url": "git://github.com/radare/radare2-webui.git"
   },
-  "scripts": {},
+  "scripts": {
+    "start": "snowpack dev",
+    "build": "snowpack build"
+  },
   "version": "0.10.2",
   "devDependencies": {
-    "bower": "*",
-    "gulp": "^3.9.1",
-    "gulp-bower": "0.0.13"
+    "snowpack": "^3.0.0-rc.1"
   }
 }
