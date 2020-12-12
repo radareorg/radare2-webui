@@ -8,6 +8,21 @@ import {Layouts} from './layout/Layouts';
 import {WidgetFactory} from './widgets/WidgetFactory';
 import {Widgets} from './widgets/Widgets';
 
+import materialDesignLite from 'https://cdn.skypack.dev/material-design-lite';
+import '../css/autocomplete.css';
+import '../css/console.css';
+import '../css/contextmenu.css';
+import '../css/disasm.css';
+import '../css/flexcontainer.css';
+import '../css/hexdump.css';
+import '../css/material-design-icons.css';
+import '../css/networkerr.css';
+import '../css/overview.css';
+import '../css/styles.css';
+import '../css/tables.css';
+import '../css/terminal.css';
+import '../css/widget.css';
+
 let inColor = true;
 let twice = false;
 

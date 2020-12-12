@@ -2,6 +2,8 @@
 
 var r2 = {};
 
+export default r2;
+
 // TODO: avoid globals
 var backward = false;
 var next_curoff = 0;

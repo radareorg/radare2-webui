@@ -1,3 +1,4 @@
+import r2 from '../../../../lib/r2';
 import {r2Wrapper} from '../../core/R2Wrapper';
 import {Widgets} from '../../widgets/Widgets';
 
