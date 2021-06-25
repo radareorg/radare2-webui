@@ -172,6 +172,10 @@ function Ajax(method, uri, body, fn, err) {
 	x.onreadystatechange = function() {
 		ajax_in_process = false;
 		if (x.status == 200) {
+			if (x.readyState < 4) {
+				// wait until request is complete
+				return;
+			}
 			if (fn) {
 				fn(x.responseText);
 			} else {
