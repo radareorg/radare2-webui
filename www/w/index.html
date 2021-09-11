@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>98.css example</title>
+  <meta charset="UTF-8" />
+<!--
+  <link rel="stylesheet" href="https://unpkg.com/98.css" />
+-->
+  <link rel="stylesheet" href="98.css" />
+  <script src="../lib/r2.js"></script>
+  <script src="index.js"></script>
+
+</head>
+
+<body style="background-color:#018281;overflow:hidden">
+  <div id="alert-window-" class="window" style="width: 250px;top:100px">
+    <div class="title-bar" id="alert-window-header">
+      <div class="title-bar-text">
+        radare2
+      </div>
+      <div class="title-bar-controls">
+        <button onclick="ok()" aria-label="Close" />
+      </div>
+    </div>
+    <div class="window-body">
+      <p>Can't find r2 executable in PATH!</p>
+      <p><input type="checkbox" id="example1"> 
+         <label for="example1">I understand and it won't happen again</label>
+         </input>
+      </p>
+    </div>
+<div style="text-align:right">
+    <button onclick="ok()" style=":hover:hand !important">
+      Agree!
+    </button>
+    <button style=":hover:hand !important">
+      Nope
+    </button>
+</div>
+</div>
+<!-- ................. -->
+  <div id="options" class="window" style="width: 340px;left:500px;top:200px">
+    <div class="title-bar" id="optionsheader">
+      <div class="title-bar-text">
+        Assembler options
+      </div>
+      <div class="title-bar-controls">
+        <button aria-label="Close" />
+      </div>
+    </div>
+    <div class="window-body">
+<p>
+Select architecture: <select style="align:right">
+<option> x86-32
+<option> x86-64
+<option> arm32
+<option> aarch64
+</select>
+and offset
+<input type="text" style="width:84px" value="0x00000000" />
+</p>
+<fieldset>
+Input bytes: <br />
+<input id="assembler-input" type="text" style="width:100%" value="90cc90"/>
+<p>
+Disassembly <br />
+<textarea id="assembler-output" rows=10 style="width:100%">
+nop
+int3
+nop
+</textarea>
+    </div>
+</p>
+<!--
+<p>
+<div class="field-row" style="width: 300px">
+  <label for="range23">Low</label>
+  <input id="range23" type="range" min="1" max="11" value="5" />
+  <label for="range24">High</label>
+</div>
+</p>
+-->
+</fieldset>
+
+<div style="text-align:right">
+    <button onclick="as()" style=":hover:hand !important">
+      Assemble!
+    </button>
+</div>
+</div>
+<!-- ................. -->
+
+  <div id="startmenu-" class="window" style="width: 100%;top:0px;left:0px">
+<div style="text-align:left">
+    <button style=":hover:hand !important">
+      Start
+    </button>
+</div>
+</div>
+</body>
+</html>
+
