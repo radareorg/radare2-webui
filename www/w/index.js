@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', function () {
   dragElement(document.getElementById('options'));
 })
 
+var newTop = 1000;
+
 function dragElement(elmnt) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
   if (document.getElementById(elmnt.id + "header")) {
@@ -17,6 +19,9 @@ function dragElement(elmnt) {
   function dragMouseDown(e) {
     e = e || window.event;
     e.preventDefault();
+elmnt.style.zIndex = newTop;
+newTop++;
+    document.getElementById(elmnt.id + "header").classList.toggle('active')
     // get the mouse cursor position at startup:
     pos3 = e.clientX;
     pos4 = e.clientY;
@@ -34,8 +39,12 @@ function dragElement(elmnt) {
     pos3 = e.clientX;
     pos4 = e.clientY;
     // set the element's new position:
-    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    var y = (elmnt.offsetTop - pos2);
+    var x = (elmnt.offsetLeft - pos1);
+    if (x < 0) { x = 0; }
+    if (y < 29) { y = 29; }
+    elmnt.style.top = y + "px";
+    elmnt.style.left = x + "px";
     //elmnt.style.top = (elmnt.style.top  +2) + "px";
     //elmnt.style.left = (elmnt.style.left +2) + "px";
   }

@@ -1,5 +1,5 @@
 all:
-	r2  -q -e http.sandbox=false -e http.root=$$PWD/.. -e http.ui=m -c=H /bin/ls
+	r2  -q -e http.sandbox=false -e http.root=$$PWD/.. -e http.ui=w -c=H /bin/ls
 
 update:
 	git clone https://github.com/jdan/98.css git-98-css
