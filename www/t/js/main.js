@@ -30,9 +30,10 @@ window.onload = function () {
   var position = 'right';
   var t = new Tiled('canvas');
   var ctr = 0;
-  r2.cmd('e scr.color=true;e scr.html=true', function () {
+  r2.cmd('e scr.color=3;eco sepia;e scr.html=true', function () {
     t.update_all();
   });
+  document.getElementById('canvas').style.visibility = 'visible';
 
   document.onkeydown = function (evt) {
     evt = evt || window.event;
@@ -57,6 +58,10 @@ window.onload = function () {
       }
       return;
     }
+    var currentElement = document.activeElement;
+    if (currentElement.tagName === 'INPUT') {
+      return true;
+    }
     if (!t.modal) {
       console.log(evt.key);
       switch (evt.key) {
@@ -72,6 +77,7 @@ window.onload = function () {
           var body = modalShell();
           t.modal = t.new_modal('Shell', body, ['items']);
           body.input.focus();
+          body.input.value = '';
           break;
         case 'a':
           var body = modalAssembler();
@@ -125,7 +131,7 @@ window.onload = function () {
       // +"Blocksize <input type=''></input><br />"
       '<input type=\'button\' id=\'randomcolors\' value=\'randomcolors\'></input>';
       return '<h2>Help</h2>' +
-      '<div id=\'' + name + '_help\' style=\'background-color:#304050;overflow:scroll;height:100%\'><pre>' + hlpmsg + '</div>';
+      '<div id=\'' + name + '_help\' style=\'background-color:#303030;overflow:scroll;height:100%\'><pre>' + hlpmsg + '</div>';
     }
     t.new_frame(n, newthing(n), function (obj) {
       var flags = _(n + '_help');

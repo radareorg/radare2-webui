@@ -90,9 +90,7 @@ function Tiled (id) {
       var height = h - mtop;
 
       var f = this.curframe[0];
-      if (f !== this.modal) {
-        f.obj.style['z-index'] = 0;
-      } else {
+      if (f === this.modal) {
         f.obj.style.position = 'absolute';
         f.obj.style['z-index'] = 1000;
         f.obj.style.zIndex = 100;
@@ -105,11 +103,12 @@ function Tiled (id) {
         // TODO: add proportions
         // f.obj.style.width = width;
         // f.obj.style.height = height;
-        f.obj.style.backgroundColor = 'green';
+        // f.obj.style.backgroundColor = 'green';
         // f.obj.innerHTML =" blabla";
         if (f.update) { f.update(f.obj); }
         return;
       }
+      f.obj.style['z-index'] = 0;
     }
     if (this.maximize && this.curframe) {
       var mtop = topmargin;
@@ -315,12 +314,12 @@ function Tiled (id) {
       for (var row in this.frames[col]) {
         var f = this.frames[col][row];
         if (f.name === name) {
-          _('frame_' + f.name).style.backgroundColor = '#2060b0';
+          _('frame_' + f.name).style.backgroundColor = '#202020';
           f.selected = true;
           f.mw = true;
           ret = this.curframe = [f, col, row];
         } else {
-          _('frame_' + f.name).style.backgroundColor = '#104080';
+          _('frame_' + f.name).style.backgroundColor = '#404040';
           f.mw = false;
           f.selected = false;
         }

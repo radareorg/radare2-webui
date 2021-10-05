@@ -77,7 +77,7 @@ function modalMenu () {
   });
   body.appendChild(inp);
   out.style.overflow = 'scroll';
-  out.style.height = '100%';
+  out.style.height = '90%';
   body.appendChild(out);
   body.input = inp;
   var txt = menuString(menu, inp.value);
@@ -120,7 +120,7 @@ function modalShell () {
   });
   body.appendChild(back);
   body.appendChild(inp);
-  out.style.overflow = 'scroll';
+  // out.style.overflow = 'hidden';
   out.style.height = '100%';
   body.appendChild(out);
   body.input = inp;
@@ -145,8 +145,8 @@ function modalAssembler () {
     });
   });
   body.appendChild(inp);
-  out.style.overflow = 'scroll';
-  out.style.height = '100%';
+  out.style.overflow = 'hidden';
+  out.style.height = '80%';
   body.appendChild(out);
   body.input = inp;
   return body;
