@@ -1,0 +1,325 @@
+<html>
+<style>
+.ui_right {
+	text-align:right;
+	display:inline;
+}
+.ui_cbutton {
+	background-color:#a0a0a0;
+	display:inline-block;
+	padding:2px;
+	min-width:10px;
+	min-height:10px;
+	vertical-align:bottom;
+	overflow:hidden;
+	border-radius: 1px;
+	border: 2px solid #606060;
+	border-top: 2px solid #d0d0d0;
+	border-left: 2px solid #d0d0d0;
+	font-weight: bold;
+	font-family: Consolas;
+	padding-left:0px;
+	padding-right:6px;
+	font-size: 10px;
+	user-select: none;
+	color:#333;
+	text-shadow: #bbb 1px 0px;
+	cursor:pointer;
+}
+.ui_cbutton:active {
+	border-top: 2px solid #505050 !important;
+	border-left: 2px solid #505050 !important;
+	background-color:#a0a0a0 !important;
+	color:#404040 !important;
+	border-bottom: 2px solid #c0c0c0 !important;
+	border-right: 2px solid #c0c0c0 !important;
+	text-shadow: #bbb -1px 0px !important;
+}
+.ui_cbutton:hover {
+	background-color:#b0b0b0;
+	border-bottom: 2px solid #404040;
+	border-right: 2px solid #404040;
+}
+.ui_button {
+	background-color:#ccc;
+	display:inline-block;
+	padding:2px;
+	padding-left:1em;
+	padding-right:1em;
+	overflow:hidden;
+	border-radius: 2px;
+	border: 2px solid #606060;
+	border-top: 2px solid #d0d0d0;
+	border-left: 2px solid #d0d0d0;
+	font-family: Times New Roman;
+	font-size: 16px;
+ 	user-select: none;
+	color:#333;
+	text-shadow: #bbb 1px 0px;
+	cursor:pointer;
+}
+.ui_button:active {
+	border-top: 2px solid #505050 !important;
+	border-left: 2px solid #505050 !important;
+	background-color:#bbb !important;
+	color:#404040 !important;
+	border-bottom: 2px solid #c0c0c0 !important;
+	border-right: 2px solid #c0c0c0 !important;
+	text-shadow: #bbb -1px 0px !important;
+}
+.ui_button:hover {
+	background-color:#ddd;
+	border-bottom: 2px solid #404040;
+	border-right: 2px solid #404040;
+}
+.ui_checkbox {
+	border: 2px solid black;
+	border-top: 2px solid #505050 !important;
+	border-left: 2px solid #505050 !important;
+	border-bottom: 2px solid #c0c0c0 !important;
+	border-right: 2px solid #c0c0c0 !important;
+	padding:8px;
+	width:32px;
+	border-radius:10px;
+	background-color: red;
+}
+.ui_frame {
+	border: 2px solid black;
+	border-left: 2px solid #666;
+	border-top: 2px solid #666;
+	padding:0px;
+ 	user-select: none;
+	background-color: #ddd;
+}
+.ui_title {
+	text-align:left;
+	color:#ddd;
+margin:0px;
+ user-select: none;
+	font-family:Consolas;
+	border: 0px solid black;
+	border-bottom: 2px solid black;
+	padding:4px;
+	background: linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(164,164,164,1) 100%);
+}
+.ui_container{
+	background-color:#fff;
+	text-align: left;
+	margin:0px;
+	padding:0px;
+	font-size: 10px;
+	font-family: Consolas;
+  	white-space: pre;
+	height: 200px;
+	overflow:hidden;
+	border-top: 2px solid #333;
+	border-left: 2px solid #333;
+	border-right: 2px solid #ccc;
+	border-bottom: 2px solid #ccc;
+}
+.ui_contents {
+	border-top: 2px solid #333;
+	border-left: 2px solid #333;
+	border-right: 2px solid #ccc;
+	border-bottom: 2px solid #ccc;
+	background-color:#fff;
+	text-align: left;
+	margin:0px;
+	padding:0px;
+	font-size: 10px;
+	font-family: Consolas;
+  	white-space: pre;
+	height: 200px;
+	overflow:scroll;
+}
+.ui_body {
+	border-top: 2px solid #eee;
+	border-left: 2px solid #eee;
+	border-right: 2px solid #666;
+	border-bottom: 2px solid #666;
+	margin:8px;
+	user-select: none;
+	padding:8px;
+	text-align:left;
+	background-color: #ddd;
+}
+</style>
+
+<script>
+var disasm_text = `
+            ;-- entry0:
+            ;-- rip:
+            0x000067d0      f30f1efa       endbr64
+            0x000067d4      31ed           xor ebp, ebp
+            0x000067d6      4989d1         mov r9, rdx
+            0x000067d9      5e             pop rsi
+            0x000067da      4889e2         mov rdx, rsp
+            0x000067dd      4883e4f0       and rsp, 0xfffffffffffffff0
+            0x000067e1      50             push rax
+            0x000067e2      54             push rsp
+            0x000067e3      4c8d05660d01.  lea r8, [0x00017550]
+            0x000067ea      488d0def0c01.  lea rcx, [0x000174e0]
+            0x000067f1      488d3df8e5ff.  lea rdi, main               ; 0x4df0
+            0x000067f8      ff15d2c70100   call qword [reloc.__libc_start_main] ; [0x22fd0:8]=0
+            0x000067fe      f4             hlt
+            0x000067ff      90             nop
+            0x00006800      488d3d61ca01.  lea rdi, [0x00023268]
+            0x00006807      488d055aca01.  lea rax, [0x00023268]
+            0x0000680e      4839f8         cmp rax, rdi
+        ┌─< 0x00006811      7415           je 0x6828
+        │   0x00006813      488b05aec701.  mov rax, qword [reloc._ITM_deregisterTMCloneTable] ; [0x22fc8:8]=0
+        │   0x0000681a      4885c0         test rax, rax
+       ┌──< 0x0000681d      7409           je 0x6828
+       ││   0x0000681f      ffe0           jmp rax
+       ││   0x00006821      0f1f80000000.  nop dword [rax]
+       └└─> 0x00006828      c3             ret
+            0x00006829      0f1f80000000.  nop dword [rax]
+        ┌─> 0x00006830      488d3d31ca01.  lea rdi, [0x00023268]
+        ╎   0x00006837      488d352aca01.  lea rsi, [0x00023268]
+        ╎   0x0000683e      4829fe         sub rsi, rdi
+        ╎   0x00006841      4889f0         mov rax, rsi
+        ╎   0x00006844      48c1ee3f       shr rsi, 0x3f
+        ╎   0x00006848      48c1f803       sar rax, 3
+        ╎   0x0000684c      4801c6         add rsi, rax
+        ╎   0x0000684f      48d1fe         sar rsi, 1
+       ┌──< 0x00006852      7414           je 0x6868
+       │╎   0x00006854      488b058dc701.  mov rax, qword [reloc._ITM_registerTMCloneTable] ; [0x22fe8:8]=0
+       │╎   0x0000685b      4885c0         test rax, rax
+      ┌───< 0x0000685e      7408           je 0x6868
+      ││╎   0x00006860      ffe0           jmp rax
+      ││╎   0x00006862      660f1f440000   nop word [rax + rax]
+      └└──> 0x00006868      c3             ret
+        ╎   0x00006869      0f1f80000000.  nop dword [rax]
+        ╎   ;-- entry.fini0:
+        ╎   0x00006870      f30f1efa       endbr64
+        ╎   0x00006874      803d4dca0100.  cmp byte [0x000232c8], 0    ; [0x232c8:1]=0
+       ┌──< 0x0000687b      752b           jne 0x68a8
+       │╎   0x0000687d      55             push rbp
+       │╎   0x0000687e      48833d6ac701.  cmp qword [reloc.__cxa_finalize], 0 ; [0x22ff0:8]=0
+       │╎   0x00006886      4889e5         mov rbp, rsp
+      ┌───< 0x00006889      740c           je 0x6897
+      ││╎   0x0000688b      488b3d76c701.  mov rdi, qword [0x00023008] ; [0x23008:8]=0x23008
+      ││╎   0x00006892      e859deffff     call 0x46f0
+      └───> 0x00006897      e864ffffff     call 0x6800
+       │╎   0x0000689c      c60525ca0100.  mov byte [0x000232c8], 1    ; [0x232c8:1]=0
+       │╎   0x000068a3      5d             pop rbp
+       │╎   0x000068a4      c3             ret
+       │╎   0x000068a5      0f1f00         nop dword [rax]
+       └──> 0x000068a8      c3             ret
+        ╎   0x000068a9      0f1f80000000.  nop dword [rax]
+        ╎   ;-- entry.init0:
+        ╎   0x000068b0      f30f1efa       endbr64
+        └─< 0x000068b4      e977ffffff     jmp 0x6830
+            0x000068b9      0f1f80000000.  nop dword [rax]
+            0x000068c0      f30f1efa       endbr64
+            0x000068c4      488b07         mov rax, qword [rdi]
+            0x000068c7      31d2           xor edx, edx
+            0x000068c9      48f7f6         div rsi
+            0x000068cc      4889d0         mov rax, rdx
+            0x000068cf      c3             ret
+            0x000068d0      f30f1efa       endbr64
+            0x000068d4      488b16         mov rdx, qword [rsi]
+            0x000068d7      31c0           xor eax, eax
+            0x000068d9      483917         cmp qword [rdi], rdx
+            0x000068dc      7402           je 0x68e0
+            0x000068de      c3             ret
+            0x000068df      90             nop
+            0x000068e0      488b4608       mov rax, qword [rsi + 8]
+            0x000068e4      48394708       cmp qword [rdi + 8], rax
+            0x000068e8      0f94c0         sete al
+            0x000068eb      c3             ret
+            0x000068ec      0f1f4000       nop dword [rax]
+            0x000068f0      f30f1efa       endbr64
+            0x000068f4      8b051ed90100   mov eax, dword [0x00024218] ; [0x24218:4]=0
+            0x000068fa      85c0           test eax, eax
+            0x000068fc      7506           jne 0x6904
+            0x000068fe      893d14d90100   mov dword [0x00024218], edi ; [0x24218:4]=0
+            0x00006904      c3             ret
+            0x00006905      66662e0f1f84.  nop word cs:[rax + rax]
+            0x00006910      4c8b0e         mov r9, qword [rsi]
+            0x00006913      4c8b1f         mov r11, qword [rdi]
+            0x00006916      4154           push r12
+            0x00006918      31c0           xor eax, eax
+            0x0000691a      55             push rbp
+            0x0000691b      4c8d15fe1601.  lea r10, [0x00018020]
+            0x00006922      53             push rbx
+            0x00006923      89d3           mov ebx, edx
+            0x00006925      450fb601       movzx r8d, byte [r9]
+            0x00006929      4180f85c       cmp r8b, 0x5c
+            0x0000692d      742b           je 0x695a
+            0x0000692f      7f57           jg 0x6988
+            0x00006931      4180f83d       cmp r8b, 0x3d
+            0x00006935      0f8475010000   je 0x6ab0
+            0x0000693b      0f8e7f000000   jle 0x69c0
+`;
+
+window.onload=function x() {
+	var e = document.getElementById('accept_button');
+	e.onselectstart = function() {return false;}
+	e.onclick = function() {
+		alert("ACCEPT");
+	};
+	var e = document.getElementById('cancel_button');
+	e.onclick = function() {
+		alert("CANCEL");
+	};
+
+	var c = document.getElementById('scroller');
+	var C = document.getElementById('contents');
+	var data = disasm_text;
+
+	const onScrollStop = function() {
+		var pos = c.scrollTop;
+		C.scroll(c.scrollLeft, 0); // ((pos/12)|0)*12);
+	};
+
+        let isScrolling;
+	c.onscroll = function() {
+		clearTimeout(isScrolling);
+		isScrolling = setTimeout(() => {
+		  onScrollStop();
+		}, 50);
+		C.scrollLeft = c.scrollLeft;
+		var pos = c.scrollTop;
+		if (pos >0&&pos <10) pos = 10;
+		var data = disasm_text.split('\n');
+		data = data.slice(pos / 10);
+		C.innerHTML = data.join('\n');
+		// c.scroll(0, ((pos/10)|0)*10);
+	}
+	c.innerHTML = data;
+};
+</script>
+
+<center>
+<div class="ui_frame" style="width:400px">
+<div class="ui_title">
+	<div align=right class="ui_cbutton">X</div><div align=right class="ui_cbutton">_</div>
+	Disassembler test view
+</div>
+<div class="ui_body">
+	<div class="ui_rotext">
+	This is just an r2web test app
+	</div>
+	<!--input id="checkbox" type="checkbox" class="ui_checkbox" value="chk"> Next</input>  -->
+	<br />
+	<div id="contents" class="ui_container"></div>
+	<br />
+	<div id="scroller" class="ui_contents"></div>
+	<hr size=1/>
+	<br />
+<table width="100%">
+<tr>
+<td width="100%" style="text-align:right">
+	<div align=right id="accept_button" class="ui_button" >Accept</div>
+	<div id="cancel_button" class="ui_button" >Cancel </div>
+</td>
+</tr>
+</table>
+	</div>
+	</div>
+</div>
+</center>
+
+</html>
+
