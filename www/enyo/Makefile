@@ -1,3 +1,7 @@
+VERSION=0.1.1
+DISTZIP=radare2-webui-enyo-$(VERSION).zip
+
+
 build:
 	npm install
 	$(shell npm bin)/gulp
