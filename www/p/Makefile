@@ -1,5 +1,5 @@
 VERSION=0.1.1
-DISTZIP=radare2-webui-p-$(VERSION).zip
+DISTZIP=radare2-webui-$(VERSION)-p.zip
 
 build: node_modules
 	$(shell npm bin)/gulp
