@@ -6,7 +6,6 @@
   "bugs": {
     "url": "https://github.com/radare/radare2-webui"
   },
-  "dependencies": {},
   "description": "Collection of radare2 web user interfaces",
   "homepage": "https://radare.org",
   "license": "MIT",
@@ -24,8 +23,8 @@
   "scripts": {},
   "version": "0.10.2",
   "devDependencies": {
-    "bower": "*",
-    "gulp": "^3.9.1",
+    "bower": "^1.8.0",
+    "gulp": "^4.0.2",
     "gulp-bower": "0.0.13",
     "gulp-clean-css": "^3.9.0",
     "gulp-concat": "^2.6.1",

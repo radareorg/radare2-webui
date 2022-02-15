@@ -3,7 +3,7 @@ build:
 	$(shell npm bin)/gulp
 
 run: build
-	r2 -q -e http.ui=enyo -e http.root=$(PWD)/../ -c=H /bin/ls
+	r2 -q -e http.ui=enyo -e http.sandbox=0  -e http.root=$(PWD)/../../dist -c=H /bin/ls
 
 watch:
 	$(shell npm bin)/gulp watch
