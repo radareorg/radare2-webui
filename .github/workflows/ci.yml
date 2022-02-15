@@ -28,11 +28,11 @@ jobs:
     - name: MaterialUI
       run: cd www/m
     - name: Installing dependencies
-      run: npm i
+      run: cd www/m && npm i
     - name: Building
-      run: make
+      run: cd www/m && make
     - name: Install
-      run: make
+      run: cd www/m && make
     - name: Pub
       uses: actions/upload-artifact@v2
       with:
