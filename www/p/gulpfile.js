@@ -104,21 +104,21 @@ const _default = function() {
 
 const _releaseHtml = function() {
 	return src([paths.dev + 'index.html', paths.dev + '*.png'])
-		.pipe(dest(paths.dev));
+		.pipe(dest(paths.dist));
 }
 const _releaseCss = function() {
 	return src([paths.dev + '*.css'])
 		.pipe(cleanCSS())
-		.pipe(dest(paths.dev));
+		.pipe(dest(paths.dist));
 }
 const _releaseJs = function() {
 	return src([paths.dev + '*.js'])
 		.pipe(uglify())
-		.pipe(dest(paths.dev));
+		.pipe(dest(paths.dist));
 }
 const _releaseVendor = function() {
 	return src([paths.dev + 'vendors/*.*'])
-		.pipe(dest(paths.dev));
+		.pipe(dest(paths.dist + 'vendors/'));
 }
 
 const _release = series(
