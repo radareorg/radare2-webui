@@ -67,12 +67,10 @@ jobs:
       run: cd www/p && make
     - name: Install
       run: cd www/p && make release
-    - name: Zipping
-      run: cd dist && zip -r radare2-www-t.zip
     - name: Pub
       uses: actions/upload-artifact@v2
-        with:
-      path: dist/p
+      with:
+        path: dist/*-p.zip
   enyo:
     name: Enyo
     runs-on: ubuntu-latest
