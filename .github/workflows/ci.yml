@@ -36,7 +36,7 @@ jobs:
     - name: Pub
       uses: actions/upload-artifact@v2
       with:
-        path: dist/*.zip
+        path: dist/*-m.zip
   tiled:
     name: Tiled
     runs-on: ubuntu-latest
@@ -53,7 +53,7 @@ jobs:
     - name: Pub
       uses: actions/upload-artifact@v2
       with:
-        path: dist/*.zip
+        path: dist/*-t.zip
   panels:
     name: Panels
     runs-on: ubuntu-latest
@@ -79,14 +79,12 @@ jobs:
     - name: EnyoJS
       run: cd www/enyo
     - name: Installing dependencies
-      run: npm i
-    - name: Building
-      run: make
-    - name: Install
-      run: make dist
+      run: cd www/enyo && npm i
+    - name: Building & Install
+      run: cd www/enyo && make build
     - name: Zipping
-      run: zip -r radare2-www-t.zip
+      run: zip -r radare2-www-enyo.zip
     - name: Pub
       uses: actions/upload-artifact@v2
       with:
-        path: dist/*.zip
+        path: dist/*-enyo.zip
