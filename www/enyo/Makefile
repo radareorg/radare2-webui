@@ -8,6 +8,11 @@ run: build
 watch:
 	$(shell npm bin)/gulp watch
 
+
+dist:
+	rm -f $(DISTZIP)
+	cd ../../dist && zip -r $(DISTZIP) enyo
+
 clean:
 	rm -rf node_modules
 	rm -rf vendors
