@@ -62,17 +62,17 @@ jobs:
     - name: Panels
       run: cd www/p
     - name: Installing dependencies
-      run: npm i
+      run: cd www/p && npm i
     - name: Building
-      run: make
+      run: cd www/p && make
     - name: Install
-      run: make dist
+      run: cd www/p && make release
     - name: Zipping
-      run: zip -r radare2-www-t.zip
+      run: cd dist && zip -r radare2-www-t.zip
     - name: Pub
       uses: actions/upload-artifact@v2
-      with:
-        path: dist/p
+        with:
+      path: dist/p
   enyo:
     name: Enyo
     runs-on: ubuntu-latest
