@@ -32,7 +32,7 @@ panel:
 ###############################
 
 runenyo:
-	r2 -q -e http.homeroot=dist -e http.ui=enyo -c=H /bin/ls
+	r2 -q -e http.sandbox=0  -e http.homeroot=dist -e http.ui=enyo -c=H /bin/ls
 
 runm:
 	r2 -q -e http.sandbox=false -e http.homeroot=dev -e http.ui=m -c=H /bin/ls
