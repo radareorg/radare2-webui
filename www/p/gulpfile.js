@@ -1,9 +1,9 @@
-var gulp = require('gulp'),
-	uglify = require('gulp-uglify'),
-	merge = require('merge-stream'),
+const { src, watch, series, dest } = require('gulp');
+
+var uglify = require('gulp-uglify'),
 	cleanCSS = require('gulp-clean-css'),
 	concat = require('gulp-concat'),
-	bower = require('gulp-bower');
+	bower = require('bower');
 
 var paths = {
 	r2: '../lib/',
@@ -11,52 +11,73 @@ var paths = {
 	dist: '../../dist/p/'
 };
 
-gulp.task('common', function() {
-	gulp.src(paths.r2+'*.js')
+const _concatCommonJs = function() {
+	return src(paths.r2 + '*.js')
 		.pipe(concat('r2core.js'))
-		.pipe(gulp.dest(paths.dev));
-
-	gulp.src(paths.r2+'*.css')
+		.pipe(dest(paths.dev));
+}
+const _concatCommonCss = function() {
+	return src(paths.r2 + '*.css')
 		.pipe(concat('r2core.css'))
-		.pipe(gulp.dest(paths.dev));
-});
+		.pipe(dest(paths.dev));
+}
 
-gulp.task('js', function() {
-	
-	gulp.src('./lib/js/panels/*.js')
+const _concatPanelJs = function() {
+	return src('./lib/js/panels/*.js')
 		.pipe(concat('panels.js'))
-		.pipe(gulp.dest(paths.dev));
-
-	gulp.src('./lib/js/dependencies/*.js')
+		.pipe(dest(paths.dev));
+}
+const _concatDepsJs = function() {
+	return src('./lib/js/dependencies/*.js')
 		.pipe(concat('dependencies.js'))
-		.pipe(gulp.dest(paths.dev));
-
-	gulp.src('./lib/js/*.js')
+		.pipe(dest(paths.dev));
+}
+const _concatMainJs = function() {
+	return src('./lib/js/*.js')
 		.pipe(concat('main.js'))
-		.pipe(gulp.dest(paths.dev));
-});
+		.pipe(dest(paths.dev));
+}
 
-gulp.task('watch', ['default'] , function() {
-	gulp.watch('./*.html', ['html']);
-	gulp.watch(['./lib/js/*.js'], ['js:main']);
-	gulp.watch(['./lib/js/**/*.js'], ['js:app']);
-	gulp.watch(['./lib/css/**/*.css'], ['js:css']);
-});
+const _common = series(
+	_concatCommonJs,
+	_concatCommonCss
+);
 
-gulp.task('css', function() {
+const _js = series(
+	_concatPanelJs,
+	_concatDepsJs,
+	_concatMainJs
+);
 
-	gulp.src(['./lib/css/jquery-ui.css', './lib/css/tree.jquery.css', './lib/css/index.css'])
+
+const _watch =  function() {
+	watch('./*.html', ['html']);
+	watch(['./lib/js/*.js'], ['js:main']);
+	watch(['./lib/js/**/*.js'], ['js:app']);
+	watch(['./lib/css/**/*.css'], ['js:css']);
+	done();
+};
+
+const _css = function() {
+
+	return src(['./lib/css/jquery-ui.css', './lib/css/tree.jquery.css'])
 		.pipe(concat('dependencies.css'))
-		.pipe(gulp.dest(paths.dev));
-});
+		.pipe(dest(paths.dev));
+};
 
-gulp.task('bower', function() {
-	return bower({ cmd: 'install'});
-});
+const _bowerInstall = function() {
+	//return bower({ cmd: 'install'});
+	return new Promise((resolve) => {
+		bower.commands.install(undefined, undefined, {
+			cwd: process.cwd()
+		}).on('end', resolve);
+	});
+};
 
-gulp.task('vendors', ['bower'], function() {
+
+const _copyVendors = function() {
 	// Moving neccesary vendors files from bower
-	gulp.src([
+	return src([
 			'vendors/jquery.layout/dist/layout-default-latest.css',
 			'vendors/jointjs/dist/joint.min.css',
 			'vendors/onoff/dist/jquery.onoff.css',
@@ -73,36 +94,43 @@ gulp.task('vendors', ['bower'], function() {
 			'vendors/jointjs/dist/joint.min.js',
 			'vendors/jointjs/dist/joint.layout.DirectedGraph.min.js'
 		 ])
-		.pipe(gulp.dest(paths.dev+'vendors/'));
-});
+		.pipe(dest(paths.dev+'vendors/'));
+};
 
-gulp.task('default', ['vendors', 'js', 'css', 'common'], function() {
-	gulp.src(['./index.html', '*.png'])
-		.pipe(gulp.dest(paths.dev));
-});
+const _default = function() {
+	return src(['./index.html', '*.png'])
+		.pipe(dest(paths.dev));
+};
 
-gulp.task('release', ['default'], function() {
-	var tasks = merge();
-tasks.add(
-	gulp.src([paths.dev + 'index.html', paths.dev + '*.png'])
-		.pipe(gulp.dest(paths.dist))
-);
-	
-tasks.add(
-	gulp.src([paths.dev + '*.css'])
+const _releaseHtml = function() {
+	return src([paths.dev + 'index.html', paths.dev + '*.png'])
+		.pipe(dest(paths.dev));
+}
+const _releaseCss = function() {
+	return src([paths.dev + '*.css'])
 		.pipe(cleanCSS())
-		.pipe(gulp.dest(paths.dist))
-);
-
-tasks.add(
-	gulp.src([paths.dev + '*.js'])
+		.pipe(dest(paths.dev));
+}
+const _releaseJs = function() {
+	return src([paths.dev + '*.js'])
 		.pipe(uglify())
-		.pipe(gulp.dest(paths.dist))
+		.pipe(dest(paths.dev));
+}
+const _releaseVendor = function() {
+	return src([paths.dev + 'vendors/*.*'])
+		.pipe(dest(paths.dev));
+}
+
+const _release = series(
+	_releaseHtml,
+	_releaseCss,
+	_releaseJs,
+	_releaseVendor
 );
 
-tasks.add(
-	gulp.src([paths.dev + 'vendors/*.*'])
-		.pipe(gulp.dest(paths.dist + 'vendors/'))
-);
-return tasks;
-});
+exports.default = series( _bowerInstall, _copyVendors, _js, _css, _common, _default);
+exports.release = series( exports.default, _release)
+exports.watch = series( exports.default, _watch)
+
+
+
