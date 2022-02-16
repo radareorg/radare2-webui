@@ -30,9 +30,9 @@ jobs:
     - name: Installing
       run: cd www/m && rm -f package-lock.json && npm i --legacy-peer-deps
     - name: Building
-      run: cd www/m && make build
+      run: make -C www/m build
     - name: Zipping
-      run: cd www/m && make dist
+      run: make -C www/m dist
     - name: Pub
       uses: actions/upload-artifact@v2
       with:
@@ -47,9 +47,9 @@ jobs:
     - name: Installing dependencies
       run: cd www/t && npm i
     - name: Building
-      run: cd www/t && make build
+      run: make -C www/t build
     - name: Zipping
-      run: cd www/t && make dist
+      run: make -C www/t dist
     - name: Pub
       uses: actions/upload-artifact@v2
       with:
@@ -64,9 +64,9 @@ jobs:
     - name: Installing dependencies
       run: cd www/p && npm i
     - name: Building
-      run: cd www/p && make
+      run: make -C www/p
     - name: Install
-      run: cd www/p && make release
+      run: make -C www/p release
     - name: Pub
       uses: actions/upload-artifact@v2
       with:
@@ -81,9 +81,9 @@ jobs:
     - name: Installing dependencies
       run: cd www/enyo && npm i
     - name: Building & Install
-      run: cd www/enyo && make build
+      run: make -C www/enyo build
     - name: Zipping
-      run: cd www/enyo && make dist
+      run: make -C www/enyo dist
     - name: Pub
       uses: actions/upload-artifact@v2
       with:
