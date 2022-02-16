@@ -18,7 +18,7 @@ dist release: node_modules
 	$(shell npm bin)/webpack-cli -o $$PWD/www/ $$PWD/js/app.js
 	$(shell npm bin)/gulp release
 	rm -f $(DISTZIP)
-	cd ../../dist && zip -r $(DISTZIP) p
+	cd ../../dist && zip -r $(DISTZIP) m
 
 
 node_modules:
