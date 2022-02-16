@@ -1,11 +1,10 @@
-var gulp = require('gulp'),
-	merge = require('merge-stream'),
+const { src, dest, task, series, parallel, watch } = require('gulp');
+var merge = require('merge-stream'),
 	cleanCSS = require('gulp-clean-css'),
 	concat = require('gulp-concat'),
-	bower = require('gulp-bower'),
+	bower = require('bower'),
 	replace = require('gulp-replace'),
 	googleWebFonts = require('gulp-google-webfonts'),
-	eslint = require('gulp-eslint'),
 	livereload = require('gulp-livereload'),
 	uglify = require('gulp-uglify'),
 	uglifycss = require('gulp-uglifycss'),
@@ -26,210 +25,210 @@ var paths = {
 	dist: '../../dist/m/'
 };
 
+const EXT_LIBS = './node_modules' ; // ./vendors
 
 /**
  * Dependencies management
  */
+const _bowerInstall = function() {
 
-gulp.task('bower', function() {
-	return bower({ cmd: 'install'});
-});
+	//return bower({ cmd: 'install'});
+	return new Promise((resolve) => {
+		bower.commands.install(undefined, undefined, {
+			cwd: process.cwd()
+		}).on('end', resolve);
+	});
+};
 
-gulp.task('dependencies:r2', function() {
-	return gulp.src(paths.r2 + 'r2.js')
+// dependencies:r2
+const _depR2Js = function() {
+	return src(paths.r2 + 'r2.js')
 		.pipe(uglify())
 		.pipe(concat('r2.js'))
-		.pipe(gulp.dest(paths.dev));
-});
-
-gulp.task('dependencies:vendors', gulp.series(['bower']), function() {
-	var task1 = gulp.src(
-		'./vendors/dialog-polyfill/dialog-polyfill.js')
+		.pipe(dest(paths.dev));
+};
+const _copyUglifiedVendors = function() {
+	return src(
+		EXT_LIBS+'/dialog-polyfill/dialog-polyfill.js')
 		.pipe(uglify())
-		.pipe(gulp.dest(paths.dev + 'vendors/'));
+		.pipe(dest(paths.dev + 'vendors/'));
+};
+const _copyVendors = function() {
+	return src([
+		EXT_LIBS+'/jquery/dist/jquery.min.js',
+		EXT_LIBS+'/material-design-lite/material.min.js',
+		EXT_LIBS+'/datatables.net/js/jquery.dataTables.min.js',
+		EXT_LIBS+'/mdl-selectfield/dist/mdl-selectfield.min.js',
+		EXT_LIBS+'/file-saver/dist/FileSaver.min.js'])
+		.pipe(dest(paths.dev + 'vendors/'));
+};
 
-	var task2 = gulp.src([
-		'./vendors/jquery/dist/jquery.min.js',
-		'./vendors/material-design-lite/material.min.js',
-		'./vendors/datatables.net/js/jquery.dataTables.min.js',
-		'./vendors/mdl-selectfield/dist/mdl-selectfield.min.js',
-		'./vendors/file-saver/FileSaver.min.js'])
-		.pipe(gulp.dest(paths.dev + 'vendors/'));
 
-	return merge(task1, task2);
-});
 
-gulp.task('dependencies:vendors-srcmaps', gulp.parallel(['bower']), function() {
-	return gulp.src([
-		'./vendors/material-design-lite/material.min.js.map',
-		'./vendors/mdl-selectfield/dist/mdl-selectfield.min.js.map'])
-		.pipe(gulp.dest(paths.dev + 'vendors/'));
-})
+const _vendorsSrcmaps = function() {
+	return src([
+		EXT_LIBS+'/material-design-lite/material.min.js.map',
+		EXT_LIBS+'/mdl-selectfield/dist/mdl-selectfield.min.js.map'])
+		.pipe(dest(paths.dev + 'vendors/'));
+};
 
-gulp.task('dependencies:css', gulp.parallel(['bower']), function() {
+
+//task('dependencies:vendors-srcmaps', parallel(['bower']), function() {})
+// ./vendors
+
+const _depCss = function() {
 	var tasks = merge();
 
-	tasks.add(gulp.src(
-		'./vendors/dialog-polyfill/dialog-polyfill.css')
+	tasks.add(src(
+		EXT_LIBS+'/dialog-polyfill/dialog-polyfill.css')
 		.pipe(uglifycss({
 			"maxLineLen": 80,
 			"uglyComments": true
-    	}))
-		.pipe(gulp.dest(paths.dev + 'vendors/')));
+		}))
+		.pipe(dest(paths.dev + 'vendors/')));
 
-	tasks.add(gulp.src([
-		'./vendors/mdl-selectfield/dist/mdl-selectfield.min.css',
-		'./vendors/material-design-lite/material.min.css'])
-		.pipe(gulp.dest(paths.dev + 'vendors/')));
+	tasks.add(src([
+		EXT_LIBS+'/mdl-selectfield/dist/mdl-selectfield.min.css',
+		EXT_LIBS+'/material-design-lite/material.min.css'])
+		.pipe(dest(paths.dev + 'vendors/')));
 
-	tasks.add(gulp.src('./vendors/datatables.net-dt/css/jquery.dataTables.min.css')
+	tasks.add(src(EXT_LIBS+'/datatables.net-dt/css/jquery.dataTables.min.css')
 		.pipe(replace('/images/', './images/'))
-		.pipe(gulp.dest(paths.dev + 'vendors/')));
+		.pipe(dest(paths.dev + 'vendors/')));
 
-	tasks.add(gulp.src('./vendors/datatables.net-dt/images/*')
-		.pipe(gulp.dest(paths.dev + 'vendors/images/')));
+	tasks.add(src(EXT_LIBS+'/datatables.net-dt/images/*')
+		.pipe(dest(paths.dev + 'vendors/images/')));
 
-	tasks.add(gulp.src('./vendors/material-design-icons-iconfont/dist/material-design-icons.css')
-		.pipe(replace('src: local("Material Icons"), local("MaterialIcons-Regular"), url(./fonts/MaterialIcons-Regular.woff2) format("woff2"), url(./fonts/MaterialIcons-Regular.woff) format("woff"), url(./fonts/MaterialIcons-Regular.ttf) format("truetype");', ''))
+	tasks.add(src(EXT_LIBS+'/material-design-icons-iconfont/dist/material-design-icons.css')
+		//.pipe(replace('src: local("Material Icons"), local("MaterialIcons-Regular"), url(./fonts/MaterialIcons-Regular.woff2) format("woff2"), url(./fonts/MaterialIcons-Regular.woff) format("woff"), url(./fonts/MaterialIcons-Regular.ttf) format("truetype");', ''))
 		.pipe(replace('./fonts/MaterialIcons-Regular.eot', './fonts/MaterialIcons-Regular.woff'))
 		.pipe(uglifycss({
 			"maxLineLen": 80,
 			"uglyComments": true
-			}))
-		.pipe(gulp.dest(paths.dev + 'vendors/')));
+		}))
+		.pipe(dest(paths.dev + 'vendors/')));
 
 	return tasks;
-});
+};
 
-gulp.task('dependencies:fonts', gulp.parallel(['bower']), function() {
-	return gulp.src('./fonts.list')
+const _depFonts = function() {
+	return src('./fonts.list')
 		.pipe(googleWebFonts({}))
-		.pipe(gulp.dest(paths.dev + 'vendors/fonts/'));
-});
+		.pipe(dest(paths.dev + 'vendors/fonts/'));
+};
 
-gulp.task('dependencies',
-	gulp.parallel([
+const _dependencies = parallel(_copyVendors, _copyUglifiedVendors, _vendorsSrcmaps, _depCss, _depFonts, _depR2Js)
+/*
+task('dependencies',
+	parallel([
 		'dependencies:vendors',
 		'dependencies:vendors-srcmaps',
 		'dependencies:r2',
 		'dependencies:css',
 		'dependencies:fonts'
-	]));
+	]));*/
 
 /**
  * Checkstyle
  */
 
-gulp.task('checkstyle', function() {
-    return gulp.src(['./js/**/*.js', './workers/*.js'])
-        .pipe(eslint())
-        .pipe(eslint.formatEach());
-});
+const _checkstyle = function() {
+	return src(['./js/**/*.js', './workers/*.js'])
+		.pipe(eslint())
+		.pipe(eslint.formatEach());
+};
 
 /**
  * JS related processing
  */
 /*
-gulp.task('js:main', function() {
-	return gulp.src('./js/main.js')
+task('js:main', function() {
+	return src('./js/main.js')
 		.pipe(babel({presets: babelPresets, compact: false}))
-		.pipe(gulp.dest(paths.dev))
+		.pipe(dest(paths.dev))
 		.pipe(livereload());
 });
 */
 
 // Will accept ES6 without export/import to ease transition
 // All legacy code should be nammed with this extension *.legacy.js
-gulp.task('js:legacy', function() {
-	return gulp.src('./js/*/**/*.legacy.js')
+
+const _jsLegacy = function() {
+	return src('./js/*/**/*.legacy.js')
 	 	.pipe(sourcemaps.init())
 	 	.pipe(babel({presets: babelPresets, compact: false}))
 	 	.pipe(concat('legacy.js'))
 	 	.pipe(sourcemaps.write('.'))
-	 	.pipe(gulp.dest(paths.dev))
+	 	.pipe(dest(paths.dev))
 	 	.pipe(livereload());
-});
+};
 
-gulp.task('js:app', function() {
+
+const _jsApp = function() {
 	return browserify({entries: './js/app.js', extensions: ['.js'], debug: true})
         .transform(babelify, {presets: babelPresets})
         .bundle()
         .pipe(source('app.js'))
-        .pipe(gulp.dest(paths.dev));
-});
+        .pipe(dest(paths.dev));
+};
+
+
 /**
  * check karma-browserify
  */
 // TODO --
-gulp.task('js:workers', function() {
-	return gulp.src(['./workers/*.js', './js/helpers/tools.legacy.js'])
+// task('js:workers',
+const _jsWorkers = function() {
+	return src(['./workers/*.js', './js/helpers/tools.legacy.js'])
 		.pipe(babel({presets: babelPresets, compact: false}))
-		.pipe(gulp.dest(paths.dev))
+		.pipe(dest(paths.dev))
 		.pipe(livereload());
-});
+}
 
-gulp.task('js', 
-	gulp.parallel([
-		'js:app',
-		'js:legacy',
-		'js:workers'
-	]));
+const _js = parallel( _jsApp, _jsLegacy, _jsWorkers);
 
 /**
  * Assets
  */
 
-gulp.task('css:stylesheets', function() {
-	return gulp.src('./css/*.css')
+
+const _css = function() {
+	return src('./css/*.css')
 		.pipe(cleanCSS())
 		.pipe(concat('stylesheet.css'))
-		.pipe(gulp.dest(paths.dev))
+		.pipe(dest(paths.dev))
 		.pipe(livereload());
-});
+};
 
-gulp.task('css:images', function() {
-	return gulp.src(['./css/images/**', './images/*'])
-		.pipe(gulp.dest(paths.dev + 'images/'));
-});
+const _img =  function() {
+	return src(['./css/images/**', './images/*'])
+		.pipe(dest(paths.dev + 'images/'));
+};
 
+const _fonts = function() {
+	var task1 = src(['./fonts/*'])
+		.pipe(dest(paths.dev + 'vendors/fonts/'));
 
-gulp.task('css:fonts', gulp.parallel(['bower', 'dependencies:fonts']), function() {
-	var task1 = gulp.src(['./fonts/*'])
-		.pipe(gulp.dest(paths.dev + 'vendors/fonts/'));
-
-	var task2 = gulp.src(['./vendors/material-design-icons-iconfont/dist/fonts/*.woff'])
-		.pipe(gulp.dest(paths.dev + 'vendors/fonts/'));
+	var task2 = src(['./vendors/material-design-icons-iconfont/dist/fonts/*.woff'])
+		.pipe(dest(paths.dev + 'vendors/fonts/'));
 
 	return merge(task1, task2);
-});
+};
+const _allFonts = series(_dependencies, _fonts);
+const _styles = parallel( _css, _img, _allFonts);
 
-gulp.task('css', 
-	gulp.parallel([
-		'css:stylesheets',
-		'css:images',
-		'css:fonts'
-	]));
-
-gulp.task('html', function() {
-	return gulp.src(['./index.html'])
-		.pipe(gulp.dest(paths.dev))
+const _html =  function() {
+	return src(['./index.html'])
+		.pipe(dest(paths.dev))
 		.pipe(livereload());
-});
+};
 
-gulp.task('build', gulp.parallel([
-		'html',
-		'dependencies',
-		'js',
-		'css'
-	]));
 
-gulp.task('default',
-	gulp.parallel([
-		'build',
-//		'checkstyle'
-	]));
+const _build = parallel( _html, _dependencies, _js, _styles);
+const _default = parallel( _build, _checkstyle);
 
-gulp.task('release', gulp.series(['build']), function() {
+
+const _preRelease =  function() {
 	var tasks = merge();
 
 	// Import files from dev
@@ -238,32 +237,39 @@ gulp.task('release', gulp.series(['build']), function() {
 		{ dir: 'vendors/', match: '**/!(*.map)' },
 		{ dir: '/', match: '*.css' }
 	].map(function(path) {
-	    tasks.add(gulp.src(paths.dev + path.dir + path.match)
-	      .pipe(gulp.dest(paths.dist + path.dir)));
+	    tasks.add(src(paths.dev + path.dir + path.match)
+	      .pipe(dest(paths.dist + path.dir)));
 	});
 
 	// Minify JS
-	tasks.add(gulp.src([paths.dev + '*.js'])
+	tasks.add(src([paths.dev + '*.js'])
 		.pipe(uglify())
-		.pipe(gulp.dest(paths.dist)));
+		.pipe(dest(paths.dist)));
 
 	// Minify HTML
-	tasks.add(gulp.src(paths.dev + 'index.html')
+	tasks.add(src(paths.dev + 'index.html')
 		.pipe(htmlmin({collapseWhitespace: true}))
-		.pipe(gulp.dest(paths.dist)));
+		.pipe(dest(paths.dist)));
 
 	return tasks;
-});
+};
 
-gulp.task('watch', gulp.series(['default']) , function() {
+const _release = series( /*_bowerInstall,*/ _build, _preRelease)
+
+// default
+const _watch = function() {
 	livereload.listen();
-	gulp.watch('./*.html', ['html']);
-	gulp.watch('./css/*.css', ['css']);
-	gulp.watch(['./js/**/*.js'], ['js:app']);
-	gulp.watch(['./js/**/*.legacy.js'], ['js:legacy']);
-	gulp.watch(['./workers/*.js'], ['js:workers']);
-});
+	watch('./*.html', ['html']);
+	watch('./css/*.css', ['css']);
+	watch(['./js/**/*.js'], ['js:app']);
+	watch(['./js/**/*.legacy.js'], ['js:legacy']);
+	watch(['./workers/*.js'], ['js:workers']);
+};
 
-gulp.task('test', function() {
+task('test', function() {
 	return opener('test/index.html');
 });
+
+exports.default = _default;
+exports.release = _release;
+exports.watch = _watch;
