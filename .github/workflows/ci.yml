@@ -28,7 +28,7 @@ jobs:
     - name: MaterialUI
       run: cd www/m
     - name: Installing
-      run: cd www/m && npm i --legacy-peer-deps
+      run: cd www/m && rm -f package-lock.json && npm i --legacy-peer-deps
     - name: Building
       run: cd www/m && make build
     - name: Zipping
