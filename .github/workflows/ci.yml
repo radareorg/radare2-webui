@@ -27,12 +27,12 @@ jobs:
     - uses: actions/checkout@v2
     - name: MaterialUI
       run: cd www/m
-    - name: Installing dependencies
-      run: cd www/m && npm i
+    - name: Installing
+      run: cd www/m && npm i --legacy-peer-deps
     - name: Building
-      run: cd www/m && make
-    - name: Install
-      run: cd www/m && make
+      run: cd www/m && make build
+    - name: Zipping
+      run: cd www/m && make dist
     - name: Pub
       uses: actions/upload-artifact@v2
       with:

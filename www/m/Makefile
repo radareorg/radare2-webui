@@ -1,3 +1,6 @@
+VERSION=0.1.1
+DISTZIP=radare2-webui-m-$(VERSION).zip
+
 YARN=$(shell npm bin)/yarn
 PWD=$(shell pwd)
 
@@ -13,7 +16,10 @@ dist release: node_modules
 	cp -f index.html dist/index.html
 	cp -rf css dist
 	$(shell npm bin)/webpack-cli -o $$PWD/www/ $$PWD/js/app.js
-	#$(shell npm bin)/gulp release
+	$(shell npm bin)/gulp release
+	rm -f $(DISTZIP)
+	cd ../../dist && zip -r $(DISTZIP) p
+
 
 node_modules:
 	$(YARN) install --flat --prod
@@ -28,7 +34,7 @@ r:
 	r2 -qe http.root=$$PWD/../../dist -e http.ui=m -c=H /bin/ls
 
 run:
-	r2 -q -e http.sandbox=false -e http.root=$$PWD/../../dev -e http.ui=m -c=H /bin/ls
+	r2 -q -e scr.html=0 -e http.sandbox=0 -e http.ui=m -e http.root=$(PWD)/../../dist -c=H /bin/ls
 
 FILES=$(shell git ls-files .)
 
