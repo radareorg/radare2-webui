@@ -27,12 +27,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: MaterialUI
       run: cd www/m
-    - name: Installing
-      run: cd www/m && rm -f package-lock.json && npm i --legacy-peer-deps
-    - name: Building
-      run: make -C www/m build
-    - name: Zipping
-      run: make -C www/m dist
+    - name: Building & Zipping
+      run: make -C www/m release
     - name: Pub
       uses: actions/upload-artifact@v2
       with:
