@@ -8,9 +8,8 @@ PWD=$(shell pwd)
 all: build
 
 build: node_modules
-	$(PM) run build
 
-dist_release: node_modules
+release: node_modules
 	mkdir -p ../../dist/m
 	cp -f index.html ../../dist/m/index.html
 	cp -rf css ../../dist/m
