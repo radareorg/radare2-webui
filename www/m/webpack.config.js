@@ -1,4 +1,4 @@
-// const TerserPlugin = require("terser-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 const _path_ = require('path');
 const PROD_MODE = 'production';
 const DEV_MODE = 'development';
@@ -14,15 +14,12 @@ module.exports = [{
   mode: MODE,
   output: {
     path: _path_.resolve(__dirname, 'dist'),
-    // This is necessary for webpack to compile
-    // But we never use style-bundle.js
-    //filename: 'style-bundle.js',
     filename: 'main.min.js',
   },
-  /*optimization: {
+  optimization: {
     minimize: true,
     minimizer: [new TerserPlugin()],
-  },*/
+  },
   module: {
     rules: [
       {
