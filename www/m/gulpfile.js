@@ -58,14 +58,14 @@ const _copyVendors = function() {
 };
 
 
-
+/*
 const _vendorsSrcmaps = function() {
 	return src([
 		EXT_LIBS+'/material-design-lite/material.min.js.map',
 		EXT_LIBS+'/mdl-selectfield/dist/mdl-selectfield.min.js.map'])
 		.pipe(dest(paths.dev + 'vendors/'));
 };
-
+*/
 
 //task('dependencies:vendors-srcmaps', parallel(['bower']), function() {})
 // ./vendors
@@ -94,7 +94,8 @@ const _depCss = function() {
 		.pipe(dest(paths.dev + 'vendors/images/')));
 
 	tasks.add(src(EXT_LIBS+'/material-design-icons-iconfont/dist/material-design-icons.css')
-		.pipe(replace('src: local("Material Icons"), local("MaterialIcons-Regular"), url(./fonts/MaterialIcons-Regular.woff2) format("woff2"), url(./fonts/MaterialIcons-Regular.woff) format("woff"), url(./fonts/MaterialIcons-Regular.ttf) format("truetype");', ''))
+		//.pipe(replace('src: local("Material Icons"), local("MaterialIcons-Regular"), url(./fonts/MaterialIcons-Regular.woff2) format("woff2"), url(./fonts/MaterialIcons-Regular.woff) format("woff"), url(./fonts/MaterialIcons-Regular.ttf) format("truetype");', ''))
+		.pipe(replace('src: local("☺"), url("./fonts/MaterialIcons-Regular.woff2") format("woff2"), url("./fonts/MaterialIcons-Regular.woff") format("woff"), url("./fonts/MaterialIcons-Regular.ttf") format("truetype");',''))
 		.pipe(replace('./fonts/MaterialIcons-Regular.eot', './fonts/MaterialIcons-Regular.woff'))
 		.pipe(uglifycss({
 			"maxLineLen": 80,
@@ -113,22 +114,14 @@ const _depFonts = function() {
 		.pipe(googleWebFonts({}))
 		.pipe(dest(paths.dev + 'vendors/fonts/')));
 
-	tasks.add(src(EXT_LIBS+'/material-design-icons-iconfont/dist/fonts/*')
+	tasks.add(src(EXT_LIBS+'/material-design-icons-iconfont/dist/fonts/*.woff')
 		.pipe(dest(paths.dev + 'vendors/fonts/')));
 
 	return tasks;
 };
 
-const _dependencies = parallel(_copyVendors, _copyUglifiedVendors, _vendorsSrcmaps, _depCss, _depFonts, _depR2Js)
-/*
-task('dependencies',
-	parallel([
-		'dependencies:vendors',
-		'dependencies:vendors-srcmaps',
-		'dependencies:r2',
-		'dependencies:css',
-		'dependencies:fonts'
-	]));*/
+const _dependencies = parallel(_copyVendors, _copyUglifiedVendors, /* _vendorsSrcmaps, */ _depCss, _depFonts, _depR2Js)
+
 
 /**
  * Checkstyle
@@ -185,18 +178,8 @@ const _img =  function() {
 	return src(['./css/images/**', './images/*'])
 		.pipe(dest(paths.dev + 'images/'));
 };
-
-const _fonts = function() {
-	var task1 = src(['./fonts/*'])
-		.pipe(dest(paths.dev + 'vendors/fonts/'));
-
-	var task2 = src([EXT_LIBS+'/material-design-icons-iconfont/dist/fonts/*.woff'])
-		.pipe(dest(paths.dev + 'vendors/fonts/'));
-
-	return merge(task1, task2);
-};
-const _allFonts = series(_dependencies, _fonts);
-const _styles = parallel( _css, _img, _allFonts);
+//const _allFonts = series(_dependencies);
+const _styles = parallel( _css, _img, _dependencies);
 
 const _html =  function() {
 	return src(['./index.html'])
