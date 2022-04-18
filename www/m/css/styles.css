@@ -358,6 +358,10 @@ td {
   background-color:#238082!important;
 }
 
+a.active {
+  color: #F00 !important;
+}
+
 mdl-select {
   -webkit-appearance:none;
   height: 2.3em;
