@@ -45,7 +45,8 @@ export class FlagsWidget extends BaseWidget {
 		content.style.paddingTop = '50px';
 		c.appendChild(content);
 
-		r2.cmd('f', function(d) {
+		r2.cmd('fj', function(d) {
+			let data = JSON.parse(d);
 			var table = new Table(
 				['+Offset', 'Size', 'Name'],
 				[true, true, false],
@@ -53,14 +54,10 @@ export class FlagsWidget extends BaseWidget {
 				null,
 				Widgets.HEXDUMP);
 
-			var lines = d.split(/\n/); //clickable offsets (d).split (/\n/);
-			for (var i in lines) {
-				var line = lines[i].split(/ /);
-				if (line.length >= 3) {
-					table.addRow([line[0], line[1], line[2]]);
-				}
-			}
-
+			data.map(x => {
+				table.addRow(['0x'+x.offset.toString(16), x.size, x.name])
+				//table.addRow(Object.values(x))
+			});
 			table.insertInto(content);
 		});
 
