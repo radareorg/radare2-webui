@@ -7,6 +7,8 @@ import {Table} from '../helpers/Table';
 import {Inputs} from '../helpers/Inputs';
 
 export class FlagsSpacesWidget extends BaseWidget {
+	activeEls = [];
+	
 	constructor() {
 		super('Flag Spaces');
 	}
@@ -49,38 +51,48 @@ export class FlagsSpacesWidget extends BaseWidget {
 		content.style.paddingTop = '70px';
 		c.appendChild(content);
 
-		r2.cmd('fs', (d) => {
+		r2.cmd('fsj', (d) => {
+			const data = JSON.parse(d);
 			const table = new Table(
 				['+Flags', 'Flagspace'],
 				[true, false],
 				'flagspaceTable');
 
-			var lines = d.split(/\n/);
-			for (var i in lines) {
-				var line = lines[i].split(/ +/);
-				if (line.length >= 4) {
-					const content = line[3];
-					const selected = line[2].indexOf('.') === -1;
-					const a = document.createElement('a');
-					a.innerHTML = content;
-					if (selected) a.style.color = 'red';
+			this.activeEls = this.activeEls.filter(e => {
+				e.classList.remove(['active']);
+				return false;
+			});
 
-					a.addEventListener('click', () => {
-						r2.cmd('fs ' + content);
-						this.draw();
-					});
-
-					const row = table.addRow([line[1], a]);
-					row.addEventListener('click', () => {
-						table.getRows().forEach((curRow) => {
-							curRow.classList.remove('active');
-						});
-						row.classList.add('active');
-						this.current = content;
-					})
+			data.map( x => {
+				const a = document.createElement('a');
+				a.textContent = x.name;
+				if (x.selected){
+					a.classList.add(['active']);
+					this.activeEls.push(a);
 				}
-			}
 
+				a.addEventListener('click', (e) => {
+					console.log(x.name, e);
+					r2.cmd('fs ' + x.name, (h)=>{
+						this.activeEls = this.activeEls.filter(e => {
+							e.classList.remove(['active']);
+							return false;
+						});
+						a.classList.add(['active']);
+						this.activeEls.push(a);
+					});
+					this.draw();
+				});
+
+				const row = table.addRow([x.count, a]);
+				row.addEventListener('click', () => {
+					table.getRows().forEach((curRow) => {
+						curRow.classList.remove('active');
+					});
+					row.classList.add('active');
+					this.current = x.name;
+				});
+			});
 			table.insertInto(content);
 		});
 
