@@ -12,7 +12,7 @@ export class DisassemblyFunctionsFullWidget extends BasePreWidget {
 		super(
 			'Functions (full)',
 			x => formatOffsets(x),
-			'e scr.color=1;s entry0;s $S;pD $SS;e scr.color=0',
+			'pD $SS@$S@e:scr.color=2',
 			Inputs.iconButton('undo', 'Back to Disassembly', () => uiContext.navigateTo(Widgets.DISASSEMBLY)));
 	}
 }

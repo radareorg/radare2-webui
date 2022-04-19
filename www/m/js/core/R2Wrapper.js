@@ -98,40 +98,40 @@ r2Conf[SettingItems.DESCRIBE] = { name: 'describe', defVal: 'false', apply: func
 r2Conf[SettingItems.BYTES] = { name: 'bytes', defVal: 'false', apply: function(p) { r2.cmd('e asm.bytes=' + p); } };
 r2Conf[SettingItems.OS] = { name: 'os', defVal: 'Linux', apply: function(p) { console.log('OS is now: ' + p); } }; // missing
 r2Conf[SettingItems.ASMEMU] = { name: 'asmemu', defVal: 'false', apply: function(p) {  r2.cmd('e asm.emu=' + p); } };
-r2Conf[SettingItems.ASMEMUSTR] = { name: 'asmemustr', defVal: 'false', apply: function(p) { r2.cmd('e asm.emustr=' + p); } };
+r2Conf[SettingItems.ASMEMUSTR] = { name: 'asmemustr', defVal: 'false', apply: function(p) { r2.cmd('e emu.str=' + p); } };
 r2Conf[SettingItems.SIZE] = { name: 'size', defVal: 'S', apply: function(p) {
 	switch (p) {
 	case 'S':
 		r2.cmd('e asm.bytes=false');
 		r2.cmd('e asm.lines=false');
-		r2.cmd('e asm.cmtright=false');
+		r2.cmd('e asm.cmt.right=false');
 		break;
 	case 'M':
 		r2.cmd('e asm.bytes=false');
 		r2.cmd('e asm.lines=true');
-		r2.cmd('e asm.lineswidth=8');
-		r2.cmd('e asm.cmtright=false');
+		r2.cmd('e asm.lines.width=8');
+		r2.cmd('e asm.cmt.right=true');
 		break;
 	case 'L':
 		r2.cmd('e asm.bytes=true');
 		r2.cmd('e asm.lines=true');
-		r2.cmd('e asm.lineswidth=12');
-		r2.cmd('e asm.cmtright=true');
+		r2.cmd('e asm.lines.width=12');
+		r2.cmd('e asm.cmt.right=true');
 		break;
 	};
 }};
 r2Conf[SettingItems.DECODING] = { name: 'decoding', defVal: 'Pseudo', apply: function(p) {
 	switch (p) {
 	case 'Pseudo':
-		r2.cmd('e asm.pseudo=1');
+		r2.cmd('e asm.pseudo=true');
 		r2.cmd('e asm.syntax=intel');
 		break;
 	case 'Opcodes':
-		r2.cmd('e asm.pseudo=0');
+		r2.cmd('e asm.pseudo=false');
 		r2.cmd('e asm.syntax=intel');
 		break;
 	case 'ATT':
-		r2.cmd('e asm.pseudo=0');
+		r2.cmd('e asm.pseudo=false');
 		r2.cmd('e asm.syntax=att');
 		break;
 	};
@@ -159,7 +159,7 @@ r2Conf[SettingItems.MODE] = { name: 'mode', defVal: 'PA', apply: function(p) {
 r2Conf[SettingItems.ANAL_HAS_NEXT] = { name: 'analHasNext', defVal: true, apply: function(p) { console.log('analHasNext is ' + p); } };
 r2Conf[SettingItems.ANAL_SKIP_NOPS] = { name: 'analSkipNops', defVal: true, apply: function(p) { console.log('analSkipNops is ' + p); } };
 r2Conf[SettingItems.ANAL_NON_CODE] = { name: 'analNonCode', defVal: false, apply: function(p) { console.log('analNonCode is ' + p); } };
-r2Conf[SettingItems.COLORS] = { name: 'colors', defVal: true, apply: function(p) { inColor = p; r2.cmd('e scr.color=' + p);} };
+r2Conf[SettingItems.COLORS] = { name: 'colors', defVal: 3, apply: function(p) { inColor = p; r2.cmd('e scr.color=' + p);} };
 r2Conf[SettingItems.THEME] = { name: 'theme', defVal: 'none', apply: function(p) { r2.cmd('eco ' + p); } }; // TODO
 r2Conf[SettingItems.USE_TTS] = { name: 'tts', defVal: true, apply: () => { } }; // TODO: not a r2Lib conf, should be externalized in an UI settings set
 

@@ -288,7 +288,7 @@ function submit(cmd) {
 }
 
 function terminal_ready() {
-	r2.cmd('e scr.color=true');
+	// r2.cmd('e scr.color=true');
 	var input = document.getElementById('terminal_input');
 	if (!input) {
 		console.error('Cannot find terminal_input');

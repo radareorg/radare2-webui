@@ -6,10 +6,11 @@ PWD=$(shell pwd)
 
 
 all: build
+	$(MAKE) dist
 
 build: node_modules
 
-release: node_modules
+dist release: node_modules
 	mkdir -p ../../dist/m
 	cp -f index.html ../../dist/m/index.html
 	cp -rf css ../../dist/m

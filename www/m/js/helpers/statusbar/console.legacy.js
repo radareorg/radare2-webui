@@ -27,7 +27,7 @@ function console_ready() {
 	if (input === null) {
 		return;
 	}
-	r2.cmd('e scr.color=true');
+	// r2.cmd('e scr.color=3');
 	input.focus();
 	input.onkeypress = function(e){
 		if (e.keyCode === 13) {

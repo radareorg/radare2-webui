@@ -15,7 +15,7 @@ export class HexdumpWidget extends BaseWidget {
 	draw() {
 		if (this.firstTime) {
 			this.firstTime = false;
-			this.hexdump = new Hexdump(this.node, 24, this.isBigEndian);
+			this.hexdump = new Hexdump(this.node, 16, this.isBigEndian);
 			this.hexdump.setOnChangeCallback(function (offset, before, after) {
 				console.log('changed');
 			});

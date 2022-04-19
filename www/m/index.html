@@ -63,7 +63,7 @@
 
 	<body>
 		<div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
-			<header class="demo-header mdl-layout__header mdl-color--white mdl-color--grey-100 mdl-color-text--grey-600">
+			<header class="demo-header mdl-layout__header mdl-color--white mdl-color--grey-100 mdl-color-text--grey-600" style="bottom:32px">
 				<div class="mdl-layout__header-row">
 					<span class="mdl-layout-title" id='title'>Overview</span>
 
@@ -145,8 +145,10 @@
 					<!-- <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons">flag</i>Updates</a> -->
 					<!--<a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons">local_offer</i>Promos</a> -->
 					<!--<a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons">settings</i>Settings</a>-->
-					<div class="mdl-layout-spacer"></div>
+					<div class="mdl-layout-spacer">-</div>
+					<a id='menu_settings2' class="mdl-navigation__link"><i class="mdl-color-text--blue-grey-400 material-icons">settings</i>Settings</a>
 					<a id='menu_help' class="mdl-navigation__link"><i class="mdl-color-text--blue-grey-400 material-icons">help_outline</i>Help</a>
+					<div class="mdl-layout-spacer"><br /><br /><br /></div>
 				</nav>
 			</div>
 
@@ -162,7 +164,6 @@
 			</main>
 
 			<footer class="mdl-mini-footer statusbar" id="statusbar_scroll">
-
 				<div class="statusbar_title" id="statusbar_title" style="width:100%"></div>
 				<div class="statusbar_body" id="statusbar"></div>
 			</footer>

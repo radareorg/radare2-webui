@@ -35,6 +35,7 @@ export class ScriptWidget extends BaseWidget {
 
 		const textarea = document.createElement('textarea');
 		textarea.id = 'script';
+		textarea.rows = 20;
 		textarea.className = 'pre';
 		textarea.style.width = '100%';
 		c.appendChild(textarea);

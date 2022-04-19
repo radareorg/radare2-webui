@@ -34,6 +34,7 @@ export class SettingsWidget extends BaseWidget {
 	}
 
 	drawPlatform(dom) {
+		// TODO: Use aLj instead , see https://github.com/radareorg/radare2/issues/19982
 		var archs = ['x86', 'arm', 'mips', 'java', 'dalvik', '6502', '8051', 'h8300', 'hppa', 'i4004', 'i8008', 'lh5801',
 			'lm32', 'm68k', 'malbolge', 'mcs96', 'msp430', 'nios2', 'ppc', 'rar', 'sh', 'snes', 'sparc', 'spc700', 'sysz',
 			'tms320', 'v810', 'v850', 'ws', 'xcore', 'prospeller', 'gb', 'z80', 'arc', 'avr', 'bf', 'cr16', 'cris', 'csr',
@@ -47,7 +48,7 @@ export class SettingsWidget extends BaseWidget {
 			r2Settings.setItem(r2Settings.keys.BITS, item);
 		});
 
-		var os = ['Linux', 'Windows', 'OSX'];
+		var os = ['Linux', 'Windows', 'Android', 'iOS', 'Darwin', 'QNX', 'macOS'];
 		uiSelect(dom, 'OS', os, os.indexOf(r2Settings.getItem(r2Settings.keys.OS)), function(item) {
 			r2Settings.setItem(r2Settings.keys.OS, item);
 		});
@@ -80,7 +81,7 @@ export class SettingsWidget extends BaseWidget {
 		uiSwitch(dom, 'Enable ESIL', r2Settings.getItem(r2Settings.keys.ASMEMU), function(param, state) {
 			r2Settings.setItem(r2Settings.keys.ASMEMU, state);
 		});
-		uiSwitch(dom, 'Enable ESIL (Lesser Verbose)', r2Settings.getItem(r2Settings.keys.ASMEMUSTR), function(param, state) {
+		uiSwitch(dom, 'Enable ESIL (Strings Only)', r2Settings.getItem(r2Settings.keys.ASMEMUSTR), function(param, state) {
 			r2Settings.setItem(r2Settings.keys.ASMEMUSTR, state);
 		});
 	}

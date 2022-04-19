@@ -34,12 +34,12 @@ export class Hexdump extends RadareInfiniteBlock {
 
 		this.lastColorUsed = -1;
 		this.bgColors = [
-			'rgba(255,0,0,0.4)',
-			'rgba(0,255,0,0.4)',
-			'rgba(0,92,192,0.4)',
-			'rgba(255,255,0,0.4)',
-			'rgba(255,0,255,0.4)',
-			'rgba(0,255,255,0.4)'
+			'rgba(255,0,0,0.2)',
+			'rgba(0,255,0,0.2)',
+			'rgba(0,92,192,0.2)',
+			'rgba(255,255,0,0.2)',
+			'rgba(255,0,255,0.2)',
+			'rgba(0,255,255,0.2)'
 		];
 
 		this.flagColorAssociation = [];
@@ -163,6 +163,7 @@ export class Hexdump extends RadareInfiniteBlock {
 	 * Return a color on a cyclic way
 	 */
 	pickColor() {
+		return 'inherit'; // no random anoying colors
 		this.lastColorUsed = (this.lastColorUsed + 1) % this.bgColors.length;
 		return this.bgColors[this.lastColorUsed];
 	}
@@ -397,7 +398,6 @@ export class Hexdump extends RadareInfiniteBlock {
 
 			offsetEl.assoc = hexpairs;
 
-			hexpairs.style.lineHeight = this.lineHeight + 'px';
 			hexpairs.classList.add('hexpairs');
 
 			asciis.classList.add('ascii');
@@ -990,7 +990,20 @@ export class Hexdump extends RadareInfiniteBlock {
 	/*
 		selectWord.appendChild(document.createTextNode('Word length: '));
 	*/
+/*
+		if (0) {
+			var div = document.createElement('div');
+			div.className = 'mdl-selectfield mdl-js-selectfield mdl-selectfield--floating-label';
+			selectWord.appendChild(div);
+			var select = document.createElement('select');
+			div.appendChild(select);
+			select.className = 'mdl-selectfield__select';
+			selectWord.appendChild(select);
+		
+*/
 		var select = document.createElement('select');
+		select.className = 'mdl-selectfield mdl-js-selectfield mdl-selectfield--floating-label';
+		select.style = 'background-color:white;border:1px;color:black;';
 		selectWord.appendChild(select);
 
 		for (var i in WordSizes) {
@@ -1183,9 +1196,10 @@ export class Hexdump extends RadareInfiniteBlock {
 			flagLine.appendChild(document.createTextNode('[' + theOffset + '] ' + flag.name));
 			flagLine.title = 'Go to Disassembly';
 			flagLine.style.cursor = 'pointer';
+			flagLine.style.marginTop = '8px'
 			flagLine.addEventListener('click', () => r2Wrapper.seek(theOffset, Widgets.DISASSEMBLY));
 			flagLine.title = '(' + flag.size + ' bytes) Seek ' + theOffset + ' on disassembly widget';
-			flagLine.style.color = this.getFlagColor(flag.name);
+			flagLine.style.color = 'white'; // this.getFlagColor(flag.name);
 			this.listContent.insertBefore(flagLine, line);
 		}
 	}

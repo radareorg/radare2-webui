@@ -51,6 +51,7 @@ function ready() {
 
 	// Right menu
 	onClick('menu_seek', () => r2Wrapper.seek());
+	onClick('menu_settings2', () => uiContext.navigateTo(Widgets.SETTINGS));
 	onClick('menu_settings', () => uiContext.navigateTo(Widgets.SETTINGS));
 	onClick('menu_about', () => {
 		r2.cmd('?V', function(version) {

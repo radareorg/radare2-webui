@@ -15,7 +15,6 @@ export class Disassembly extends RadareInfiniteBlock {
 		this.container = new FlexContainer(containerElement, 'disasm');
 		this.lineHeight = lineHeight;
 		this.init();
-
 	}
 
 	init() {
@@ -168,7 +167,7 @@ export class Disassembly extends RadareInfiniteBlock {
 			active: false,
 			action: function(active) {
 				if (active) {
-					r2.cmd('e asm.emu=1;aae;e asm.emu=0');
+					r2.cmd('e asm.emu=1;aae');
 				} else {
 					r2.cmd('e asm.emu=false');
 				}
@@ -434,6 +433,7 @@ export class Disassembly extends RadareInfiniteBlock {
 		moreMenu.setAttribute('for', 'disasm_more');
 
 		const subPanels = {
+			'Toggle Bytes': () => { r2.cmd('e!asm.bytes', () => { r2Wrapper.seek('$$') })},
 			'Graph': () => uiContext.navigateTo(Widgets.DISASSEMBLY_GRAPH),
 			'Infos': () => uiContext.navigateTo(Widgets.DISASSEMBLY_INFOS),
 			'Functions': () => uiContext.navigateTo(Widgets.DISASSEMBLY_FUNCTIONS),

@@ -1,6 +1,7 @@
 'use strict';
 
 const m_root = self.location.pathname.split('/').slice(0, -1).join('/');
+
 importScripts(m_root + '/r2.js');
 
 function extractOffset(str) {
@@ -45,8 +46,10 @@ function prepareClickableOffsets(x) {
 function getChunk(where, howManyLines) {
 	var raw;
 
+	let scrColor = 3;
+	// TODO var a = r2Settings.getItem(r2Settings.keys.BYTES)
 	// Line retrieved from the current offset
-	r2.cmd('pD ' + howManyLines + '@' + where + '|H', function(d) {
+	r2.cmd('pD ' + howManyLines + '@e:scr.color='+ scrColor + '@' + where + '|H', function(d) {
 		raw = d;
 	});
 
