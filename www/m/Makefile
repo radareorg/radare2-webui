@@ -1,9 +1,8 @@
-VERSION=0.1.1
+VERSION=$(shell jq .version package.json)
 DISTZIP=radare2-webui-m-$(VERSION).zip
 
 PM=npm
 PWD=$(shell pwd)
-
 
 all: build
 	$(MAKE) dist
@@ -19,9 +18,11 @@ dist release: node_modules
 	cp $$PWD/www/* ../../dist/m/.
 	rm -f $(DISTZIP)
 	cd ../../dist && ls -la && zip -r $(DISTZIP) m
+	@echo zip -r ../../dist/$(DISTZIP) m
 
 
 node_modules:
+	mkdir -p node_modules
 	$(PM) install
 
 watch:

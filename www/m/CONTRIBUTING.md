@@ -10,7 +10,9 @@ Run UI from dev
 
 The webserver is handled by `radare2`. From the root folder, you would run:
 
-    make runm
+```sh
+make run
+```
 
 This command will open your browser at http://localhost:9090/m pointing to `dev/m/` folder.
 
@@ -19,32 +21,50 @@ Development
 
 You would develop modifying files inside this folder and having your updated inside your browser. The build process is fairly simple:
 
-    npm run build # gulp default
+```sh
+npm run build
+```
 
 You can make the choice to run the `watcher` instead to have the file processed at the same time you save them:
 
-    npm run watch # gulp watch
+```sh
+npm run watch # gulp watch
+```
 
 Tests
 -----
 
-Tests are runned against the `dev` version.
+Tests run against the `dev` version.
 
 You can run the tests both ways, inside your commandline:
 
-    npm run test # calling mocha
+```sh
+npm run test # calling mocha
+```
 
 Or into your browser if you need to debug:
 
-    npm run testbrowser # gulp test
+```sh
+npm run testbrowser # gulp test
+```
 
 As a part of the test, you can also run ESLint:
 
-    npm run checkstyle # gulp checkstyle
+```sh
+npm run checkstyle # gulp checkstyle
+```
 
 Release
 -------
 
 The release process stricly use the development but compress the output by minifying HTML, CSS and JS.
 
-    npm run release
+```sh
+make dist
+```
+
+or
+
+```sh
+npm run release
+```
