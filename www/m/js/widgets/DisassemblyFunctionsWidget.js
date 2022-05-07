@@ -15,7 +15,7 @@ export class DisassemblyFunctionsWidget extends BasePreWidget {
 				container.innerHTML = x;
 				return container;
 			},
-			'pdf @e:asm.lineswidth=0|H',  // TODO, tail !inColor = @e:asm.lineswidth=0
+			'pdf @e:asm.lines.width=0|H',
 			Inputs.iconButton('undo', 'Back to Disassembly', () => uiContext.navigateTo(Widgets.DISASSEMBLY)));
 	}
 }

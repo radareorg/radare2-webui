@@ -11,7 +11,6 @@ export class ClassesWidget extends BaseWidget {
 
 	init() {
 		this.inColor = true; // TODO
-		r2.cmd('e scr.utf8=false');
 
 		r2Wrapper.registerListener(R2Actions.SEEK, () => {
 			if (!this.displayed) {

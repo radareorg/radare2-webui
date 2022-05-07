@@ -54,7 +54,7 @@ enyo.kind ({
     this.inherited (arguments);
  //   this.$.list.setCount (this.data.length) ;
     var text = this.$.text;
-    r2.cmd("e asm.lineswidth = 20", function(x){});
+    r2.cmd("e asm.lines.width = 20", function(x){});
     this.seek ("entry0");
     r2ui._dis = this;
     r2ui.history_push ("entry0");
