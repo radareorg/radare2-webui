@@ -49,7 +49,7 @@
     "jsdom-global": ">=3.0.2",
     "merge-stream": "^2.0.0",
     "mocha": "^9.2.2",
-    "npm": "^8.7.0",
+    "npm": "^8.11.0",
     "sass": "^1.49.7",
     "semistandard": "^16.0.1",
     "sinon": "^9.2.1",
