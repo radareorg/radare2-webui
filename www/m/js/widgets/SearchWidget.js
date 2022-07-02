@@ -3,6 +3,12 @@ import {Inputs} from '../helpers/Inputs';
 import {formatOffsets} from '../helpers/Format';
 import {r2Wrapper, R2Actions} from '../core/R2Wrapper';
 
+function searchResults(d) {
+	const node = document.getElementById('search_output');
+	node.innerHTML = "";
+	node.appendChild(formatOffsets(d));
+}
+
 export class SearchWidget extends BaseWidget {
 	constructor() {
 		super('Search');
@@ -21,8 +27,7 @@ export class SearchWidget extends BaseWidget {
 	}
 
 	getPanel() {
-		var c = document.createElement('div');
-
+		const c = document.createElement('div');
 		var header = document.createElement('div');
 		header.style.margin = '0.5em';
 		c.appendChild(header);
@@ -34,12 +39,9 @@ export class SearchWidget extends BaseWidget {
 		form.style.paddingLeft = '10px';
 		form.style.top = '3.5em';
 		form.style.height = '1.8em';
-		form.style.color = 'white';
 		form.addEventListener('keypress', (e) => this.searchKey(e.keyCode));
 
-
 		header.appendChild(form);
-
 		header.appendChild(document.createElement('br'));
 
 		header.appendChild(Inputs.button('Hex', () => this.runSearch()));
@@ -48,7 +50,7 @@ export class SearchWidget extends BaseWidget {
 		header.appendChild(Inputs.button('ROP', () => this.runSearchROP()));
 		header.appendChild(Inputs.button('Magic', () => this.runSearchMagic()));
 
-		var content = document.createElement('div');
+		const content = document.createElement('div');
 		content.id = 'search_output';
 		content.style.paddingTop = '50px';
 		content.style.color = 'black';
@@ -67,56 +69,39 @@ export class SearchWidget extends BaseWidget {
 	}
 
 	runSearchMagic() {
-		r2.cmd('/m', function (d) {
-			const node = document.getElementById('search_output');
-			node.appendChild(formatOffsets(d));
-		});
+		r2.cmd('/m', searchResults);
 	}
 
 	runSearchCode(text) {
 		if (!text) {
 			text = document.getElementById('search_input').value;
 		}
-		r2.cmd('"/c ' + text + '"', function (d) {
-			const node = document.getElementById('search_output');
-			node.appendChild(formatOffsets(d));
-		});
+		r2.cmd('"/c ' + text + '"', searchResults);
 	}
 
 	runSearchString(text) {
 		if (!text) {
 			text = document.getElementById('search_input').value;
 		}
-		r2.cmd('/ ' + text, function (d) {
-			const node = document.getElementById('search_output');
-			node.appendChild(formatOffsets(d));
-		});
+		r2.cmd('/ ' + text, searchResults);
 	}
 
 	runSearchROP(text) {
 		if (!text) {
 			text = document.getElementById('search_input').value;
 		}
-		r2.cmd('"/R ' + text + '"', function (d) {
-			const node = document.getElementById('search_output');
-			node.appendChild(formatOffsets(d));
-		});
+		r2.cmd('"/R ' + text + '"', searchResults);
 	}
 
 	runSearch(text) {
 		if (!text) {
 			text = document.getElementById('search_input').value;
 		}
-		if (text[0] === '"') {
-			r2.cmd('"/ ' + text + '"', function (d) {
-				const node = document.getElementById('search_output');
-				node.appendChild(formatOffsets(d));
-			});
+		if (text.startsWith('"') && text.endsWith('"')) {
+			const a = text.replace(/"/g, '');
+			r2.cmd('/ ' + a, searchResults);
 		} else {
-			r2.cmd('"/x ' + text + '"', function (d) {
-				const node = document.getElementById('search_output');
-				node.appendChild(formatOffsets(d));
-			});
+			r2.cmd('"/x ' + text + '"', searchResults);
 		}
 	}
 }

@@ -266,7 +266,7 @@ ul {
 textarea, input {
   font-size: 1.2em;
   background-color: #f0f0f0;
-  color: black !important;
+  color: black;
   padding-left:1em;
   font-family: "Roboto Mono", monospace;
   width: 100%;
