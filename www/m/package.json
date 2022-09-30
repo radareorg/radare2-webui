@@ -31,7 +31,7 @@
     "browserify": "^17.0.0",
     "chai": ">=4.0",
     "css-loader": "^5.0.0",
-    "eslint": "latest",
+    "eslint": "^7.12.1",
     "extract-loader": "^5.1.0",
     "file-loader": "^6.2.0",
     "gulp": "4.0.2",
@@ -61,17 +61,17 @@
     "webpack-cli": "^4.9.2"
   },
   "dependencies": {
-    "datatables.net": "^1.11.5",
-    "datatables.net-dt": "^1.11.5",
+    "datatables.net": "^1.12.1",
+    "datatables.net-dt": "^1.12.1",
     "dialog-polyfill": "^0.5.6",
     "file-saver": "^2.0.5",
     "infinite-scroll": "^3.0.6",
-    "jquery": "^3.6.0",
-    "material-components-web": ">=13.0.0",
-    "material-design-icons-iconfont": "^6.1.1",
+    "jquery": "^3.6.1",
+    "material-components-web": ">=14.0.0",
+    "material-design-icons-iconfont": "^6.7.0",
     "material-design-lite": "^1.3.0",
     "mdl-selectfield": "^1.0.4",
-    "postinstall": "^0.7.0"
+    "postinstall": "^0.7.4"
   },
   "overrides": {
     "micromatch": "4.0.1",
