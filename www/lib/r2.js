@@ -567,7 +567,7 @@ r2.filter_asm = function(x, display) {
 	r2.cmd('s', function(x) {
 		curoff = x;
 	});
-	for (let i = lines.length - 1; i > 0; i--) {
+	for (var i = lines.length - 1; i > 0; i--) {
 		var a = lines[i].match(/0x([a-fA-F0-9]+)/);
 		if (a && a.length > 0) {
 			lastoff = a[0].replace(/:/g, '');
@@ -576,9 +576,9 @@ r2.filter_asm = function(x, display) {
 	}
 	if (display == 'afl') {
 		// hasmore (false);
-		let z = '';
-		for (let i = 0; i < lines.length; i++) {
-			const row = lines[i].replace(/\ +/g, ' ').split(/ /g);
+		var z = '';
+		for (var i = 0; i < lines.length; i++) {
+			var row = lines[i].replace(/\ +/g, ' ').split(/ /g);
 			z += row[0] + '  ' + row[3] + '\n';
 		}
 		x = z;
@@ -608,7 +608,7 @@ r2.filter_asm = function(x, display) {
 				var name = '';
 				var addr = '';
 				for (var j = 0; j < elems.length; j++) {
-					const kv = elems[j].split(/=/);
+					var kv = elems[j].split(/=/);
 					if (kv.length !== 2) {
 						continue;
 					}
