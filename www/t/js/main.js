@@ -164,7 +164,7 @@ window.onload = function () {
       input.onkeyup = function (ev) {
         if (ev.keyCode === 13) {
           r2.cmd(input.value, function (x) {
-            _(n + '_output').innerHTML = '<pre>' + x + '</pre>';
+            _(n + '_output').innerHTML = x; // '<pre>' + x + '</pre>';
             input.value = '';
           });
         }
@@ -302,9 +302,8 @@ window.onload = function () {
             _(n + '_hexdump').innerHTML = seekbar +
       '<br /><center><a class=link href=\'#\' id=' + idPrev + '>[PREV]</a>' +
       '<a class=link href=\'#\' id=' + id_goto + '>[GOTO]</a>' +
-      '<a class=link href=\'#\' id=' + idNext + '>[NEXT]</a></center>' +
-      '<pre>' + x + '</pre>'
-            ;
+      '<a class=link href=\'#\' id=' + idNext + '>[NEXT]</a></center>' + x;
+//      '<pre>' + x + '</pre>' ;
             // var q = document.getElementById(n+'_hexdump_hex_prev');
             var q = document.getElementById(idPrev);
             q.onclick = function () {
@@ -418,8 +417,8 @@ window.onload = function () {
           _(n + '_code').innerHTML = seekbar +
           '<br /><center><a class=link href=\'#\' id=' + idPrev + '>[PREV]</a>' +
           '<a class=link href=\'#\' id=' + id_goto + '>[GOTO]</a>' +
-          '<a class=link href=\'#\' id=' + idNext + '>[NEXT]</a></center>' +
-          '<pre>' + x + '</pre>';
+          '<a class=link href=\'#\' id=' + idNext + '>[NEXT]</a></center>' + x;
+          // '<pre>' + x + '</pre>';
           var q = document.getElementById(idPrev);
           q.onclick = function () {
             r2.cmd('s-512;s', function (res) {
@@ -451,6 +450,10 @@ window.onload = function () {
     });
     seekAction();
     r2.cmd('s', function (res) {
+       if (typeof frame === 'undefined') {
+	   alert("Noframe");
+	   return;
+       }
       frame.offset = res.trim();
       seekAction();
       frame.refresh();
@@ -466,12 +469,12 @@ window.onload = function () {
       r2.cmd(t.cmd, function (x) {
         x = r2.filter_asm(x, 'pd');
         _(t.key).innerHTML =
-      '<div class=\'frame_body\'><a href=\'#\' id=\'cmd_' + ctr + '\'>cmd</a><pre>' + x + '</pre></div>';
+      '<div class=\'frame_body\'><a href=\'#\' id=\'cmd_' + ctr + '\'>cmd</a>' + x + '</div>';
       });
     };
     _('cmd_' + ctr).onclick = function () {
       t.key = 'div_' + ctr;
-      t.cmd = prompt();
+      t.cmd = prompt("lala");
       t.update();
     };
   }
@@ -498,12 +501,12 @@ window.onload = function () {
       r2.cmd(t.cmd, function (x) {
         x = r2.filter_asm(x);
         _(t.key).innerHTML =
-        '<div class=\'frame_body\'><pre>' + x + '</pre></div>';
+        '<div class=\'frame_body\'>' + x + '</div>';
       });
     };
     _('cmd_' + ctr).onclick = function () {
       t.key = 'div_' + ctr;
-      t.cmd = prompt();
+      t.cmd = prompt("pene");
       t.update();
     };
   };
@@ -559,7 +562,7 @@ case 'K': t.move_frame ('up'); break;
 case 'L': t.move_frame ('right'); break;
 */
       case 'i':
-        r2.cmd('pi 2', function (x) { alert(x); });
+        r2.cmd('pi 2', alert);
         break;
       case '!':
         r2.cmd(prompt('Command to execute'), function (x) { alert(x); });

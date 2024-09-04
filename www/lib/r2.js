@@ -1,4 +1,4 @@
-/* radare2 Copyleft 2013-2016 pancake */
+/* radare2 Copyleft 2013-2024 pancake */
 
 var r2 = {};
 
@@ -437,12 +437,9 @@ function _internal_cmd(c, cb, err) {
 	if (hascmd) {
 		// TODO: use setTimeout for async?
 		if (typeof (r2plugin) != 'undefined') {
-			// duktape
-			return cb(r2cmd(c));
-		} else {
-			// node
-			return hascmd(c, cb);
+			return cb(r2cmd(c)); // duktape
 		}
+		return hascmd(c, cb); // node
 	} else {
 		Ajax('GET', r2.root + '/cmd/' + encodeURI(c), '', function(x) {
 				if (cb) {
@@ -565,14 +562,12 @@ r2.getTextLogger = function(obj) {
 
 r2.filter_asm = function(x, display) {
 	var curoff = backward ? prev_curoff : next_curoff;
-	;
 	var lastoff = backward ? prev_lastoff : next_lastoff;
-	;
 	var lines = x.split(/\n/g);
 	r2.cmd('s', function(x) {
 		curoff = x;
 	});
-	for (var i = lines.length - 1; i > 0; i--) {
+	for (let i = lines.length - 1; i > 0; i--) {
 		var a = lines[i].match(/0x([a-fA-F0-9]+)/);
 		if (a && a.length > 0) {
 			lastoff = a[0].replace(/:/g, '');
@@ -580,15 +575,17 @@ r2.filter_asm = function(x, display) {
 		}
 	}
 	if (display == 'afl') {
-		//hasmore (false);
-		var z = '';
-		for (var i = 0; i < lines.length; i++) {
-			var row = lines[i].replace(/\ +/g, ' ').split(/ /g);
+		// hasmore (false);
+		let z = '';
+		for (let i = 0; i < lines.length; i++) {
+			const row = lines[i].replace(/\ +/g, ' ').split(/ /g);
 			z += row[0] + '  ' + row[3] + '\n';
 		}
 		x = z;
-	} else if (display[0] == 'f') {
-		//hasmore (false);
+	} else if (display === '') {
+		// nothing
+	} else if (display[0] === 'f') {
+		// hasmore (false);
 		if (display[1] == 's') {
 			var z = '';
 			for (var i = 0; i < lines.length; i++) {
@@ -603,7 +600,7 @@ r2.filter_asm = function(x, display) {
 		} else {
 		}
 	} else if (display[0] == 'i') {
-		//hasmore (false);
+		// hasmore (false);
 		if (display[1]) {
 			var z = '';
 			for (var i = 0; i < lines.length; i++) {
@@ -611,26 +608,33 @@ r2.filter_asm = function(x, display) {
 				var name = '';
 				var addr = '';
 				for (var j = 0; j < elems.length; j++) {
-					var kv = elems[j].split(/=/);
-					if (kv[0] == 'addr') {
+					const kv = elems[j].split(/=/);
+					if (kv.length !== 2) {
+						continue;
+					}
+					switch (kv[0]) {
+					case 'addr':
 						addr = kv[1];
-					}
-					if (kv[0] == 'name') {
+						break;
+					case 'name':
+					case 'string':
 						name = kv[1];
-					}
-					if (kv[0] == 'string') {
-						name = kv[1];
+						break;
 					}
 				}
 				z += addr + '  ' + name + '\n';
 			}
 			x = z;
 		}
-	} //else hasmore (true);
+	} // else hasmore (true);
 
 	function haveDisasm(x) {
-		if (x[0] == 'p' && x[1] == 'd') return true;
-		if (x.indexOf(';pd') != -1) return true;
+		if (x[0] == 'p' && x[1] == 'd') {
+			return true;
+		}
+		if (x.indexOf(';pd') != -1) {
+			return true;
+		}
 		return false;
 	}
 	if (haveDisasm(display)) {

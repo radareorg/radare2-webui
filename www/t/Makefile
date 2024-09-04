@@ -1,4 +1,5 @@
 VERSION=0.1.1
+NPMBIN=node_modules/.bin
 
 GLOBALS=
 GLOBALS+=--global _
@@ -19,7 +20,7 @@ node_modules:
 build: node_modules
 	mkdir -p dist/t
 	rm -rf dist
-	$(shell npm bin)/gulp
+	$(NPMBIN)/gulp
 
 dist:
 	rm -f $(DISTZIP)
@@ -27,14 +28,16 @@ dist:
 
 run: dist
 #	r2 -e http.ui=dist -e http.root=$$PWD -qc=H /bin/ls
+	(sleep 1 && open http://localhost:9090/t) &
 	r2 -qcq -e http.verbose=true -e http.root=$$PWD/../../dist -e http.ui=t -e http.sandbox=0 -c=H /bin/ls
 
 watch:
-	$(shell npm bin)/gulp watch
+#$(shell npm bin)/gulp watch
+	$(NPMBIN)/gulp watch
 
 mrproper: clean
 	rm -rf node_modules
 
 
 indent:
-	node_modules/.bin/semistandard $(GLOBALS) --fix js/*.js
+	$(NPMBIN)/semistandard $(GLOBALS) --fix js/*.js
