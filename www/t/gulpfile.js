@@ -1,13 +1,12 @@
-var gulp = require('gulp'),
-	tar = require('gulp-tar'),
-	gzip = require('gulp-gzip'),
-	uglify = require('gulp-uglify'),
-	cleanCSS = require('gulp-clean-css'),
-	concat = require('gulp-concat'),
-	gulpUtil = require('gulp-util');
+import gulp from 'gulp';
+import tar from 'gulp-tar';
+import uglify from 'gulp-uglify';
+import cleanCSS from 'gulp-clean-css';
+import concat from 'gulp-concat';
+import gulpUtil from 'gulp-util';
 
-var R2 = '../lib/';
-var DEST = '../../dist/t/'
+const R2 = '../lib/';
+const DEST = '../../dist/t/'
 
 gulp.task('default', async function() {
 	await gulp.src(['js/tiled.js', 'js/modals.js', R2 + 'r2.js', 'js/main.js'])

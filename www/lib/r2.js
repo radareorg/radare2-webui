@@ -330,7 +330,7 @@ r2.get_flag_address = function(name) {
 
 r2.get_flag_names = function(offset) {
 	var names = [];
-	for (var i in r2.flags[offset]) {
+	for (let i in r2.flags[offset]) {
 		names[names.length] = r2.flags[offset][i].name;
 	}
 	return names;
@@ -364,7 +364,7 @@ r2.store_asm_config = function() {
 	config = {};
 	r2.cmd('e', function(x) {
 		conf = x.split('\n');
-		for (var prop in conf) {
+		for (let prop in conf) {
 			var fields = conf[prop].split(' ');
 			if (fields.length == 3) {
 				// TODO: Dont know why byt e~asm. is not working so filtering here
@@ -518,7 +518,7 @@ r2.getTextLogger = function(obj) {
 	obj.refresh = function(cb) {
 		obj.load(function(ret) {
 			//obj.last = 0;
-			for (var i = 0; i < ret.length; i++) {
+			for (let i = 0; i < ret.length; i++) {
 				var message = ret[i];
 				obj.events['message']({
 					'id': message[0],
@@ -567,7 +567,7 @@ r2.filter_asm = function(x, display) {
 	r2.cmd('s', function(x) {
 		curoff = x;
 	});
-	for (var i = lines.length - 1; i > 0; i--) {
+	for (let i = lines.length - 1; i > 0; i--) {
 		var a = lines[i].match(/0x([a-fA-F0-9]+)/);
 		if (a && a.length > 0) {
 			lastoff = a[0].replace(/:/g, '');
@@ -577,8 +577,8 @@ r2.filter_asm = function(x, display) {
 	if (display == 'afl') {
 		// hasmore (false);
 		var z = '';
-		for (var i = 0; i < lines.length; i++) {
-			var row = lines[i].replace(/\ +/g, ' ').split(/ /g);
+		for (let i = 0; i < lines.length; i++) {
+			const row = lines[i].replace(/\ +/g, ' ').split(/ /g);
 			z += row[0] + '  ' + row[3] + '\n';
 		}
 		x = z;
@@ -592,7 +592,9 @@ r2.filter_asm = function(x, display) {
 				var row = lines[i].replace(/\ +/g, ' ').split(/ /g);
 				var mark = row[1] == '*' ? '*' : ' ';
 				var space = row[2] ? row[2] : row[1];
-				if (!space) continue;
+				if (!space) {
+					continue;
+				}
 				z += row[0] + ' ' + mark + ' <a href="javascript:runcmd(\'fs ' +
 				space + '\')">' + space + '</a>\n';
 			}
