@@ -2,14 +2,14 @@ VERSION=0.1.1
 DISTZIP=radare2-webui-p-$(VERSION).zip
 
 build: node_modules
-	$(shell npm bin)/gulp
+	npx gulp
 
 node_modules:
 	npm install
 
 dist release:
 	npm install
-	$(shell npm bin)/gulp release
+	npx gulp release
 	rm -f $(DISTZIP)
 	cd ../../dist && zip -r $(DISTZIP) p
 
@@ -19,8 +19,7 @@ run:
 	r2 -q -e scr.html=0 -e http.sandbox=false -e http.ui=p -e http.root=$(PWD)/../../dev -c=H /bin/ls
 
 watch:
-	$(shell npm bin)/gulp watch
-
+	npx gulp watch
 
 indent:
 	# TODO: use semistandard

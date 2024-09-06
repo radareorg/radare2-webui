@@ -15,10 +15,12 @@ This repository contains the different WebUIs for radare2:
 
 First, you should install [radare2](https://github.com/radare/radare2), then `r2pm` will handle this for you:
 
-    $ r2pm -i www-enyo
-    $ r2pm -i www-m
-    $ r2pm -i www-p
-    $ r2pm -i www-t
+```console
+$ r2pm -i www-enyo
+$ r2pm -i www-m
+$ r2pm -i www-p
+$ r2pm -i www-t
+```
 
 This process will install the proper UI by downloading the latest version available.
 
@@ -26,27 +28,35 @@ This process will install the proper UI by downloading the latest version availa
 
 The Web UIs (/m specifically) are using some tools that require an updated version of `node`, so if you encounter the following error, you should consider an update.
 
-    ~/radare2-webui/www/m/node_modules/gulp-google-webfonts/index.js:209
-        request.name = path.posix.join(options.fontsDir, request.name);
-    TypeError: Cannot call method 'join' of undefined
+```console
+~/radare2-webui/www/m/node_modules/gulp-google-webfonts/index.js:209
+request.name = path.posix.join(options.fontsDir, request.name);
+TypeError: Cannot call method 'join' of undefined
+```
 
 Updating node is easy, I recommand you to follow this [article](https://davidwalsh.name/upgrade-nodejs):
 
-    sudo npm cache clean -f
-    sudo npm install -g n
-    sudo n stable
+```shell
+sudo npm cache clean -f
+sudo npm install -g n
+sudo n stable
+```
 
 # Use it
 
 You can run one of the UI by typing the following command with: `enyo`, `m`, `p` and `t`.
 
-    $ r2 -q -e http.ui=<UI> -c=H /bin/ls
+```shell
+$ r2 -q -e http.ui=<UI> -c=H /bin/ls
+```
 
 # Uninstall
 
 To uninstall an UI, you can use this command.
 
-    $ r2pm -u <package>
+```shell
+$ r2pm -u <package>
+```
 
 # Soon...
 

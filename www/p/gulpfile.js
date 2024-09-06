@@ -1,9 +1,10 @@
-const { src, watch, series, dest } = require('gulp');
+import { src, series, dest } from 'gulp';
+import gulp from 'gulp';
+import uglify from 'gulp-uglify';
+import concat from 'gulp-concat';
+import cleanCSS from 'gulp-clean-css';
 
-var uglify = require('gulp-uglify'),
-	cleanCSS = require('gulp-clean-css'),
-	concat = require('gulp-concat'),
-	bower = require('bower');
+import bower from 'bower';
 
 var paths = {
 	r2: '../lib/',
@@ -51,10 +52,10 @@ const _js = series(
 
 
 const _watch =  function() {
-	watch('./*.html', ['html']);
-	watch(['./lib/js/*.js'], ['js:main']);
-	watch(['./lib/js/**/*.js'], ['js:app']);
-	watch(['./lib/css/**/*.css'], ['js:css']);
+	gulp.watch('./*.html', ['html']);
+	gulp.watch(['./lib/js/*.js'], ['js:main']);
+	gulp.watch(['./lib/js/**/*.js'], ['js:app']);
+	gulp.watch(['./lib/css/**/*.css'], ['js:css']);
 	done();
 };
 
@@ -84,7 +85,7 @@ const _copyVendors = function() {
 			'vendors/jquery/dist/jquery.min.js',
 			'vendors/jquery.scrollTo/jquery.scrollTo.min.js',
 			'vendors/jquery.layout/dist/jquery.layout-latest.min.js',
-			'vendors/jquery-ui/ui/minified/jquery-ui.min.js',
+			'vendors/jquery-ui/jquery-ui.min.js',
 			'vendors/jquery-ui-contextmenu/jquery.ui-contextmenu.min.js',
 			'vendors/onoff/dist/jquery.onoff.min.js',
 			'vendors/lodash/lodash.min.js',
@@ -128,9 +129,9 @@ const _release = series(
 	_releaseVendor
 );
 
-exports.default = series( _bowerInstall, _copyVendors, _js, _css, _common, _default);
-exports.release = series( exports.default, _release)
-exports.watch = series( exports.default, _watch)
-
+export const defaultTask = series(_bowerInstall, _copyVendors, _js, _css, _common, _default);
+export default defaultTask;
+export const release = series(defaultTask, _release);
+export const watch = series(defaultTask, _watch);
 
 

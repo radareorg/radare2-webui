@@ -8,6 +8,7 @@
   },
   "description": "Panel UI for radare2",
   "homepage": "https://radare.org",
+  "type": "module",
   "license": "MIT",
   "maintainers": [
     {
@@ -24,9 +25,12 @@
   "version": "0.10.2",
   "devDependencies": {
     "bower": "^1.8.0",
-    "gulp": "^4.0.2",
-    "gulp-clean-css": "^3.9.0",
+    "gulp": "^5.0.0",
+    "gulp-clean-css": "^4.3.0",
     "gulp-concat": "^2.6.1",
     "gulp-uglify": "^3.0.0"
+  },
+  "dependencies": {
+    "jquery-ui": "^1.14.0"
   }
 }
