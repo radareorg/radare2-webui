@@ -8,7 +8,7 @@ enyo.kind({
 		{kind: 'Image', src: 'icon.png'},
 		{tag: 'h3', style: 'color:#707070;margin-bottom:50px',
 				content: 'the web frontend for radare2'},
-		{tag: 'h2', style: 'color:#a0a0a0', content: 'author: pancake 2013-2014'},
+		{tag: 'h2', style: 'color:#a0a0a0', content: 'author: pancake 2013-2024'},
 		{tag: 'h2', style: 'color:#a0a0a0', content: 'version: ???', name: 'vertext'},
 		{tag: 'h2', style: 'color:#a0a0a0', content: 'revision: ???', name: 'revtext'}
 		]}

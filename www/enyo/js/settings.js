@@ -1,3 +1,18 @@
+
+const archList = [];
+r2.cmd("-a", function(curArch) {
+	curArch = curArch.trim();
+	r2.cmd("-a?", function(arches) {
+		for (let arch of arches.trim().split("\n")) {
+			const entry = {
+				content: arch,
+				active: (arch === curArch)
+			};
+			archList.push(entry);
+		}
+	})
+});
+
 enyo.kind({
 	name: 'Settings',
 	classes: 'panels-sample-sliding-content r2panel',
@@ -23,26 +38,7 @@ enyo.kind({
 				 {tag: 'p', content: 'Arch', classes: 'rowline'},
 				 {kind: 'onyx.PickerDecorator', components: [
 					 {},
-					 {kind: 'onyx.Picker', name: 'arch', components: [
-/* TODO: construct from code */
-						 {content: 'arc'},
-						 {content: 'arm'},
-						 {content: 'avr'},
-						 {content: 'ppc'},
-						 {content: 'bf'},
-						 {content: 'dalvik'},
-						 {content: 'dcpu16'},
-						 {content: 'i8080'},
-						 {content: 'java'},
-						 {content: 'm68k'},
-						 {content: 'mips'},
-						 {content: 'msil'},
-						 {content: 'rar'},
-						 {content: 'sh'},
-						 {content: 'sparc'},
-						 {content: 'x86', active: true},
-						 {content: 'z80'}
-					 ]}
+					 {kind: 'onyx.Picker', name: 'arch', components: archList }
 				 ]}
 			]}
 			,{kind: 'onyx.InputDecorator', components: [
@@ -127,7 +123,7 @@ enyo.kind({
 		self.$.toggle_pseudo.setActive(r2.settings['asm.pseudo']);
 		self.$.toggle_flags.setActive(r2.settings['asm.flags']);
 		self.$.toggle_xrefs.setActive(r2.settings['asm.xrefs']);
-		self.$.toggle_cmtright.setActive(r2.settings['asm.cmtright']);
+		self.$.toggle_cmtright.setActive(r2.settings['asm.cmt.right']);
 		self.$.toggle_offset.setActive(r2.settings['asm.offset']);
 		self.$.toggle_lines.setActive(r2.settings['asm.lines']);
 		var mode = readCookie('r2_view_mode');
