@@ -3,21 +3,22 @@ enyo.kind({
 	kind: 'Scroller',
 	style: 'background-color:#c0c0c0',
 	clear: function() {
-		with (this.$.input) { setContent(value = ''); render(); };
+		const field = this.$.input;
+		field.setContent(value = '');
+		field.render();
 	},
 	demo: function() {
-		with (this.$.input) {
-			setContent(value = [
-				'r2.disassemble (0, "9090", function(text) {',
-				'  show (text)',
-				'  show ()',
-				'  r2.assemble (0, "mov eax, 33", function (text) {',
-				'    show (text);',
-				'  });',
-				'  show (r2)',
-				'});'].join('\n'));
-			render();
-		}
+		const field = this.$.input;
+		field.setContent(value = [
+			'r2.disassemble (0, "9090", function(text) {',
+			'  show (text)',
+			'  show ()',
+			'  r2.assemble (0, "mov eax, 33", function (text) {',
+			'    show (text);',
+			'  });',
+			'  show (r2)',
+			'});'].join('\n'));
+		field.render();
 	},
 	run: function() {
 		var code = this.$.input.value;

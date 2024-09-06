@@ -4,14 +4,13 @@ DISTZIP=radare2-webui-enyo-$(VERSION).zip
 
 build:
 	npm install
-	$(shell npm bin)/gulp
+	npx gulp
 
 run: build
 	r2 -q -e http.ui=enyo -e http.sandbox=0  -e http.root=$(PWD)/../../dist -c=H /bin/ls
 
 watch:
-	$(shell npm bin)/gulp watch
-
+	npx gulp watch
 
 dist:
 	rm -f $(DISTZIP)
