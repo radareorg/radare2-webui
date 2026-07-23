@@ -14,12 +14,40 @@ p {
 body {
   overflow:hidden;
 }
+#mainCanvas {
+  position: relative;
+  z-index: 1;
+}
+#graphControls {
+  z-index: 100000 !important;
+  pointer-events: auto;
+}
 </style>
-<script src="index.js"> </script>
+<script src="index.js"></script>
 </head>
 <body onload="onLoad();">
-  <div id="menu"></div>
-  <div id="mainCanvas" class="canvas" style="width:100%;height:100%;"></div>
-  <div style="z-index:99999;top:0px;left:5px;position:absolute"><h1><a href="../">back</a></h1></div>
+   <div id="menu"></div>
+   <div id="mainCanvas" class="canvas" style="width:100%;height:100%;"></div>
+    <div id="graphControls" onmousedown="event.stopPropagation();" ontouchstart="event.stopPropagation();" style="z-index:99999;top:5px;right:5px;position:fixed;text-align:right;background-color:rgba(255,255,255,0.95);padding:10px;border-radius:6px;border:1px solid #CCCCCC;box-shadow: 2px 2px 4px rgba(0,0,0,0.1);">
+     <h1 style="margin:0;"><a href="../">back</a></h1>
+     <div style="margin-top: 8px;">
+        <button type="button" onclick="loadTestGraph()" style="margin:2px;padding:4px 8px;border:1px solid #CCCCCC;border-radius:3px;background:#F8F8F8;">Test CFG</button>
+        <button type="button" onclick="loadCyclicTestGraph()" style="margin:2px;padding:4px 8px;border:1px solid #CCCCCC;border-radius:3px;background:#F8F8F8;">Cyclic CFG</button>
+        <button type="button" onclick="loadSampleDotGraph()" style="margin:2px;padding:4px 8px;border:1px solid #CCCCCC;border-radius:3px;background:#F8F8F8;">Sample DOT</button>
+        <button type="button" onclick="get_graph()" style="margin:2px;padding:4px 8px;border:1px solid #CCCCCC;border-radius:3px;background:#F8F8F8;">Original</button>
+        <button type="button" onclick="relayoutGraph()" style="margin:2px;padding:4px 8px;border:1px solid #CCCCCC;border-radius:3px;background:#F8F8F8;">Re-layout</button>
+     </div>
+     <div style="margin-top: 8px;">
+        <button type="button" onclick="zoomIn()" style="margin:2px;padding:4px 8px;border:1px solid #CCCCCC;border-radius:3px;background:#F8F8F8;">Zoom In</button>
+        <button type="button" onclick="zoomOut()" style="margin:2px;padding:4px 8px;border:1px solid #CCCCCC;border-radius:3px;background:#F8F8F8;">Zoom Out</button>
+        <button type="button" onclick="resetZoom()" style="margin:2px;padding:4px 8px;border:1px solid #CCCCCC;border-radius:3px;background:#F8F8F8;">Reset Zoom</button>
+        <button type="button" onclick="centerGraph()" style="margin:2px;padding:4px 8px;border:1px solid #CCCCCC;border-radius:3px;background:#F8F8F8;">Center Graph</button>
+       <span id="zoomLevel" style="margin-left:10px;color:#333;">Zoom: 100%</span>
+     </div>
+     <div style="margin-top: 8px;">
+       <textarea id="dotInput" rows="8" cols="35" placeholder="Paste DOT format here..." style="margin-bottom:5px;border:1px solid #CCCCCC;border-radius:3px;padding:4px;font-family:monospace;font-size:10px;"></textarea><br>
+        <button type="button" onclick="loadFromTextarea()">Load DOT</button>
+     </div>
+   </div>
 </body>
 </html>

@@ -12,6 +12,10 @@ run: runm
 
 build: root enyo material tiles panel
 
+graph:
+	r2 -qA -e http.sandbox=false -e http.homeroot=www -e http.ui=graph -c=H /bin/ls
+	open http://localhost:9090/graph
+
 root:
 	$(MAKE) -C www build
 

@@ -3,22 +3,34 @@
 }
 
 div.block, h1.block, h2.block, p.block {
-	border: 1px solid #9DA3B3;
-	/*background-color: #E0E8FF; */
-	background-color: #404040;
-	color: white;
-	padding: 5px;
+	border: 2px solid #4A4A4A;
+	background-color: #F8F8F8;
+	color: #000000;
+	padding: 0px;
+	border-radius: 6px;
+	box-shadow: 3px 3px 6px rgba(0,0,0,0.2);
+	font-family: 'Courier New', monospace;
+	font-size: 10px;
+	min-width: 250px;
+	max-width: 450px;
+	transition: all 0.2s ease;
+}
+
+div.block:hover {
+	box-shadow: 5px 5px 10px rgba(0,0,0,0.3);
+	border-color: #0066CC;
 }
 
 div.canvas {
 	border: 0px solid #262A37;
-	background-color: black;
+	background-color: #F5F5F5;
 /*
 	background-image: url('gradient.jpg');
 	background-repeat: no-repeat;
 	background-position: top right;
 */
-	padding: 0px;	
+	padding: 50px;
+	min-height: 100vh;
 }
 
 .highlighter {
@@ -42,12 +54,12 @@ html {
 }
 
 body {
-	font-family: verdana;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 	font-size: 11px;
 	color: #33333F;
 	padding: 0px;
 	margin: 0px;
-	background-color: black;
+	background-color: #E8E8E8;
 }
 
 h1 {
@@ -78,9 +90,57 @@ a {
 }
 
 div.connector {
-	background-color: #ff9900;
-	width: 5px;
+	background-color: #0066CC;
+	width: 2px;
+	height: 2px;
 	z-index: 1000;
+	box-shadow: 0px 0px 2px rgba(0,102,204,0.5);
+}
+
+/* IDA Pro style edge colors */
+.connector.conditional {
+	background-color: #FF6B35;
+	box-shadow: 0px 0px 2px rgba(255,107,53,0.5);
+}
+
+.connector.unconditional {
+	background-color: #4CAF50;
+	box-shadow: 0px 0px 2px rgba(76,175,80,0.5);
+}
+
+.connector.call {
+	background-color: #2196F3;
+	box-shadow: 0px 0px 2px rgba(33,150,243,0.5);
+}
+
+/* IDA Pro style node components */
+.node-title {
+	background-color: #E8E8E8;
+	border-bottom: 1px solid #CCCCCC;
+	padding: 4px 8px;
+	font-weight: bold;
+	font-size: 11px;
+	color: #2E2E2E;
+	border-radius: 2px 2px 0 0;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	text-align: center;
+}
+
+.node-body {
+	padding: 6px 8px;
+	background-color: #FFFFFF;
+	border-radius: 0 0 2px 2px;
+}
+
+.node-body pre {
+	margin: 0;
+	padding: 0;
+	font-family: 'Courier New', monospace;
+	font-size: 10px;
+	line-height: 1.2;
+	color: #000000;
+	white-space: pre-wrap;
+	word-wrap: break-word;
 }
 
 table.main_table {

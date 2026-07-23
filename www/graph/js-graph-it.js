@@ -5,6 +5,533 @@
 var ie=document.all;
 var nn6=document.getElementById&&!document.all;
 
+/*********************
+ * DOT format parser *
+ *********************/
+
+/**
+ * Parse basic GraphViz DOT format and return nodes and edges
+ * @param {string} dotString - The DOT format string
+ * @returns {object} Object with nodes and edges arrays
+ */
+function parseDotFormat(dotString) {
+    var nodes = [];
+    var edges = [];
+
+    // Remove comments (//, /* */, and #) while respecting quoted strings
+    dotString = (function stripComments(input) {
+        var out = '';
+        var inString = false;
+        var escapeNext = false;
+        for (var i = 0; i < input.length; i++) {
+            var c = input[i];
+            var next = i + 1 < input.length ? input[i + 1] : '';
+
+            if (escapeNext) {
+                out += c;
+                escapeNext = false;
+                continue;
+            }
+
+            if (c === '\\') {
+                // keep escapes inside strings
+                if (inString) {
+                    escapeNext = true;
+                }
+                out += c;
+                continue;
+            }
+
+            if (c === '"') {
+                inString = !inString;
+                out += c;
+                continue;
+            }
+
+            if (!inString) {
+                // C++ style // comment
+                if (c === '/' && next === '/') {
+                    // skip until end of line
+                    while (i < input.length && input[i] !== '\n') i++;
+                    out += '\n';
+                    continue;
+                }
+                // C style /* */ comment
+                if (c === '/' && next === '*') {
+                    i += 2; // skip /*
+                    while (i < input.length && !(input[i] === '*' && i + 1 < input.length && input[i + 1] === '/')) i++;
+                    i++; // skip closing '/'
+                    continue;
+                }
+                // Graphviz # line comment (but not in strings)
+                if (c === '#') {
+                    while (i < input.length && input[i] !== '\n') i++;
+                    out += '\n';
+                    continue;
+                }
+            }
+
+            out += c;
+        }
+        return out;
+    })(dotString);
+
+    // Extract content between digraph braces
+    var graphMatch = dotString.match(/digraph\s+(?:"[^"]*"|\w+)?\s*\{([\s\S]*)\}/);
+    if (!graphMatch) {
+        console.error('Invalid DOT format: missing digraph declaration');
+        return { nodes: nodes, edges: edges };
+    }
+
+    var content = graphMatch[1];
+
+    // Use a more robust parser that handles quoted strings properly
+    var statements = parseDotStatements(content);
+
+    for (var i = 0; i < statements.length; i++) {
+        var statement = statements[i].trim();
+        if (!statement) continue;
+
+        // Skip graph, node, and edge attribute statements
+        if (statement.match(/^(graph|node|edge)\s*\[/)) continue;
+
+        // Check if it's an edge (contains ->)
+        if (statement.indexOf('->') !== -1) {
+            // Parse edge: "node1" -> "node2" [attributes] or node1 -> node2 [attributes]
+            var edgeMatch = statement.match(/^\s*"([^"]+)"\s*->\s*"([^"]+)"|^(\w+)\s*->\s*(\w+)/);
+            if (edgeMatch) {
+                var source = edgeMatch[1] || edgeMatch[3];
+                var target = edgeMatch[2] || edgeMatch[4];
+                edges.push({
+                    source: source,
+                    target: target
+                });
+
+                // Add nodes if not already present
+                if (!nodes.find(n => n.id === source)) {
+                    nodes.push({ id: source, label: source });
+                }
+                if (!nodes.find(n => n.id === target)) {
+                    nodes.push({ id: target, label: target });
+                }
+            }
+        } else if (statement.indexOf('[') !== -1) {
+            // Parse node with attributes: "node_id" [label="content", ...]
+            var nodeMatch = statement.match(/^\s*"([^"]+)"\s*\[([^\]]+)\]|^(\w+)\s*\[([^\]]+)\]/);
+            if (nodeMatch) {
+                var nodeId = nodeMatch[1] || nodeMatch[3];
+                var attributes = nodeMatch[2] || nodeMatch[4];
+
+                // Extract label from attributes - handle multi-line labels properly
+                var labelMatch = attributes.match(/label\s*=\s*"((?:[^"\\]|\\.|\\")*)"/);
+                var label = labelMatch ? labelMatch[1] : nodeId;
+
+                // Clean up the label (handle various escape sequences)
+                label = label.replace(/\\l/g, '\n');  // Left-aligned line break
+                label = label.replace(/\\n/g, '\n');  // Regular newline
+                label = label.replace(/\\r/g, '\r');  // Carriage return
+                label = label.replace(/\\t/g, '\t');  // Tab
+                label = label.replace(/\\"/g, '"');   // Escaped quotes
+                label = label.replace(/\\\\/g, '\\'); // Escaped backslashes
+
+                var existingNode = nodes.find(n => n.id === nodeId);
+                if (!existingNode) {
+                    nodes.push({ id: nodeId, label: label });
+                } else {
+                    existingNode.label = label;
+                }
+            }
+        }
+    }
+
+    // Fallback parser if nothing was detected (be permissive)
+    if (nodes.length === 0 && edges.length === 0) {
+        try {
+            // Nodes
+            var nodeRegex = /"([^"]+)"\s*\[([^\]]*)\]/g;
+            var m;
+            while ((m = nodeRegex.exec(content)) !== null) {
+                var nid = m[1];
+                var attrs = m[2] || '';
+                var lm = attrs.match(/label\s*=\s*"((?:[^"\\]|\\.)*)"/);
+                var lbl = lm ? lm[1] : nid;
+                lbl = lbl.replace(/\\l/g, '\n').replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+                if (!nodes.find(function(n){return n.id===nid;})) nodes.push({id:nid, label: lbl});
+            }
+            // Edges
+            var edgeRegex = /"([^"]+)"\s*->\s*"([^"]+)"/g;
+            var em;
+            while ((em = edgeRegex.exec(content)) !== null) {
+                edges.push({ source: em[1], target: em[2] });
+                if (!nodes.find(function(n){return n.id===em[1];})) nodes.push({id: em[1], label: em[1]});
+                if (!nodes.find(function(n){return n.id===em[2];})) nodes.push({id: em[2], label: em[2]});
+            }
+        } catch(e) {
+            // ignore
+        }
+    }
+
+    return { nodes: nodes, edges: edges };
+}
+
+/**
+ * Parse DOT statements, properly handling quoted strings and semicolons
+ * @param {string} content - The content inside the digraph braces
+ * @returns {string[]} Array of statements
+ */
+function parseDotStatements(content) {
+    var statements = [];
+    var current = '';
+    var inString = false;
+    var escapeNext = false;
+    var bracketDepth = 0; // Tracks [...] attribute lists
+
+    for (var i = 0; i < content.length; i++) {
+        var char = content[i];
+
+        if (escapeNext) {
+            current += char;
+            escapeNext = false;
+            continue;
+        }
+
+        if (char === '\\') {
+            escapeNext = true;
+            current += char;
+            continue;
+        }
+
+        if (char === '"') {
+            inString = !inString;
+            current += char;
+            continue;
+        }
+
+        // Track attribute list brackets when not inside strings
+        if (!inString) {
+            if (char === '[') {
+                bracketDepth++;
+            } else if (char === ']') {
+                bracketDepth = Math.max(0, bracketDepth - 1);
+                // Include the closing bracket in the current token
+                current += char;
+                // If we are back to top-level after an attribute list, this can terminate a statement
+                if (bracketDepth === 0) {
+                    if (current.trim()) {
+                        statements.push(current.trim());
+                    }
+                    current = '';
+                    continue;
+                }
+                // Already appended ']' and handled termination if needed
+                continue;
+            }
+        }
+
+        // Semicolon also terminates a statement when not in a string
+        if (char === ';' && !inString && bracketDepth === 0) {
+            if (current.trim()) {
+                statements.push(current.trim());
+            }
+            current = '';
+            continue;
+        }
+
+        current += char;
+    }
+
+    // Add the last statement if any
+    if (current.trim()) {
+        statements.push(current.trim());
+    }
+
+    return statements;
+}
+
+/**
+ * Create HTML elements for nodes and edges from parsed DOT data
+ * @param {object} graphData - Object with nodes and edges arrays
+ * @param {HTMLElement} container - Container element to append to
+ */
+function createGraphFromDot(graphData, container) {
+    var nodes = graphData.nodes;
+    var edges = graphData.edges;
+
+    // Clear existing content
+    container.innerHTML = '';
+
+    // Create nodes (pre-position to ensure visibility even before layout)
+    var seedX = 20, seedY = 20, seedRowH = 0, seedGapX = 30, seedGapY = 40;
+    var seedMaxW = container.clientWidth || 800;
+    for (var i = 0; i < nodes.length; i++) {
+        var node = nodes[i];
+        var nodeDiv = document.createElement('div');
+        nodeDiv.className = 'block draggable';
+        nodeDiv.id = node.id;
+
+        // Use the parsed label from DOT format
+        var blockContent = node.label || node.id;
+
+        // Parse the label to extract title and body for IDA Pro style
+        var title = node.id;
+        var body = blockContent;
+
+        // If the label contains multiple lines, extract function name as title
+        var lines = blockContent.split('\n');
+        if (lines.length > 1) {
+            // Look for function signature in first line
+            var firstLine = lines[0].trim();
+            if (firstLine.includes('sym.func.') || firstLine.includes('(')) {
+                title = firstLine;
+                body = lines.slice(1).join('\n').trim();
+            } else {
+                // Use address as title, rest as body
+                title = node.id;
+                body = blockContent;
+            }
+        }
+
+        // Create IDA Pro style node with title and body
+        nodeDiv.innerHTML = '<div class="node-title">' + title + '</div>' +
+                           '<div class="node-body"><pre>' + body + '</pre></div>';
+        // ensure absolute positioning so it shows before layout
+        nodeDiv.style.position = 'absolute';
+        nodeDiv.style.left = seedX + 'px';
+        nodeDiv.style.top = seedY + 'px';
+
+        container.appendChild(nodeDiv);
+
+        // naive pre-layout to avoid blank screen
+        var w = nodeDiv.offsetWidth || 250;
+        var h = nodeDiv.offsetHeight || 80;
+        seedRowH = Math.max(seedRowH, h);
+        seedX += (w + seedGapX);
+        if (seedX > seedMaxW - 200) { // wrap row
+            seedX = 20;
+            seedY += seedRowH + seedGapY;
+            seedRowH = 0;
+        }
+    }
+
+    // Create edges
+    for (var j = 0; j < edges.length; j++) {
+        var edge = edges[j];
+        var edgeDiv = document.createElement('div');
+        edgeDiv.className = 'connector ' + edge.source + ' ' + edge.target;
+        edgeDiv.id = 'edge_' + j;
+        container.appendChild(edgeDiv);
+    }
+}
+
+/************************
+ * Control Flow Graph Layout *
+ ************************/
+
+/**
+ * Detect cycles in the graph using DFS
+ * @param {string} node - Current node
+ * @param {Object} adjList - Adjacency list
+ * @param {Object} visited - Visited nodes
+ * @param {Object} recStack - Recursion stack
+ * @returns {boolean} True if cycle detected
+ */
+function hasCycleDFS(node, adjList, visited, recStack) {
+    visited[node] = true;
+    recStack[node] = true;
+
+    var neighbors = adjList[node] || [];
+    for (var i = 0; i < neighbors.length; i++) {
+        var neighbor = neighbors[i];
+        if (!visited[neighbor] && hasCycleDFS(neighbor, adjList, visited, recStack)) {
+            return true;
+        } else if (recStack[neighbor]) {
+            return true;
+        }
+    }
+
+    recStack[node] = false;
+    return false;
+}
+
+/**
+ * Check if graph has cycles
+ * @param {Object} adjList - Adjacency list
+ * @returns {boolean} True if cycles exist
+ */
+function hasCycles(adjList) {
+    var visited = {};
+    var recStack = {};
+
+    for (var node in adjList) {
+        if (!visited[node]) {
+            if (hasCycleDFS(node, adjList, visited, recStack)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+/**
+ * Layout nodes in a control-flow-graph style using topological sorting
+ * @param {Array} blocks - Array of Block objects
+ * @param {Array} connectors - Array of Connector objects
+ * @param {Object} canvas - Canvas object for dimension calculations
+ */
+function layoutControlFlowGraph(blocks, connectors, canvas) {
+    if (!blocks || blocks.length === 0) return;
+
+    // Build adjacency (outgoing) and incoming lists and indegree map
+    var adjList = {};
+    var inAdj = {};
+    var indegree = {};
+    var nodeMap = {};
+
+    for (var i = 0; i < blocks.length; i++) {
+        var blockId = blocks[i].id;
+        adjList[blockId] = [];
+        inAdj[blockId] = [];
+        indegree[blockId] = 0;
+        nodeMap[blockId] = blocks[i];
+    }
+
+    for (var j = 0; j < connectors.length; j++) {
+        var connector = connectors[j];
+        if (connector.source && connector.destination) {
+            var sourceId = connector.source.id;
+            var destId = connector.destination.id;
+            adjList[sourceId].push(destId);
+            inAdj[destId].push(sourceId);
+            indegree[destId] = (indegree[destId] || 0) + 1;
+        }
+    }
+
+    // Kahn topological layering
+    var queue = [];
+    var levels = {};
+    var currentLevel = 0;
+    var processed = 0;
+
+    for (var nodeId in indegree) {
+        if (indegree[nodeId] === 0) {
+            queue.push(nodeId);
+            levels[nodeId] = 0;
+        }
+    }
+
+    while (queue.length > 0) {
+        var levelSize = queue.length;
+        for (var k = 0; k < levelSize; k++) {
+            var currentNode = queue.shift();
+            processed++;
+            var neighbors = adjList[currentNode] || [];
+            for (var m = 0; m < neighbors.length; m++) {
+                var neighbor = neighbors[m];
+                indegree[neighbor]--;
+                if (indegree[neighbor] === 0) {
+                    queue.push(neighbor);
+                    levels[neighbor] = currentLevel + 1;
+                }
+            }
+        }
+        currentLevel++;
+    }
+
+    // Handle cycles: place remaining nodes at the deepest current level
+    if (processed < Object.keys(nodeMap).length) {
+        for (var id in nodeMap) {
+            if (!(id in levels)) levels[id] = currentLevel; // push cyclic nodes down
+        }
+    }
+
+    // Bucket nodes by level and compute level sizes
+    var levelNodes = {};
+    var maxLevel = 0;
+    for (var id2 in levels) {
+        var lvl = levels[id2];
+        if (!levelNodes[lvl]) levelNodes[lvl] = [];
+        levelNodes[lvl].push(id2);
+        if (lvl > maxLevel) maxLevel = lvl;
+    }
+
+    // Barycentric ordering to reduce crossings
+    var xPos = {}; // store x of nodes once placed for ordering of subsequent levels
+    var baseGapX = 60;
+    var gapY = 80;
+
+    // Compute level heights to stack with spacing
+    var levelHeights = [];
+    for (var l = 0; l <= maxLevel; l++) {
+        var nodesAt = levelNodes[l] || [];
+        var h = 0;
+        for (var t = 0; t < nodesAt.length; t++) {
+            var b = nodeMap[nodesAt[t]];
+            if (b) h = Math.max(h, b.height());
+        }
+        levelHeights[l] = h || 50;
+    }
+
+    // Canvas dimensions
+    var canvasWidth = canvas ? (canvas.width || canvas.htmlElement.offsetWidth) : 800;
+    var startY = 20; // top margin
+    var yCursor = startY;
+
+    for (var l2 = 0; l2 <= maxLevel; l2++) {
+        var nodesAtLevel = levelNodes[l2] || [];
+        if (nodesAtLevel.length === 0) {
+            yCursor += levelHeights[l2] + gapY;
+            continue;
+        }
+
+        // Sort by barycenter of predecessors (or keep stable for level 0)
+        if (l2 > 0) {
+            nodesAtLevel.sort(function(a, b) {
+                function barycenter(id) {
+                    var preds = inAdj[id] || [];
+                    if (preds.length === 0) return 0;
+                    var sum = 0, count = 0;
+                    for (var p = 0; p < preds.length; p++) {
+                        var px = xPos[preds[p]];
+                        if (typeof px === 'number') { sum += px; count++; }
+                    }
+                    return count ? (sum / count) : 0;
+                }
+                return barycenter(a) - barycenter(b);
+            });
+        }
+
+        // Compute total width of this level using actual block widths
+        var totalWidth = 0;
+        var widths = [];
+        for (var n = 0; n < nodesAtLevel.length; n++) {
+            var bl = nodeMap[nodesAtLevel[n]];
+            var w = bl ? bl.width() : 200;
+            widths.push(w);
+            totalWidth += w;
+        }
+        var totalGaps = baseGapX * (nodesAtLevel.length - 1);
+        var levelTotal = totalWidth + totalGaps;
+        var startX = Math.max(20, (canvasWidth - levelTotal) / 2);
+
+        // Place nodes in order, store center x for barycenter of next level
+        var xCursor = startX;
+        for (var idx = 0; idx < nodesAtLevel.length; idx++) {
+            var nodeId = nodesAtLevel[idx];
+            var block = nodeMap[nodeId];
+            var w = widths[idx];
+            if (block) {
+                var x = xCursor;
+                var y = yCursor;
+                block.move(x, y);
+                xPos[nodeId] = x + w / 2;
+            }
+            xCursor += w + baseGapX;
+        }
+
+        yCursor += levelHeights[l2] + gapY;
+    }
+}
+
 /****************************************************
  * This class is a scanner for the visitor pattern. *
  ****************************************************/
@@ -40,6 +567,8 @@ function DocumentScanner(visitor, scanElementsOnly) {
 var isdrag=false;					// this flag indicates that the mouse movement is actually a drag.
 var mouseStartX, mouseStartY;		// mouse position when drag starts
 var elementStartX, elementStartY;	// element position when drag starts
+var lastRepaintTime = 0;			// timestamp of last connector repaint during drag
+var repaintThrottleMs = 16;			// throttle repaints to ~60fps (16ms)
 
 /**
  * the html element being dragged.
@@ -50,6 +579,35 @@ var elementToMove;
  * an array containing the blocks being dragged. This is used to notify them of move.
  */
 var blocksToMove;
+
+/**
+ * flag indicating if we're panning the entire canvas
+ */
+var canvasPanning = false;
+
+/**
+ * array storing initial positions of blocks for panning
+ */
+var initialBlockPositions = [];
+
+/**
+ * flag indicating if we're scrolling the canvas
+ */
+var canvasScrolling = false;
+
+/**
+ * initial scroll positions for scrolling
+ */
+var initialScrollLeft = 0;
+var initialScrollTop = 0;
+
+/**
+ * zoom level and related variables
+ */
+var currentZoom = 1.0;
+var minZoom = 0.1;
+var maxZoom = 3.0;
+var zoomStep = 0.1;
 
 /**
  * this variable stores the original z-index of the object being dragged in order
@@ -102,16 +660,17 @@ function movemouse(e) {
 
 //		elementToMove.style.left = newElementX / elementToMove.parentNode.offsetWidth * 100 + '%';
 //		elementToMove.style.top  = newElementY / elementToMove.parentNode.offsetHeight * 100 + '%';
-	
+
 		elementToMove.style.right = null;
 		elementToMove.style.bottom = null;
-		
-		for (var i = 0; i < blocksToMove.length; i++) {
-			if (blocksToMove[i])
-				blocksToMove[i].onMove();
-		}
-		return false;
-	}
+
+        // Repaint connectors for affected blocks
+        for (var i = 0; i < blocksToMove.length; i++) {
+            if (blocksToMove[i])
+                blocksToMove[i].onMove();
+        }
+        return false;
+    }
 }
 
 /**
@@ -119,13 +678,13 @@ function movemouse(e) {
  * (i.e.: the html element under mouse pointer), then setup the document's onmousemove function to
  * move the element around.
  */
-function startDrag(e) {	
+function startDrag(e) {
 	var eventSource = nn6 ? e.target : event.srcElement;
 	if (eventSource.tagName == 'HTML')
 		return;
 
 	while (eventSource != document.body && !hasClass(eventSource, "draggable"))
-	{  	
+	{
 		eventSource = nn6 ? eventSource.parentNode : eventSource.parentElement;
 	}
 
@@ -134,17 +693,17 @@ function startDrag(e) {
 		isdrag = true;
 		elementToMove = eventSource;
 
-		// set absolute positioning on the element		
+		// set absolute positioning on the element
 		elementToMove.style.position = "absolute";
-				
+
 		// calculate start point
 		elementStartX = elementToMove.offsetLeft;
 		elementStartY = elementToMove.offsetTop;
-		
+
 		// calculate mouse start point
 		mouseStartX = nn6 ? e.clientX : event.clientX;
 		mouseStartY = nn6 ? e.clientY : event.clientY;
-		
+
 		// calculate bounds as left, top, width, height of the parent element
 		if(getStyle(elementToMove.parentNode, "position") == 'absolute') {
 			bounds[0] = bounds[1] = 0;
@@ -153,27 +712,319 @@ function startDrag(e) {
 			bounds[1] = calculateOffsetTop(elementToMove.parentNode);
 		}
 		bounds[2] = bounds[0] + elementToMove.parentNode.offsetWidth;
-		bounds[3] = bounds[1] + elementToMove.parentNode.offsetHeight;		
-		
+		bounds[3] = bounds[1] + elementToMove.parentNode.offsetHeight;
+
 		// either find the block related to the dragging element to call its onMove method
 		blocksToMove = new Array();
-		
+
 		blocksToMoveScanner.scan(eventSource);
 		document.onmousemove = movemouse;
-		
+
 		originalZIndex = getStyle(elementToMove, "z-index");
 		elementToMove.style.zIndex = "3";
-		
+
 		return false;
+	} else {
+		// Check if we're clicking on the canvas background for panning
+		var canvasElement = findCanvasElement(eventSource);
+		if (canvasElement) {
+			// Start canvas scrolling
+			isdrag = true;
+			elementToMove = null; // No specific element to move
+			canvasScrolling = true;
+
+			// Store initial mouse position and scroll position for scrolling
+			mouseStartX = nn6 ? e.clientX : event.clientX;
+			mouseStartY = nn6 ? e.clientY : event.clientY;
+			initialScrollLeft = canvasElement.scrollLeft;
+			initialScrollTop = canvasElement.scrollTop;
+
+			document.onmousemove = scrollCanvas;
+			return false;
+		}
 	}
 }
 
+/**
+ * Scroll the canvas by adjusting scroll position
+ */
+function scrollCanvas(e) {
+    if (canvasScrolling) {
+        var currentMouseX = nn6 ? e.clientX : event.clientX;
+        var currentMouseY = nn6 ? e.clientY : event.clientY;
+
+        var deltaX = currentMouseX - mouseStartX;
+        var deltaY = currentMouseY - mouseStartY;
+
+        // Find the canvas element and update scroll position
+        if (canvases && canvases.length > 0) {
+            var canvasElement = canvases[0].htmlElement;
+            var scrollSpeed = 1.5; // Adjust scroll sensitivity
+            canvasElement.scrollLeft = initialScrollLeft - deltaX * scrollSpeed;
+            canvasElement.scrollTop = initialScrollTop - deltaY * scrollSpeed;
+        }
+
+        return false;
+    }
+}
+
+/**
+ * Check if a line segment intersects with any node
+ */
+function lineIntersectsNodes(x1, y1, x2, y2, excludeNode) {
+	if (!canvases || canvases.length === 0) return false;
+
+	var canvas = canvases[0];
+	for (var i = 0; i < canvas.blocks.length; i++) {
+		var block = canvas.blocks[i];
+		if (block === excludeNode) continue;
+
+		var blockLeft = block.left();
+		var blockTop = block.top();
+		var blockRight = blockLeft + block.width();
+		var blockBottom = blockTop + block.height();
+
+		// Check if line intersects with block bounding box
+		if (lineIntersectsRect(x1, y1, x2, y2, blockLeft, blockTop, blockRight, blockBottom)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * Check if a line intersects with a rectangle
+ */
+function lineIntersectsRect(x1, y1, x2, y2, rectLeft, rectTop, rectRight, rectBottom) {
+	// Check if either endpoint is inside the rectangle
+	if (x1 >= rectLeft && x1 <= rectRight && y1 >= rectTop && y1 <= rectBottom) return true;
+	if (x2 >= rectLeft && x2 <= rectRight && y2 >= rectTop && y2 <= rectBottom) return true;
+
+	// Check line intersections with rectangle edges
+	return lineIntersectsLine(x1, y1, x2, y2, rectLeft, rectTop, rectRight, rectTop) || // top
+		   lineIntersectsLine(x1, y1, x2, y2, rectRight, rectTop, rectRight, rectBottom) || // right
+		   lineIntersectsLine(x1, y1, x2, y2, rectRight, rectBottom, rectLeft, rectBottom) || // bottom
+		   lineIntersectsLine(x1, y1, x2, y2, rectLeft, rectBottom, rectLeft, rectTop); // left
+}
+
+/**
+ * Find a clear path between two nodes that avoids intersecting other nodes
+ */
+function findClearPath(sourceBlock, destBlock, sourceLeft, sourceTop, sourceWidth, sourceHeight,
+                      destLeft, destTop, destWidth, destHeight, goingRight) {
+	var sourceCenterY = sourceTop + sourceHeight / 2;
+	var destCenterY = destTop + destHeight / 2;
+	var baseVLength = destCenterY - sourceCenterY;
+
+	// Start with direct path
+	var hLength = goingRight ? (destLeft - (sourceLeft + sourceWidth)) : (destLeft + destWidth - sourceLeft);
+	var startHLength = Math.floor(Math.abs(hLength) / 2);
+	var endHLength = Math.floor(Math.abs(hLength) / 2);
+
+	// Try direct path first
+	var directPath = {
+		vLength: baseVLength,
+		startHLength: goingRight ? startHLength : -startHLength,
+		endHLength: goingRight ? endHLength : -endHLength
+	};
+
+	if (!pathIntersectsNodes(sourceBlock, destBlock, directPath, sourceLeft, sourceTop, sourceWidth, sourceHeight,
+	                        destLeft, destTop, destWidth, destHeight, goingRight)) {
+		return directPath;
+	}
+
+	// If direct path intersects, try with increasing vertical offsets
+	var maxOffset = 200; // Maximum vertical offset to try
+	var step = 20; // Step size for offset
+
+	for (var offset = step; offset <= maxOffset; offset += step) {
+		// Try positive offset
+		var pathUp = {
+			vLength: baseVLength + offset,
+			startHLength: goingRight ? startHLength : -startHLength,
+			endHLength: goingRight ? endHLength : -endHLength
+		};
+
+		if (!pathIntersectsNodes(sourceBlock, destBlock, pathUp, sourceLeft, sourceTop, sourceWidth, sourceHeight,
+		                        destLeft, destTop, destWidth, destHeight, goingRight)) {
+			return pathUp;
+		}
+
+		// Try negative offset
+		var pathDown = {
+			vLength: baseVLength - offset,
+			startHLength: goingRight ? startHLength : -startHLength,
+			endHLength: goingRight ? endHLength : -endHLength
+		};
+
+		if (!pathIntersectsNodes(sourceBlock, destBlock, pathDown, sourceLeft, sourceTop, sourceWidth, sourceHeight,
+		                        destLeft, destTop, destWidth, destHeight, goingRight)) {
+			return pathDown;
+		}
+	}
+
+	// If no clear path found, return the direct path as fallback
+	return directPath;
+}
+
+/**
+ * Check if a proposed path intersects with any nodes
+ */
+function pathIntersectsNodes(sourceBlock, destBlock, path, sourceLeft, sourceTop, sourceWidth, sourceHeight,
+                            destLeft, destTop, destWidth, destHeight, goingRight) {
+	var sourceX = goingRight ? sourceLeft + sourceWidth : sourceLeft;
+	var sourceY = sourceTop + sourceHeight / 2;
+
+	var cornerX = sourceX + path.startHLength * (goingRight ? 1 : -1);
+	var cornerY = sourceY + path.vLength;
+
+	var destX = goingRight ? destLeft : destLeft + destWidth;
+	var destY = destTop + destHeight / 2;
+
+	// Check three segments of the path
+	// 1. Horizontal from source to corner
+	if (lineIntersectsNodes(sourceX, sourceY, cornerX, sourceY, sourceBlock)) return true;
+
+	// 2. Vertical from corner to destination level
+	if (lineIntersectsNodes(cornerX, sourceY, cornerX, cornerY, sourceBlock)) return true;
+
+	// 3. Horizontal from corner to destination
+	if (lineIntersectsNodes(cornerX, cornerY, destX, destY, destBlock)) return true;
+
+	return false;
+}
+
+/**
+ * Find a clear path between two nodes for vertical routing that avoids intersecting other nodes
+ */
+function findClearPathVertical(sourceBlock, destBlock, sourceLeft, sourceTop, sourceWidth, sourceHeight,
+                              destLeft, destTop, destWidth, destHeight, goingDown) {
+	var sourceCenterX = sourceLeft + sourceWidth / 2;
+	var destCenterX = destLeft + destWidth / 2;
+	var baseHLength = destCenterX - sourceCenterX;
+
+	// Start with direct path
+	var vLength = goingDown ? (destTop - (sourceTop + sourceHeight)) : (destTop + destHeight - sourceTop);
+	var startVLength = Math.floor(Math.abs(vLength) / 2);
+	var endVLength = Math.floor(Math.abs(vLength) / 2);
+
+	// Try direct path first
+	var directPath = {
+		hLength: baseHLength,
+		startVLength: goingDown ? startVLength : -startVLength,
+		endVLength: goingDown ? endVLength : -endVLength
+	};
+
+	if (!pathIntersectsNodesVertical(sourceBlock, destBlock, directPath, sourceLeft, sourceTop, sourceWidth, sourceHeight,
+	                                destLeft, destTop, destWidth, destHeight, goingDown)) {
+		return directPath;
+	}
+
+	// If direct path intersects, try with increasing horizontal offsets
+	var maxOffset = 200; // Maximum horizontal offset to try
+	var step = 20; // Step size for offset
+
+	for (var offset = step; offset <= maxOffset; offset += step) {
+		// Try positive offset
+		var pathRight = {
+			hLength: baseHLength + offset,
+			startVLength: goingDown ? startVLength : -startVLength,
+			endVLength: goingDown ? endVLength : -endVLength
+		};
+
+		if (!pathIntersectsNodesVertical(sourceBlock, destBlock, pathRight, sourceLeft, sourceTop, sourceWidth, sourceHeight,
+		                                destLeft, destTop, destWidth, destHeight, goingDown)) {
+			return pathRight;
+		}
+
+		// Try negative offset
+		var pathLeft = {
+			hLength: baseHLength - offset,
+			startVLength: goingDown ? startVLength : -startVLength,
+			endVLength: goingDown ? endVLength : -endVLength
+		};
+
+		if (!pathIntersectsNodesVertical(sourceBlock, destBlock, pathLeft, sourceLeft, sourceTop, sourceWidth, sourceHeight,
+		                                destLeft, destTop, destWidth, destHeight, goingDown)) {
+			return pathLeft;
+		}
+	}
+
+	// If no clear path found, return the direct path as fallback
+	return directPath;
+}
+
+/**
+ * Check if a proposed vertical path intersects with any nodes
+ */
+function pathIntersectsNodesVertical(sourceBlock, destBlock, path, sourceLeft, sourceTop, sourceWidth, sourceHeight,
+                                    destLeft, destTop, destWidth, destHeight, goingDown) {
+	var sourceX = sourceLeft + sourceWidth / 2;
+	var sourceY = goingDown ? sourceTop + sourceHeight : sourceTop;
+
+	var cornerY = sourceY + path.startVLength * (goingDown ? 1 : -1);
+	var cornerX = sourceX + path.hLength;
+
+	var destX = destLeft + destWidth / 2;
+	var destY = goingDown ? destTop : destTop + destHeight;
+
+	// Check three segments of the path
+	// 1. Vertical from source to corner
+	if (lineIntersectsNodes(sourceX, sourceY, sourceX, cornerY, sourceBlock)) return true;
+
+	// 2. Horizontal from corner to destination level
+	if (lineIntersectsNodes(sourceX, cornerY, cornerX, cornerY, sourceBlock)) return true;
+
+	// 3. Vertical from corner to destination
+	if (lineIntersectsNodes(cornerX, cornerY, destX, destY, destBlock)) return true;
+
+	return false;
+}
+
+/**
+ * Check if two lines intersect
+ */
+function lineIntersectsLine(x1, y1, x2, y2, x3, y3, x4, y4) {
+	var denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+	if (denom === 0) return false; // parallel lines
+
+	var t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom;
+	var u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denom;
+
+	return t >= 0 && t <= 1 && u >= 0 && u <= 1;
+}
+
 function stopDrag(e) {
-	isdrag = false; 
+	isdrag = false;
+	canvasPanning = false;
+	canvasScrolling = false;
+	initialBlockPositions = [];
+
+	// Final repaint of all connectors after dragging stops
+	if (canvases && canvases.length > 0) {
+		var canvas = canvases[0];
+		for (var i = 0; i < canvas.connectors.length; i++) {
+			canvas.connectors[i].repaint();
+		}
+	}
+
 	if (elementToMove)
 		elementToMove.style.zIndex=originalZIndex;
 	elementToMove = null;
 	document.onmousemove = null;
+}
+
+/**
+ * Find the canvas element from a given element
+ */
+function findCanvasElement(element) {
+	while (element && element != document.body) {
+		if (hasClass(element, "canvas")) {
+			return element;
+		}
+		element = nn6 ? element.parentNode : element.parentElement;
+	}
+	return null;
 }
 
 document.onmousedown = startDrag;
@@ -194,10 +1045,80 @@ document.ontouchstart = function(x) {
 document.ontouchmove = function(x) {
 	if (x.touches.length >1) return;
 	isdrag = true;
-	movemouse (touch2move (x));
+	if (canvasScrolling) {
+		scrollCanvas(touch2move (x));
+	} else {
+		movemouse (touch2move (x));
+	}
 	x.preventDefault();
 }
 document.ontouchend = stopDrag;
+
+/**
+ * Handle mouse wheel scrolling on canvas
+ */
+function handleMouseWheel(e) {
+	var canvasElement = findCanvasElement(nn6 ? e.target : event.srcElement);
+	if (canvasElement) {
+		var delta = 0;
+		if (e.wheelDelta) {
+			delta = e.wheelDelta / 120; // Normalize for different browsers
+		} else if (e.detail) {
+			delta = -e.detail / 3; // Firefox
+		}
+
+		// Scroll vertically by default, horizontally with shift key
+		var scrollSpeed = 30;
+		if (e.shiftKey) {
+			canvasElement.scrollLeft -= delta * scrollSpeed;
+		} else {
+			canvasElement.scrollTop -= delta * scrollSpeed;
+		}
+
+		// Prevent default browser scrolling
+		if (e.preventDefault) {
+			e.preventDefault();
+		}
+		e.returnValue = false;
+		return false;
+	}
+}
+
+// Add mouse wheel event listeners
+if (window.addEventListener) {
+	window.addEventListener('DOMMouseScroll', handleMouseWheel, false);
+	window.addEventListener('mousewheel', handleMouseWheel, false);
+} else {
+	window.onmousewheel = handleMouseWheel;
+}
+
+/**
+ * Handle keyboard shortcuts for zoom
+ */
+document.onkeydown = function(e) {
+	var key = e.keyCode || e.which;
+
+	// Ctrl + '+' or Ctrl + '=' for zoom in
+	if ((e.ctrlKey || e.metaKey) && (key === 187 || key === 107)) {
+		e.preventDefault();
+		zoomIn();
+		return false;
+	}
+
+	// Ctrl + '-' for zoom out
+	if ((e.ctrlKey || e.metaKey) && (key === 189 || key === 109)) {
+		e.preventDefault();
+		zoomOut();
+		return false;
+	}
+
+	// Ctrl + '0' for reset zoom
+	if ((e.ctrlKey || e.metaKey) && key === 48) {
+		e.preventDefault();
+		resetZoom();
+		return false;
+	}
+};
 
 
 
@@ -290,7 +1211,12 @@ function Canvas(htmlElement) {
 			
 		this.height = Math.max(this.height, visibleHeight);
 		this.width = Math.max(this.width, visibleWidth);
-		
+
+		// Add massive extra space for infinite scrolling
+		var scrollMargin = 10000; // Large space for infinite scrolling in all directions
+		this.width += scrollMargin;
+		this.height += scrollMargin;
+
 		this.innerDiv.style.width = this.width + "px";
 		this.innerDiv.style.height = this.height + "px";
 		
@@ -343,22 +1269,15 @@ function Canvas(htmlElement) {
 		return output;
 	}
 	
-	this.alignBlocks = function() {
-		var i;
-		var roof = 0;
-		// TODO: implement proper layout
-		for (i = 0; i < this.blocks.length ; i++) {
-			var b = this.blocks[i]; //.findBlock(blockId);
-			b.onMove();
-			b.htmlElement.style.top =roof;
-			roof += b.htmlElement.style.height+20;
-			// TODO: alert ("align "+b);
-		}
-		for (i = 0; i < this.connectors.length; i++) {
-			this.connectors[i].repaint();
-			console.log( this.connectors[i]);
-		}
-	}
+ 	this.alignBlocks = function() {
+ 		// Use control flow graph layout instead of simple vertical stacking
+ 		layoutControlFlowGraph(this.blocks, this.connectors, this);
+
+ 		// Repaint connectors after layout
+ 		for (var i = 0; i < this.connectors.length; i++) {
+ 			this.connectors[i].repaint();
+ 		}
+ 	}
 
 	this.fitBlocks = function() {
 		for (var i = 0; i < this.blocks.length ; i++) {
@@ -466,24 +1385,51 @@ function Block(htmlElement, canvas)
 		return result;
 	}
 
-	this.fit = function() {
-		function getlines(txt) {
-			return (12*txt.split ("\n").length);
-		}
-		function getcolumns(txt) {
-			var cols = 0;
-			var txts = txt.split ("\n");
-			for (var x in txts) {
-				const len = txts[x].length;
-				if (len>cols)
-					cols = len;
-			}
-			return 10+ (7*cols);
-		}
-		var text = this.htmlElement.innerHTML;
-		this.htmlElement.style.width = getcolumns (text);
-		this.htmlElement.style.height = getlines (text);
-	}
+    this.fit = function() {
+        // Measure title and body to size the block accurately
+        var titleEl = this.htmlElement.querySelector('.node-title');
+        var bodyEl = this.htmlElement.querySelector('.node-body');
+        var preEl = this.htmlElement.querySelector('.node-body pre');
+
+        // Read min/max width from computed styles
+        function toPx(v, defVal) {
+            if (!v || v === 'none' || v === 'auto') return defVal;
+            if (v.endsWith('px')) return parseFloat(v);
+            var n = parseFloat(v);
+            return isNaN(n) ? defVal : n;
+        }
+
+        var cs = window.getComputedStyle(this.htmlElement);
+        var minW = toPx(cs.getPropertyValue('min-width'), 120);
+        var maxW = Math.max(minW, toPx(cs.getPropertyValue('max-width'), 600));
+        var borderW = toPx(cs.getPropertyValue('border-left-width'), 0) + toPx(cs.getPropertyValue('border-right-width'), 0);
+        var paddingW = toPx(cs.getPropertyValue('padding-left'), 0) + toPx(cs.getPropertyValue('padding-right'), 0);
+
+        // Temporarily let content define height; we control width only
+        this.htmlElement.style.height = 'auto';
+
+        // Compute desired width based on content
+        var contentWidth = 0;
+        if (titleEl) contentWidth = Math.max(contentWidth, titleEl.scrollWidth);
+        if (preEl) contentWidth = Math.max(contentWidth, preEl.scrollWidth);
+        if (bodyEl) contentWidth = Math.max(contentWidth, bodyEl.scrollWidth);
+
+        // Add horizontal paddings and borders
+        var desiredWidth = Math.ceil(contentWidth + paddingW + borderW + 8);
+        desiredWidth = Math.min(maxW, Math.max(minW, desiredWidth));
+
+        // Apply width and let browser compute final height
+        this.htmlElement.style.width = desiredWidth + 'px';
+
+        // Ensure minimum height for very small nodes
+        var minH = 30;
+        if (this.htmlElement.offsetHeight < minH) {
+            this.htmlElement.style.height = minH + 'px';
+        }
+
+        // Notify listeners so connectors reposition to new size
+        this.onMove();
+    }
 	
 	this.move = function(left, top) {
 		this.htmlElement.style.left = left;
@@ -712,7 +1658,7 @@ function Connector(htmlElement, canvas)
 		var splitted = htmlElement.className.split(' ');
 		if(splitted.length < 3)
 		{
-			alert('Unable to create connector \'' + id + '\', class is not in the correct format: connector <sourceBlockId>, <destBlockId>');
+				console.warn('Unable to create connector: expected "connector <sourceBlockId> <destBlockId>"');
 			return;
 		}
 		
@@ -721,16 +1667,16 @@ function Connector(htmlElement, canvas)
 		this.source = this.canvas.findBlock(splitted[1]);
 		if(!this.source)
 		{
-			alert('cannot find source block with id \'' + splitted[1] + '\'');
+				console.warn('Cannot find source block with id \'' + splitted[1] + '\'');
 			return;
 		}
 		
-		this.destination = this.canvas.findBlock(splitted[2]);
-		if(!this.destination)
-		{
-			// alert('cannot find destination block with id \'' + splitted[2] + '\'');
-			return;
-		}
+			this.destination = this.canvas.findBlock(splitted[2]);
+			if(!this.destination)
+			{
+				console.warn('Cannot find destination block with id \'' + splitted[2] + '\'');
+				return;
+			}
 		
 		// check preferred orientation
 		if(hasClass(this.htmlElement, 'vertical'))
@@ -1158,11 +2104,38 @@ function initPageObjects()
 				var newCanvas = new Canvas(divs[i]);
 				newCanvas.initCanvas();
 				canvases.push(newCanvas);
-				newCanvas.fitBlocks();
-				newCanvas.alignBlocks();
+				// Size blocks to their contents
+				try { newCanvas.fitBlocks(); } catch (e) { console.error('fitBlocks failed', e); }
+				// Try improved layout; if it fails, use a simple grid fallback
+				try {
+					newCanvas.alignBlocks();
+				} catch (e) {
+					console.error('alignBlocks failed, using fallback layout', e);
+					fallbackAlignBlocks(newCanvas);
+				}
 			}
 		}
 	}
+}
+
+// Very simple, safe fallback layout: place blocks in rows
+function fallbackAlignBlocks(canvas) {
+    var x = 20, y = 20;
+    var rowH = 0;
+    var gapX = 40, gapY = 60;
+    var maxW = canvas.htmlElement.clientWidth || 800;
+    for (var i = 0; i < canvas.blocks.length; i++) {
+        var b = canvas.blocks[i];
+        var w = b.width();
+        var h = b.height();
+        if (x + w > maxW - 20) { x = 20; y += rowH + gapY; rowH = 0; }
+        b.move(x, y);
+        x += w + gapX;
+        rowH = Math.max(rowH, h);
+    }
+    for (var j = 0; j < canvas.connectors.length; j++) {
+        try { canvas.connectors[j].repaint(); } catch(e) { /* ignore */ }
+    }
 }
 
 
@@ -1310,54 +2283,67 @@ function HorizontalSStrategy(connector) {
 		return Math.abs(2 * destinationLeft + destinationWidth - (2 * sourceLeft + sourceWidth)) - (sourceWidth + destinationWidth) > 4 * this.connector.minSegmentLength;
 	}
 	
-	this.paint = function() {
-		this.startSegment = connector.createSegment();
-		this.middleSegment = connector.createSegment();
-		this.endSegment = connector.createSegment();
-		
-		var sourceLeft = this.connector.source.left();
-		var sourceTop = this.connector.source.top();
-		var sourceWidth = this.connector.source.width();
-		var sourceHeight = this.connector.source.height();
-		
-		var destinationLeft = this.connector.destination.left();
-		var destinationTop = this.connector.destination.top();
-		var destinationWidth = this.connector.destination.width();
-		var destinationHeight = this.connector.destination.height();
-		
-		var hLength;
-		
-		this.startSegment.startY = Math.floor(sourceTop + sourceHeight / 2);
-			
-		// deduce which face to use on source and destination blocks
-		if(sourceLeft + sourceWidth / 2 < destinationLeft + destinationWidth / 2)
-		{
-			// use left side of the source block and right side of the destination block
-			this.startSegment.startX = sourceLeft + sourceWidth;
-			hLength = destinationLeft - (sourceLeft + sourceWidth);
-		}
-		else
-		{
-			// use right side of the source block and left side of the destination block
-			this.startSegment.startX = sourceLeft;
-			hLength = destinationLeft + destinationWidth - sourceLeft;
-		}
+ 	this.paint = function() {
+ 		this.startSegment = connector.createSegment();
+ 		this.middleSegment = connector.createSegment();
+ 		this.endSegment = connector.createSegment();
 
-		// first horizontal segment positioning
-		this.startSegment.length = Math.floor(Math.abs(hLength) / 2);
-		this.startSegment.orientation = hLength > 0 ? RIGHT : LEFT;
-		
-		// vertical segment positioning			
-		var vLength = Math.floor(destinationTop + destinationHeight / 2 - (sourceTop + sourceHeight / 2));		
-		this.middleSegment.length = Math.abs(vLength);
-		if(vLength == 0)
-			this.middleSegment.visible = false;
-		this.middleSegment.orientation = vLength > 0 ? DOWN : UP;
-		
-		// second horizontal segment positioning
-		this.endSegment.length = Math.floor(Math.abs(hLength) / 2);
-		this.endSegment.orientation = hLength > 0 ? RIGHT : LEFT;
-	}
+ 		var sourceLeft = this.connector.source.left();
+ 		var sourceTop = this.connector.source.top();
+ 		var sourceWidth = this.connector.source.width();
+ 		var sourceHeight = this.connector.source.height();
+
+ 		var destinationLeft = this.connector.destination.left();
+ 		var destinationTop = this.connector.destination.top();
+ 		var destinationWidth = this.connector.destination.width();
+ 		var destinationHeight = this.connector.destination.height();
+
+ 		var hLength;
+
+ 		this.startSegment.startY = Math.floor(sourceTop + sourceHeight / 2);
+
+ 		// deduce which face to use on source and destination blocks
+ 		if(sourceLeft + sourceWidth / 2 < destinationLeft + destinationWidth / 2)
+ 		{
+ 			// use left side of the source block and right side of the destination block
+ 			this.startSegment.startX = sourceLeft + sourceWidth;
+ 			hLength = destinationLeft - (sourceLeft + sourceWidth);
+ 		}
+ 		else
+ 		{
+ 			// use right side of the source block and left side of the destination block
+ 			this.startSegment.startX = sourceLeft;
+ 			hLength = destinationLeft + destinationWidth - sourceLeft;
+ 		}
+
+  		// Calculate vertical offset to avoid crossing nodes using collision detection
+  		var sourceCenterY = sourceTop + sourceHeight / 2;
+  		var destCenterY = destinationTop + destinationHeight / 2;
+  		var vLength = destCenterY - sourceCenterY;
+
+  		// Use collision detection to find a clear path
+  		var path = findClearPath(this.connector.source, this.connector.destination, sourceLeft, sourceTop, sourceWidth, sourceHeight,
+  		                        destinationLeft, destinationTop, destinationWidth, destinationHeight, hLength > 0);
+
+  		// Apply the calculated path
+  		vLength = path.vLength;
+  		var startHLength = path.startHLength;
+  		var endHLength = path.endHLength;
+
+  		// first horizontal segment positioning
+  		this.startSegment.length = Math.abs(startHLength);
+  		this.startSegment.orientation = startHLength > 0 ? RIGHT : LEFT;
+
+  		// vertical segment positioning
+  		this.middleSegment.length = Math.abs(vLength);
+  		if(vLength == 0)
+  			this.middleSegment.visible = false;
+  		this.middleSegment.orientation = vLength > 0 ? DOWN : UP;
+
+  		// second horizontal segment positioning
+  		this.endSegment.length = Math.abs(endHLength);
+  		this.endSegment.orientation = endHLength > 0 ? RIGHT : LEFT;
+ 	}
 }
 
 /**
@@ -1387,53 +2373,66 @@ function VerticalSStrategy(connector)
 		return Math.abs(2 * destinationTop + destinationHeight - (2 * sourceTop + sourceHeight)) - (sourceHeight + destinationHeight) > 4 * this.connector.minSegmentLength;
 	}
 	
-	this.paint = function()
-	{
-		this.startSegment = connector.createSegment();
-		this.middleSegment = connector.createSegment();
-		this.endSegment = connector.createSegment();
-		
-		var sourceLeft = this.connector.source.left();
-		var sourceTop = this.connector.source.top();
-		var sourceWidth = this.connector.source.width();
-		var sourceHeight = this.connector.source.height();
-		
-		var destinationLeft = this.connector.destination.left();
-		var destinationTop = this.connector.destination.top();
-		var destinationWidth = this.connector.destination.width();
-		var destinationHeight = this.connector.destination.height();
-		
-		var vLength;
-		
-		this.startSegment.startX = 	Math.floor(sourceLeft + sourceWidth / 2);
-			
-		// deduce which face to use on source and destination blocks
-		if(sourceTop + sourceHeight / 2 < destinationTop + destinationHeight / 2)
-		{
-			// use bottom side of the source block and top side of destination block
-			this.startSegment.startY = sourceTop + sourceHeight;
-			vLength = destinationTop - (sourceTop + sourceHeight);
-		}
-		else
-		{
-			// use top side of the source block and bottom side of the destination block
-			this.startSegment.startY = sourceTop;
-			vLength = destinationTop + destinationHeight - sourceTop;
-		}
-		
-		// first vertical segment positioning
-		this.startSegment.length = Math.floor(Math.abs(vLength) / 2);
-		this.startSegment.orientation = vLength > 0 ? DOWN : UP;
-		
-		// horizontal segment positioning
-		var hLength = Math.floor(destinationLeft + destinationWidth / 2 - (sourceLeft + sourceWidth / 2));
-		this.middleSegment.length = Math.abs(hLength);
-		this.middleSegment.orientation = hLength > 0 ? RIGHT : LEFT;
-					
-		// second vertical segment positioning
-		this.endSegment.length = Math.floor(Math.abs(vLength) / 2);
-		this.endSegment.orientation = vLength > 0 ? DOWN : UP;
-	}
+ 	this.paint = function()
+ 	{
+ 		this.startSegment = connector.createSegment();
+ 		this.middleSegment = connector.createSegment();
+ 		this.endSegment = connector.createSegment();
+
+ 		var sourceLeft = this.connector.source.left();
+ 		var sourceTop = this.connector.source.top();
+ 		var sourceWidth = this.connector.source.width();
+ 		var sourceHeight = this.connector.source.height();
+
+ 		var destinationLeft = this.connector.destination.left();
+ 		var destinationTop = this.connector.destination.top();
+ 		var destinationWidth = this.connector.destination.width();
+ 		var destinationHeight = this.connector.destination.height();
+
+ 		var vLength;
+
+ 		this.startSegment.startX = Math.floor(sourceLeft + sourceWidth / 2);
+
+ 		// deduce which face to use on source and destination blocks
+ 		if(sourceTop + sourceHeight / 2 < destinationTop + destinationHeight / 2)
+ 		{
+ 			// use bottom side of the source block and top side of destination block
+ 			this.startSegment.startY = sourceTop + sourceHeight;
+ 			vLength = destinationTop - (sourceTop + sourceHeight);
+ 		}
+ 		else
+ 		{
+ 			// use top side of the source block and bottom side of the destination block
+ 			this.startSegment.startY = sourceTop;
+ 			vLength = destinationTop + destinationHeight - sourceTop;
+ 		}
+
+  		// Calculate horizontal offset to avoid crossing nodes using collision detection
+  		var sourceCenterX = sourceLeft + sourceWidth / 2;
+  		var destCenterX = destinationLeft + destinationWidth / 2;
+  		var baseHLength = destCenterX - sourceCenterX;
+
+  		// Use collision detection to find a clear path
+  		var path = findClearPathVertical(this.connector.source, this.connector.destination, sourceLeft, sourceTop, sourceWidth, sourceHeight,
+  		                                destinationLeft, destinationTop, destinationWidth, destinationHeight, vLength > 0);
+
+  		// Apply the calculated path
+  		var hLength = path.hLength;
+  		var startVLength = path.startVLength;
+  		var endVLength = path.endVLength;
+
+  		// first vertical segment positioning
+  		this.startSegment.length = Math.abs(startVLength);
+  		this.startSegment.orientation = startVLength > 0 ? DOWN : UP;
+
+  		// horizontal segment positioning
+  		this.middleSegment.length = Math.abs(hLength);
+  		this.middleSegment.orientation = hLength > 0 ? RIGHT : LEFT;
+
+  		// second vertical segment positioning
+  		this.endSegment.length = Math.abs(endVLength);
+  		this.endSegment.orientation = endVLength > 0 ? DOWN : UP;
+ 	}
 }
 
 /**
@@ -1701,11 +2700,9 @@ function VerticalCStrategy(connector, startOrientation)
 //strategies[0] = function(connector) {return new VerticalCStrategy(connector)};
 strategies[0] = function(connector) {return new VerticalSStrategy(connector)};
 strategies[1] = function(connector) {return new HorizontalSStrategy(connector)};
-/*
-strategies[2] = function(connector) {return new HorizontalCStrategy(connector, LEFT)};
-strategies[1] = function(connector) {return new VerticalSStrategy(connector)};
 strategies[2] = function(connector) {return new HorizontalLStrategy(connector)};
 strategies[3] = function(connector) {return new VerticalLStrategy(connector)};
+/*
 strategies[4] = function(connector) {return new HorizontalCStrategy(connector, LEFT)};
 strategies[5] = function(connector) {return new HorizontalCStrategy(connector, RIGHT)};
 strategies[6] = function(connector) {return new VerticalCStrategy(connector, UP)};
