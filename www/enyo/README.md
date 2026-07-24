@@ -1,11 +1,7 @@
-Enyo Radare2 WebUI
-==================
+# Enyo Radare2 WebUI
 
-js/
-	Contains all webui specific javascript files
-css/
-	CSS files
-lib/
-	javascript libraries (jquery, enyo, ...)
-img/
-	images for this webui
+This is one of the oldest mobile-friendly webuis of radare2.
+
+Based on enyo widgets and written entirely in Javascript.
+
+To build and test: `make; make run`

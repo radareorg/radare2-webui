@@ -1,4 +1,4 @@
-/* radare2 Copyleft 2013-2024 pancake */
+/* radare2 Copyleft 2013-2026 pancake */
 
 var r2 = {};
 
@@ -287,10 +287,10 @@ r2.load_settings = function() {
 	r2.cmd('e asm.bits', function(x) {r2.settings['asm.bits'] = x.trim();});
 	r2.cmd('e asm.bytes', function(x) {r2.settings['asm.bytes'] = toBoolean(x.trim());});
 	r2.cmd('e asm.flags', function(x) {r2.settings['asm.flags'] = toBoolean(x.trim());});
-	r2.cmd('e asm.offset', function(x) {r2.settings['asm.offset'] = toBoolean(x.trim());});
+	r2.cmd('e asm.addr', function(x) {r2.settings['asm.addr'] = toBoolean(x.trim());});
 	r2.cmd('e asm.lines', function(x) {r2.settings['asm.lines'] = toBoolean(x.trim());});
 	r2.cmd('e asm.xrefs', function(x) {r2.settings['asm.xrefs'] = toBoolean(x.trim());});
-	r2.cmd('e asm.cmtright', function(x) {r2.settings['asm.cmtright'] = toBoolean(x.trim());});
+	r2.cmd('e asm.cmt.right', function(x) {r2.settings['asm.cmt.right'] = toBoolean(x.trim());});
 	r2.cmd('e asm.pseudo', function(x) {r2.settings['asm.pseudo'] = toBoolean(x.trim());});
 	// console.log("Loading settings from r2");
 	// console.log(r2.settings);
@@ -670,4 +670,3 @@ r2.filter_asm = function(x, display) {
 	}
 	return x;
 };
-

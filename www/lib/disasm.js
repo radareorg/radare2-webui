@@ -467,7 +467,7 @@ function render_instructions(instructions) {
 
 	var flatcanvas_rect = getOffsetRect(flatcanvas);
 	var asm_lines = (r2.settings['asm.lines']);
-	var asm_offset = (r2.settings['asm.offset']);
+	var asm_addr = (r2.settings['asm.addr']);
 
 	var accumulated_heigth = flatcanvas_rect.top;
 	var lines = [];
@@ -609,7 +609,7 @@ function render_instructions(instructions) {
 			}
 		}
 	}
-	if (!asm_offset) {
+	if (!asm_addr) {
 		var elements = document.getElementsByClassName('insaddr');
 		for (var j in elements) {
 			if (elements[j].style) elements[j].style.display = 'none';
@@ -650,7 +650,7 @@ function html_for_instruction(ins) {
 	var asm_flags = (r2.settings['asm.flags']);
 	var asm_bytes = (r2.settings['asm.bytes']);
 	var asm_xrefs = (r2.settings['asm.xrefs']);
-	var asm_cmtright = (r2.settings['asm.cmtright']);
+	var asm_cmt_right = (r2.settings['asm.cmt.right']);
 
     if (ins.fcn_addr > 0 && offset === "0x"+ins.fcn_addr.toString(16)) {
         if (r2ui._dis.display == "flat") idump += '<div class="ec_flow">; -----------------------------------------------------------</div>';
@@ -731,7 +731,7 @@ function html_for_instruction(ins) {
 		}
 		if (flags !== '' && flags !== undefined && flags !== null) idump += '<div class="ec_flag flags_' + address_canonicalize(offset) + '">;-- ' + escapeHTML(flags) + ':</div> ';
 	}
-	if (ins.comment && !asm_cmtright) {
+	if (ins.comment && !asm_cmt_right) {
 		idump += '<div class="comment ec_comment comment_' + address_canonicalize(offset) + '">; ' + escapeHTML(ins.comment) + '</div>';
 	}
 	if (asm_xrefs) {
@@ -799,7 +799,7 @@ function html_for_instruction(ins) {
 		idump += '<span class="comment ec_comment comment_' + address_canonicalize(offset) + '">' + escapeHTML(ins.ptr_info) + '</span>';
 	}
 
-	if (ins.comment && asm_cmtright) {
+	if (ins.comment && asm_cmt_right) {
 		idump += '<span class="comment ec_comment comment_' + address_canonicalize(offset) + '"> ; ' + escapeHTML(ins.comment) + '</span>';
 	}
 
@@ -1151,7 +1151,7 @@ function eraseCookie(name) {
 }
 
 function do_randomcolors() {
-	r2.cmd('ecr;ec gui.background rgb:000', function() {
+	r2.cmd('ecr', function() {
 		r2ui.load_colors();
 	});
 }
@@ -1159,4 +1159,3 @@ function do_randomcolors() {
 function inColor(x) {
 	return 'e scr.color=true;' + x + ';e scr.color=false';
 }
-

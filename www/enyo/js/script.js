@@ -3,54 +3,39 @@ enyo.kind({
 	kind: 'Scroller',
 	style: 'background-color:#c0c0c0',
 	clear: function() {
-		const field = this.$.input;
-		field.setContent(value = '');
-		field.render();
-	},
-	demo: function() {
-		const field = this.$.input;
-		field.setContent(value = [
-			'r2.disassemble (0, "9090", function(text) {',
-			'  show (text)',
-			'  show ()',
-			'  r2.assemble (0, "mov eax, 33", function (text) {',
-			'    show (text);',
-			'  });',
-			'  show (r2)',
-			'});'].join('\n'));
-		field.render();
+		this.$.input.setValue('');
+		this.$.output.setContent('');
+		return true;
 	},
 	run: function() {
-		var code = this.$.input.value;
-		var out = '';
-		/* helper functions */
-		function show(x) {
-			if (!x) out += '\n'; else
-			if (typeof x == 'object') {
-				out += '{';
-				for (var y in x) {
-					var v = x[y]; //(typeof x[y] == 'function')? 'function': x[y];
-					out += y + ': ' + v + '\n , ';
-				}
-				out += '}';
-			} else {
-				out += x + '\n';
-			}
+		var code = this.$.input.getValue();
+		if (!code) {
+			return true;
 		}
-		try {
-			eval(code);
-			this.$.output.setContent(out);
-		} catch (e) {
-			alert(e);
-		}
+		var command = this.$.language.selected.content === 'r2js'
+			? 'js base64:' + btoa(unescape(encodeURIComponent(code)))
+			: code;
+		this.$.output.setContent('Running...');
+		r2.cmd(command, function(output) {
+			this.$.output.setContent(enyo.Control.escapeHtml(output || ''));
+		}.bind(this));
+		return true;
 	},
 	components: [
-		{tag: 'p', style: 'margin-left:10px', components: [
+		{tag: 'div', classes: 'script-toolbar', components: [
+			{kind: 'onyx.PickerDecorator', components: [
+				{},
+				{kind: 'onyx.Picker', name: 'language', components: [
+					{content: 'r2', active: true},
+					{content: 'r2js'}
+				]}
+			]},
 			{kind: 'onyx.Button', content: 'Run', classes: 'sourcebutton', ontap: 'run' },
-			{kind: 'onyx.Button', content: 'Clear', classes: 'sourcebutton', ontap: 'clear' },
-			{kind: 'onyx.Button', content: 'Demo', classes: 'sourcebutton', ontap: 'demo' }
+			{kind: 'onyx.Button', content: 'Clear', classes: 'sourcebutton', ontap: 'clear' }
 		]},
-		{kind: 'onyx.TextArea', name: 'input', classes: 'sourcecode' },
-		{tag: 'pre', name: 'output', style: 'margin-left:12px' }
+		{tag: 'div', classes: 'sourcecode-container', components: [
+			{kind: 'onyx.TextArea', name: 'input', classes: 'sourcecode' }
+		]},
+		{tag: 'pre', name: 'output', classes: 'script-output' }
 	]
 });

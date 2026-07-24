@@ -147,40 +147,31 @@ enyo.kind({
 			*/
 				{kind: 'onyx.PickerDecorator', classes: 'top', components: [
 					{kind: 'onyx.Button',  name: 'actionsButton', content: 'Actions'},
-					{kind: 'onyx.Picker', name: 'actionsPicker', components: [
+					{kind: 'onyx.Picker', name: 'actionsPicker', classes: 'actions-picker', maxHeight: 400, components: [
 						{content: 'Analyze', ontap: 'goAnalyze'},
 						{content: 'Rename', ontap: 'goRename'},
 						{content: 'Comment', ontap: 'goComment'},
 						{content: 'Flag', ontap: 'goFlag'},
 						{content: 'Unflag', ontap: 'goUnflag'},
 						{content: 'Copy', ontap: 'goCopy'},
-						{content: 'Paste', ontap: 'goPaste'}
+						{content: 'Paste', ontap: 'goPaste'},
+						{tag: 'div', classes: 'onyx-menu-divider'},
+						{tag: 'div', classes: 'onyx-menu-label', content: 'Write'},
+						{content: 'File', ontap: 'wrFile'},
+						{content: 'Hexpair', ontap: 'wrHex'},
+						{content: 'String', ontap: 'wrString'},
+						{content: 'Opcode', ontap: 'wrOpcode'},
+						{tag: 'div', classes: 'onyx-menu-divider'},
+						{tag: 'div', classes: 'onyx-menu-label', content: 'Convert'},
+						{content: 'Data', ontap: 'coData'},
+						{content: 'Code', ontap: 'coCode'},
+						{content: 'String', ontap: 'coString'}
 					]}
 				]},
 			{kind: 'onyx.Button', content: '<', ontap: 'prevSeek', classes: 'top', style: 'top:10px' },
 			{kind: 'onyx.Button', content: '>', ontap: 'nextSeek', classes: 'top', style: 'top:10px' },
 			{kind: 'onyx.InputDecorator', style: 'width: 200px;top:10px', classes: 'top', components: [
 				{kind: 'onyx.Input', name: 'input', value: 'entry0', onchange: 'gotoSeek', onkeydown: 'inputKey' }
-			]},
-			{kind: 'onyx.PickerDecorator', classes: 'top', components: [
-				{kind: 'onyx.Button', content: 'Convert'},
-				{kind: 'onyx.Picker', components: [
-					{content: 'Data', ontap: 'coData'},
-					{content: 'Code', ontap: 'coCode'},
-					{content: 'String', ontap: 'coString'}
-				]}
-			]},
-			{kind: 'onyx.PickerDecorator', classes: 'top', components: [
-				{kind: 'onyx.Button', content: 'Write'},
-				{kind: 'onyx.Picker', components: [
-					{content: 'File', ontap: 'wrFile'},
-					{content: 'Hexpair', ontap: 'wrHex'},
-					{content: 'String', ontap: 'wrString'},
-					{content: 'Opcode', ontap: 'wrOpcode'}
-				]}
-			]},
-			{kind: 'onyx.PickerDecorator', classes: 'top', components: [
-				{kind: 'onyx.Button', name: 'saveButton', content: 'Save', ontap: 'save_project'}
 			]},
 			{kind: 'onyx.PickerDecorator', classes: 'top', components: [
 				{kind: 'onyx.Button', name: 'switchButton', content: 'Switch View', ontap: 'switch_view'}
@@ -206,11 +197,6 @@ enyo.kind({
 	},
 	switch_view: function() {
 		r2ui._dis.switch_view();
-	},
-	save_project: function() {
-		var project_name = prompt('Project Name:', r2.project_name);
-		r2.cmd(':Ps ' + project_name, function() {});
-		r2.project_name = project_name;
 	},
 	create: function() {
 		this.inherited(arguments);

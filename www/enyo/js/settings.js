@@ -85,8 +85,8 @@ enyo.kind({
 				{kind: 'onyx.ToggleButton', name: 'toggle_bytes'}
 			]}
 			,{kind: 'onyx.InputDecorator',components: [
-				{tag: 'p', content: 'Show offsets', classes: 'rowline', ontap: 'nextPanel'},
-				{kind: 'onyx.ToggleButton', name: 'toggle_offset' }
+				{tag: 'p', content: 'Show addresses', classes: 'rowline', ontap: 'nextPanel'},
+				{kind: 'onyx.ToggleButton', name: 'toggle_addr' }
 			]}
 			,{kind: 'onyx.InputDecorator',components: [
 				{tag: 'p', content: 'Show flags', classes: 'rowline', ontap: 'nextPanel'},
@@ -98,7 +98,7 @@ enyo.kind({
 			]}
 			,{kind: 'onyx.InputDecorator',components: [
 				{tag: 'p', content: 'Show comments on right', classes: 'rowline', ontap: 'nextPanel'},
-				{kind: 'onyx.ToggleButton', name: 'toggle_cmtright' }
+				{kind: 'onyx.ToggleButton', name: 'toggle_cmt_right' }
 			]}
 			,{kind: 'onyx.InputDecorator',components: [
 				{tag: 'p', content: 'Show lines', classes: 'rowline', ontap: 'nextPanel'},
@@ -112,7 +112,8 @@ enyo.kind({
 		,{tag: 'h2', content: 'Save changes?' }
 		,{tag: 'div',style: 'margin-left:50px', components: [
 			{ontap: 'reset', kind: 'onyx.Button', style: 'position:relative;left:0px', content: 'Reset'},
-			{ontap: 'save', kind: 'onyx.Button', style: 'position:relative;left:50px', content: 'Save', classes: 'onyx-affirmative'}
+			{ontap: 'save', kind: 'onyx.Button', style: 'position:relative;left:50px', content: 'Save', classes: 'onyx-affirmative'},
+			{ontap: 'saveProject', kind: 'onyx.Button', style: 'position:relative;left:70px', content: 'Save Project'}
 		]}
 		,{tag: 'div', style: 'height:64px'}
 	],
@@ -123,8 +124,8 @@ enyo.kind({
 		self.$.toggle_pseudo.setActive(r2.settings['asm.pseudo']);
 		self.$.toggle_flags.setActive(r2.settings['asm.flags']);
 		self.$.toggle_xrefs.setActive(r2.settings['asm.xrefs']);
-		self.$.toggle_cmtright.setActive(r2.settings['asm.cmt.right']);
-		self.$.toggle_offset.setActive(r2.settings['asm.offset']);
+		self.$.toggle_cmt_right.setActive(r2.settings['asm.cmt.right']);
+		self.$.toggle_addr.setActive(r2.settings['asm.addr']);
 		self.$.toggle_lines.setActive(r2.settings['asm.lines']);
 		var mode = readCookie('r2_view_mode');
 		if (!mode) mode = 'old';
@@ -137,7 +138,7 @@ enyo.kind({
 	},
 	save: function() {
 		var use_new_view = this.$.use_new_view.active;
-		var show_offset = this.$.toggle_offset.active;
+		var show_addr = this.$.toggle_addr.active;
 		var arch = this.$.arch.selected.content;
 		var bits = this.$.bits.selected.content;
 		var show_bytes = this.$.toggle_bytes.active;
@@ -145,27 +146,28 @@ enyo.kind({
 		var show_flags = this.$.toggle_flags.active;
 		var show_lines = this.$.toggle_lines.active;
 		var show_xrefs = this.$.toggle_xrefs.active;
-		var comments_on_right = this.$.toggle_cmtright.active;
+		var comments_on_right = this.$.toggle_cmt_right.active;
 		var twopanels = this.$.twopanels.active;
 		r2.cmds([
-			'e asm.offset=' + show_offset,
+			'e asm.addr=' + show_addr,
 			'e asm.arch=' + arch,
 			'e asm.bits=' + bits,
 			'e asm.lines=' + show_lines,
 			'e asm.bytes=' + show_bytes,
 			'e asm.flags=' + show_flags,
 			'e asm.xrefs=' + show_xrefs,
-			'e asm.cmtright=' + comments_on_right,
+			'e asm.cmt.right=' + comments_on_right,
 			'e asm.pseudo=' + show_pseudo
 		]);
 		r2.settings = {
 			'use_new_view': use_new_view,
 			'asm.arch': arch,
 			'asm.bits': bits,
+			'asm.addr': show_addr,
 			'asm.bytes': show_bytes,
 			'asm.flags': show_flags,
 			'asm.xrefs': show_xrefs,
-			'asm.cmtright': comments_on_right,
+			'asm.cmt.right': comments_on_right,
 			'asm.lines': show_lines,
 			'asm.pseudo': show_pseudo
 		};
@@ -182,5 +184,14 @@ enyo.kind({
 	},
 	reset: function() {
 		this.load();
+	},
+	saveProject: function() {
+		var projectName = prompt('Project Name:', r2.project_name);
+		if (!projectName) {
+			return true;
+		}
+		r2.cmd(':Ps ' + projectName, function() {});
+		r2.project_name = projectName;
+		return true;
 	}
 });

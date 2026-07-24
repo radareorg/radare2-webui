@@ -23,12 +23,12 @@
   "scripts": {},
   "version": "0.10.2",
   "devDependencies": {
-    "bower": "^1.8.0",
-    "gulp": "^4.0.2",
-    "gulp-bower": "0.0.13",
-    "gulp-clean-css": "^3.9.0",
+    "bower": "^1.8.14",
+    "gulp": "^5.0.1",
+    "gulp-bower": "^0.0.15",
+    "gulp-clean-css": "^4.3.0",
     "gulp-concat": "^2.6.1",
-    "gulp-replace": "^0.6.1",
-    "gulp-uglify": "^3.0.0"
+    "gulp-replace": "^1.1.4",
+    "gulp-uglify": "^3.0.2"
   }
 }

@@ -72,11 +72,15 @@ const _concatEnyoCss = function() {
 		.pipe(dest(paths.dist));
 }
 const _copyNestedPng = function() {
-	return src('css/**/*.png')
+	return src('css/**/*.png', { encoding: false })
 		.pipe(dest(paths.dist+'enyo/'));
 }
 const _copyPng = function() {
-	return src(['css/lib/onyx/images/*.png','*.png'])
+	return src(['css/lib/onyx/images/*.png','*.png'], { encoding: false })
+		.pipe(dest(paths.dist))
+}
+const _copyFavicon = function() {
+	return src('favicon.ico', { encoding: false })
 		.pipe(dest(paths.dist))
 }
 
@@ -84,7 +88,8 @@ const _css = series(
 	_concatAllCss,
 	_concatEnyoCss,
 	_copyNestedPng,
-	_copyPng
+	_copyPng,
+	_copyFavicon
 );
 
 const _bowerInstall = function() {
@@ -117,5 +122,3 @@ const _default = () => {
 }
 
 exports.default = series( _bowerInstall, _copyVendors, _js, _css, _common, _default);
-
-
