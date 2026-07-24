@@ -26,7 +26,6 @@ export class SettingsWidget extends BaseWidget {
 		this.addGrid('Core/IO', (dom) => this.drawCoreIO(dom));
 		this.addGrid('Analysis', (dom) => this.drawAnalysis(dom));
 		this.addGrid('Colors', (dom) => this.drawColors(dom));
-		this.addGrid('TTS', (dom) => this.drawTTS(dom));
 		this.addGrid('Reset configuration', (dom) => this.drawReset(dom));
 		this.addGrid('Emulator', (dom) => this.drawEmulator(dom));
 
@@ -140,12 +139,6 @@ export class SettingsWidget extends BaseWidget {
 		});
 	}
 
-
-	drawTTS(dom) {
-		uiSwitch(dom, 'Use TTS', r2Settings.getItem(r2Settings.keys.USE_TTS), function(param, state) {
-			r2Settings.setItem(r2Settings.keys.USE_TTS, state);
-		});
-	}
 
 	drawReset(dom) {
 		uiActionButton(dom, function() {

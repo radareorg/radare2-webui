@@ -81,7 +81,6 @@ const SettingItems = {
 	ANAL_SKIP_NOPS: 'analSkipNops',
 	ANAL_NON_CODE: 'analNonCode',
 	COLORS: 'colors',
-	USE_TTS: 'useTTS',
 	THEME: 'theme',
 	ASMEMU: 'asmemu',
 	ASMEMUSTR: 'asmemustr'
@@ -161,6 +160,5 @@ r2Conf[SettingItems.ANAL_SKIP_NOPS] = { name: 'analSkipNops', defVal: true, appl
 r2Conf[SettingItems.ANAL_NON_CODE] = { name: 'analNonCode', defVal: false, apply: function(p) { console.log('analNonCode is ' + p); } };
 r2Conf[SettingItems.COLORS] = { name: 'colors', defVal: 3, apply: function(p) { inColor = p; r2.cmd('e scr.color=' + p);} };
 r2Conf[SettingItems.THEME] = { name: 'theme', defVal: 'none', apply: function(p) { r2.cmd('eco ' + p); } }; // TODO
-r2Conf[SettingItems.USE_TTS] = { name: 'tts', defVal: true, apply: () => { } }; // TODO: not a r2Lib conf, should be externalized in an UI settings set
 
 export const r2Settings = new SettingsManager(SettingItems, r2Conf);

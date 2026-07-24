@@ -13,7 +13,7 @@ dist release: node_modules
 	mkdir -p ../../dist/m
 	cp -f index.html ../../dist/m/index.html
 	cp -rf css ../../dist/m
-	npx webpack-cli -o $$PWD/www/ $$PWD/js/app.js
+	npx webpack-cli --output-path $$PWD/www/
 	npx gulp release
 	cp $$PWD/www/* ../../dist/m/.
 	rm -f $(DISTZIP)

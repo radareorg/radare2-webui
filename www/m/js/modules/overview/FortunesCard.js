@@ -1,12 +1,9 @@
-import {speak} from '../../helpers/Speak.js';
-
 export class FortunesCard {
 
 	get DOM() { return this.card; }
 
 	constructor() {
 		this.currentFortune = this.getNewFortune();
-		speak(this.currentFortune);
 
 		this.build();
 	}
@@ -41,7 +38,6 @@ export class FortunesCard {
 	refresh() {
 		this.currentFortune = this.getNewFortune();
 		this.fortuneBlock.innerHTML = this.currentFortune;
-		speak(this.currentFortune);
 	}
 
 	getNewFortune() {
