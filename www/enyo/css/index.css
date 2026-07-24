@@ -53,6 +53,21 @@ a {
   white-space: nowrap;
 }
 
+.theme-picker {
+  min-width: 180px;
+  width: 180px;
+}
+
+.theme-picker .onyx-menu-item {
+  box-sizing: border-box;
+  clear: both;
+  display: block;
+  float: none;
+  text-align: left;
+  white-space: nowrap;
+  width: 100%;
+}
+
 
 .sourcebutton {
   margin:4px;
@@ -144,6 +159,12 @@ color: black;
   height:24px;
   padding-left:10px;
   border:0px;
+}
+
+.disasm-load-button {
+  box-sizing: border-box;
+  margin: 4px 5px;
+  width: calc(100% - 10px);
 }
 
 .r2panel {

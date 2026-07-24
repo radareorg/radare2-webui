@@ -1,5 +1,21 @@
 
 const archList = [];
+const themeList = [];
+let activeTheme = 'default';
+
+r2.cmd('eco.', function(currentTheme) {
+	activeTheme = currentTheme.trim() || activeTheme;
+	r2.cmd('ecoj', function(themes) {
+		try {
+			for (let theme of JSON.parse(themes)) {
+				themeList.push({content: theme, active: theme === activeTheme});
+			}
+		} catch (e) {
+			console.error('Unable to load color themes:', e);
+		}
+	});
+});
+
 r2.cmd("-a", function(curArch) {
 	curArch = curArch.trim();
 	r2.cmd("-a?", function(arches) {
@@ -30,6 +46,13 @@ enyo.kind({
 			{kind: 'onyx.InputDecorator', components: [
 				{tag: 'p', content: 'Edit keybindings', classes: 'rowline' },
 				{kind: 'onyx.Button', content: '+'}
+			]},
+			{kind: 'onyx.InputDecorator', components: [
+				{tag: 'p', content: 'Theme', classes: 'rowline' },
+				{kind: 'onyx.PickerDecorator', components: [
+					{kind: 'onyx.PickerButton', name: 'themeButton', content: activeTheme, style: 'min-width:180px'},
+					{kind: 'onyx.Picker', name: 'theme', classes: 'theme-picker', maxHeight: 300, onChange: 'themeChanged', components: themeList}
+				]}
 			]}
 		]},
 		{kind: 'FittableRows', fit: false, components: [
@@ -130,6 +153,11 @@ enyo.kind({
 		var mode = readCookie('r2_view_mode');
 		if (!mode) mode = 'old';
 		self.$.use_new_view.setActive(mode == 'new');
+	},
+	themeChanged: function(inSender, inEvent) {
+		if (inEvent.content) {
+			r2.cmd('eco ' + inEvent.content, function() {});
+		}
 	},
 
 	create: function() {

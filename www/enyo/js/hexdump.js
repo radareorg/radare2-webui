@@ -30,7 +30,7 @@ enyo.kind({
 		var text = this.$.text;
 		this.min += this.block;
 		r2.get_hexdump(this.base + '-' + this.min, this.block, function(x) {
-			x = css(r2.filter_asm(x, 'px'));
+			x = docss(r2.filter_asm(x, 'px'));
 			var oldy = r2ui._hex.getScrollBounds().height;
 			text.setContent('<div class=\'enyo-selectable\'>' + x + text.getContent() + '</div>');
 			var newy = r2ui._hex.getScrollBounds().height;

@@ -210,12 +210,12 @@ r2.disassemble = function(offset, bytes, fn) {
 };
 
 r2.get_hexdump = function(offset, length, cb) {
-	r2.cmd('px ' + length + '@' + offset, cb);
+	r2.cmd('px ' + length + '@' + offset + ' @e:scr.color=3', cb);
 };
 
 r2.get_disasm = function(offset, length, cb) {
 	// TODO: honor offset and length
-	r2.cmd('pD ' + length + '@' + offset, cb);
+	r2.cmd('pD ' + length + '@' + offset + ' @e:scr.color=3', cb);
 };
 
 r2.get_disasm_before = function(offset, start, cb) {
@@ -560,7 +560,40 @@ r2.getTextLogger = function(obj) {
 	return obj;
 };
 
+r2.ansi_to_html = function(text) {
+	var html = '';
+	var color = false;
+	var last = 0;
+	var ansi = /\x1b\[([0-9;]*)m/g;
+	var match;
+	function escape(text) {
+		return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+	}
+	while ((match = ansi.exec(text))) {
+		html += escape(text.slice(last, match.index));
+		last = ansi.lastIndex;
+		var parts = match[1].split(';').map(Number);
+		if (parts[0] === 0 || parts[0] === 39) {
+			if (color) {
+				html += '</span>';
+				color = false;
+			}
+			continue;
+		}
+		if (parts[0] === 38 && parts[1] === 2 && parts.length >= 5) {
+			if (color) {
+				html += '</span>';
+			}
+			html += '<span style="color:rgb(' + parts[2] + ',' + parts[3] + ',' + parts[4] + ')">';
+			color = true;
+		}
+	}
+	html += escape(text.slice(last));
+	return color ? html + '</span>' : html;
+};
+
 r2.filter_asm = function(x, display) {
+	x = r2.ansi_to_html(x);
 	var curoff = backward ? prev_curoff : next_curoff;
 	var lastoff = backward ? prev_lastoff : next_lastoff;
 	var lines = x.split(/\n/g);

@@ -9,11 +9,9 @@ enyo.kind ({
   style:"margin:0px;background-color:#c0c0c0",
   data: null,
   components: [
-    {tag: "div", allowHtml: true, classes: "colorbar", name: "colorbar" },
-    {tag: "br" },
-    {tag: "div", content: "^", classes: "moreless", ontap: "less"},
+    {kind: "onyx.Button", content: "Load previous instructions", classes: "disasm-load-button", ontap: "less"},
     {tag: "pre", allowHtml: true, name: "text", content: "..", style:"margin-left:5px"},
-    {tag: "div", content: "v", classes: "moreless", ontap: "more"},
+    {kind: "onyx.Button", content: "Load more instructions", classes: "disasm-load-button", ontap: "more"},
   ],
   min: 0,
   max: 0,
