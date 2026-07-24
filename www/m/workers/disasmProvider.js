@@ -43,6 +43,12 @@ function prepareClickableOffsets(x) {
 	return x;
 }
 
+function normalizeHtmlLineBreaks(x) {
+	// `|H` emits both <br> and physical newlines. Keep one line break per
+	// rendered line while preserving intentional consecutive <br> elements.
+	return x.replace(/<br\s*\/?>[\r\n]*/gi, '\n').replace(/\n$/, '');
+}
+
 function getChunk(where, howManyLines) {
 	var raw;
 
@@ -53,6 +59,7 @@ function getChunk(where, howManyLines) {
 		raw = d;
 	});
 
+	raw = normalizeHtmlLineBreaks(raw);
 	raw = prepareClickableOffsets(raw);
 	var lines = raw.split('\n');
 	for (var i = 0 ; i < lines.length ; i++) {
