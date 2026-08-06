@@ -62,7 +62,7 @@ const _watch =  function() {
 
 const _css = function() {
 
-	return src(['./lib/css/jquery-ui.css', './lib/css/tree.jquery.css'])
+	return src(['./lib/css/jquery-ui.css', './lib/css/tree.jquery.css', './lib/css/panels.css'])
 		.pipe(concat('dependencies.css'))
 		.pipe(dest(paths.dev));
 };
@@ -134,12 +134,13 @@ const _cleanDist = function() {
 };
 
 const _default = function() {
-	return src(['./index.html', '*.png'])
+	// encoding:false keeps gulp5 from decoding the pngs as utf8
+	return src(['./index.html', './*.png'], { encoding: false })
 		.pipe(dest(paths.dev));
 };
 
 const _releaseHtml = function() {
-	return src([paths.dev + 'index.html', paths.dev + '*.png'])
+	return src([paths.dev + '*.html', paths.dev + '*.png'], { encoding: false })
 		.pipe(dest(paths.dist));
 }
 const _releaseCss = function() {

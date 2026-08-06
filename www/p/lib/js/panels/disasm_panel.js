@@ -275,6 +275,15 @@ function scroll_to_address(address, pos) {
 function handleClick(inEvent) {
 
 	if ($(inEvent.target).hasClass('addr')) {
+		// Single click on a sidebar entry (functions, symbols, flags, ...)
+		// seeks right away instead of requiring a double click
+		if ($(inEvent.target).hasClass('flag') || $(inEvent.target).hasClass('xref')) {
+			var flag_address = get_address_from_class(inEvent.target);
+			if (flag_address !== undefined && flag_address !== null) {
+				do_jumpto(address_canonicalize(flag_address));
+			}
+			return;
+		}
 		if ($(inEvent.target).hasClass('history')) {
 			var idx = inEvent.target.className.split(' ').filter(function(x) { return x.substr(0, 'history_idx_'.length) == 'history_idx_'; });
 			idx = String(idx).split('_')[2];

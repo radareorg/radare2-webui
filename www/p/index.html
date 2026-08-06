@@ -57,7 +57,7 @@
 <body>
 
 <!-- SOUTH -->
-<div id="console_panel" class="ui-layout-south ui-widget-content ui-state-error" style="display: none;background-color:rgb(20,20,20);">
+<div id="console_panel" class="ui-layout-south ui-widget-content" style="display: none;">
 	<pre id="cmd_output" class="ui-layout-content cmdconsole">
 	</pre>
 	<div id="cmd_input">
@@ -70,8 +70,10 @@
 <div id="main_panel" class="ui-layout-center ec_gui_background">
 	<ul style="-moz-border-radius-bottomleft: 0; -moz-border-radius-bottomright: 0;overflow-x:hidden;overflow-y:scroll">
 		<li><a id="disasm_tab_link" href="#disasm_tab"><span>Disassembler</span></a></li>
+		<li><a href="#decompiler_tab"><span>Decompiler</span></a></li>
 		<li><a href="#hex_tab"><span>Hex Dump</span></a></li>
 		<li><a href="#strings_tab"><span>Strings</span></a></li>
+		<li><a href="#comments_tab"><span>Comments</span></a></li>
 		<li><a href="#entropy_tab"><span>Entropy</span></a></li>
 		<li><a href="#types_tab"><span>Types</span></a></li>
 		<li><a href="#settings_tab"><span>Settings</span></a></li>
@@ -80,13 +82,15 @@
 	</ul>
 	<div id="center_panel" class="ui-layout-content ui-widget-content ui-corner-bottom" style="border-top: 0; padding-bottom: 0em;">
 		<div id="disasm_tab"></div>
-		<div id="hex_tab" style="background-color:rgb(20,20,20);"></div>
-		<div id="strings_tab" style="background-color:rgb(20,20,20);"></div>
-		<div id="entropy_tab" style="background-color:rgb(20,20,20);"></div>
-		<div id="settings_tab" style="background-color:rgb(20,20,20);"></div>
+		<div id="decompiler_tab" class="side_tab"></div>
+		<div id="hex_tab" class="side_tab"></div>
+		<div id="strings_tab" class="side_tab"></div>
+		<div id="comments_tab" class="side_tab"></div>
+		<div id="entropy_tab" class="side_tab"></div>
+		<div id="settings_tab" class="side_tab"></div>
 		<div id="logs_tab"></div>
-		<div id="projects_tab" style="background-color:rgb(20,20,20);"></div>
-		<div id="types_tab" style="background-color:rgb(20,20,20);"></div>
+		<div id="projects_tab" class="side_tab"></div>
+		<div id="types_tab" class="side_tab"></div>
 	</div>
 	<div id="history_bar">
 		<h3 class="header-footer ui-state-default ui-corner-all" style="padding: 3px 5px 5px; margin-top: 1ex;" id="history">_</h3>
@@ -95,7 +99,7 @@
 </div>
 
 <!-- WEST -->
-<div class="ui-layout-west" style="color:rgb(127,127,127);background-color:rgb(20,20,20);display: none;">
+<div class="ui-layout-west" style="display: none;">
 	<div class="ui-widget-header" style="border:0px solid; color: white; background:black;text-align:center">
 		<a href=".."><img id="button" src="rlogo-inv.png" border=0/></a>
 	</div>
@@ -114,7 +118,7 @@
 </div>
 
 <!-- EAST -->
-<div class="ui-layout-east" style="color:rgb(127,127,127);background-color:rgb(20,20,20);display: none;">
+<div class="ui-layout-east" style="display: none;">
 	<div class="ui-layout-content">
 		<div id="accordion2" class="basic">
 			<h3>Information</h3>

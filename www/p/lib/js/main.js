@@ -1,23 +1,76 @@
 var myLayout;
 
+// Propagate the r2 `eco` color theme to the UI chrome through CSS variables
+// consumed by panels.css. Only background/widget hues are taken verbatim:
+// the palette's semantic colors (comment red, addr green...) are meant for
+// disassembly text, so foregrounds are neutral tones computed against the
+// theme background and the accent uses the calm `flow` hue.
+function apply_theme() {
+	r2.cmdj('ecj|', function(p) {
+		if (p === null || p === undefined) return;
+		var root = document.documentElement.style;
+		var rgb = function(c) {
+			return 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
+		};
+		var mix = function(a, b, t) {
+			return [Math.round(a[0] + (b[0] - a[0]) * t),
+				Math.round(a[1] + (b[1] - a[1]) * t),
+				Math.round(a[2] + (b[2] - a[2]) * t)];
+		};
+		var dist = function(a, b) {
+			return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]) + Math.abs(a[2] - b[2]);
+		};
+		var bg = p['gui.background'] || [20, 20, 20];
+		var is_dark = (bg[0] + bg[1] + bg[2]) / 3 < 128;
+		var fg = is_dark ? [212, 212, 212] : [35, 35, 35];
+		// use widget.bg for raised surfaces only when it is a near-neutral
+		// tone; saturated values (e.g. from `ecr`) would tint all the chrome
+		var bg2 = p['widget.bg'];
+		var saturation = bg2 === undefined ? 999
+			: Math.max(bg2[0], bg2[1], bg2[2]) - Math.min(bg2[0], bg2[1], bg2[2]);
+		if (bg2 === undefined || saturation > 40 || dist(bg2, bg) < 24) {
+			bg2 = mix(bg, fg, 0.08);
+		}
+		var accent = p['flow'] || p['widget.sel'] || fg;
+		root.setProperty('--r2-bg', rgb(bg));
+		root.setProperty('--r2-bg2', rgb(bg2));
+		root.setProperty('--r2-border', rgb(mix(bg, fg, 0.22)));
+		root.setProperty('--r2-fg', rgb(fg));
+		root.setProperty('--r2-fg-muted', rgb(mix(fg, bg, 0.42)));
+		root.setProperty('--r2-accent', rgb(accent));
+		root.setProperty('--r2-accent2', rgb(p['fname'] || accent));
+	});
+}
+
 $(document).ready(function() {
 
 	r2.cmd('e scr.html=false');
 	// create tabs FIRST so elems are correct size BEFORE Layout measures them
 	$('#main_panel').tabs({
-		select: function(event, ui) {
-			if (ui.tab.innerHTML.indexOf('Entropy') > -1) r2ui._ent.render();
-			else if (ui.tab.innerHTML.indexOf('Strings') > -1) r2ui._str.render();
-			else if (ui.tab.innerHTML.indexOf('Types') > -1) r2ui._typ.render();
-			else if (ui.tab.innerHTML.indexOf('Settings') > -1) r2ui._set.render();
-			else if (ui.tab.innerHTML.indexOf('Projects') > -1) r2ui._prj.render();
-			else if (ui.tab.innerHTML.indexOf('Hex') > -1) r2ui._hex.render();
-			else if (ui.tab.innerHTML.indexOf('Logs') > -1) r2ui._log.render();
-		},
+		// the 'select' event was removed in jQuery UI 1.10, use 'activate'
 		activate: function(event, ui) {
-			if (ui.newTab[0].innerHTML.indexOf('Disas') > -1) {r2ui._dis.render();}
+			var label = ui.newTab.text();
+			if (label.indexOf('Disas') > -1) r2ui._dis.render();
+			else if (label.indexOf('Decompiler') > -1) r2ui._dec.render();
+			else if (label.indexOf('Comments') > -1) r2ui._cmt.render();
+			else if (label.indexOf('Entropy') > -1) r2ui._ent.render();
+			else if (label.indexOf('Strings') > -1) r2ui._str.render();
+			else if (label.indexOf('Types') > -1) r2ui._typ.render();
+			else if (label.indexOf('Settings') > -1) r2ui._set.render();
+			else if (label.indexOf('Projects') > -1) r2ui._prj.render();
+			else if (label.indexOf('Hex') > -1) r2ui._hex.render();
+			else if (label.indexOf('Logs') > -1) r2ui._log.render();
 		}
 	});
+
+	// jquery.layout's resizePaneAccordions callback plugin is not part of the
+	// bundled build, so refresh the accordions ourselves whenever a side pane
+	// changes size (window resize included)
+	var resizeAccordions = function() {
+		$('#accordion1, #accordion2').each(function() {
+			if ($(this).data('ui-accordion')) $(this).accordion('refresh');
+		});
+	};
 
 	// Layout
 	myLayout = $('body').layout({
@@ -26,8 +79,8 @@ $(document).ready(function() {
 		south__size:    200,
 		north__resizable: false,
 		center__onresize: function() {if (r2ui._dis.display == 'graph' && r2ui._dis.minimap) update_minimap();},
-		west__onresize:   $.layout.callbacks.resizePaneAccordions,
-		east__onresize:   $.layout.callbacks.resizePaneAccordions
+		west__onresize:   resizeAccordions,
+		east__onresize:   resizeAccordions
 	});
 	// myLayout.disableClosable("north", true);
 	$('#accordion1').accordion({ heightStyle:  'fill' });
@@ -38,11 +91,14 @@ $(document).ready(function() {
 	r2.analAll();
 	r2.load_mmap();
 	r2ui.load_colors();
+	apply_theme();
 	r2.load_settings();
 	load_binary_details();
 
 	// Create panels
 	var disasm_panel = new DisasmPanel();
+	var decompiler_panel = new DecompilerPanel();
+	var comments_panel = new CommentsPanel();
 	var hex_panel = new HexPanel();
 	var entropy_panel = new EntropyPanel();
 	var strings_panel = new StringsPanel();
@@ -52,6 +108,8 @@ $(document).ready(function() {
 	var logs_panel = new LogsPanel();
 	r2ui._ent = entropy_panel;
 	r2ui._dis = disasm_panel;
+	r2ui._dec = decompiler_panel;
+	r2ui._cmt = comments_panel;
 	r2ui._str = strings_panel;
 	r2ui._typ = types_panel;
 	r2ui._set = settings_panel;

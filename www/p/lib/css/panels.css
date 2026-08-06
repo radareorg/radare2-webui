@@ -1,0 +1,552 @@
+/* Panel-specific polish for the p webui */
+
+/* Theme variables: overwritten at runtime from the r2 `eco` palette */
+:root {
+	--r2-bg: rgb(20, 20, 20);
+	--r2-bg2: rgb(30, 30, 30);
+	--r2-border: rgb(60, 60, 60);
+	--r2-fg: rgb(204, 204, 204);
+	--r2-fg-muted: rgb(127, 127, 127);
+	--r2-accent: rgb(58, 150, 221);
+	--r2-accent2: rgb(193, 156, 0);
+}
+
+/* jquery.layout needs an explicit full-height container to follow
+   window resizes; without this the panes never grow vertically */
+html, body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+body {
+	background: var(--r2-bg);
+	scrollbar-color: var(--r2-border) var(--r2-bg);
+}
+::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+}
+::-webkit-scrollbar-track {
+	background: var(--r2-bg);
+}
+::-webkit-scrollbar-thumb {
+	background: var(--r2-border);
+	border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: var(--r2-fg-muted);
+}
+
+/* Chrome: side panes, tabs, accordions and resizers follow the theme */
+.ui-layout-west,
+.ui-layout-east {
+	background-color: var(--r2-bg);
+	color: var(--r2-fg-muted);
+}
+#console_panel {
+	background-color: var(--r2-bg);
+}
+#center_panel > div {
+	background-color: var(--r2-bg);
+}
+#main_panel.ui-tabs {
+	background: var(--r2-bg);
+	border-color: var(--r2-border);
+}
+/* Tab bar: flex layout so overflowing tabs wrap to a visible second row
+   instead of hiding behind a scroll, and labels keep readable contrast */
+#main_panel .ui-tabs-nav {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: stretch;
+	background: var(--r2-bg2);
+	border: none;
+	border-bottom: 1px solid var(--r2-border);
+	border-radius: 0;
+	padding: 0 4px;
+	overflow: visible;
+	height: auto;
+}
+#main_panel .ui-tabs-nav li {
+	background: transparent;
+	border: none !important;
+	border-radius: 0;
+	margin: 0 !important;
+	padding: 0;
+	top: 0;
+	float: none;
+	display: block;
+	white-space: nowrap;
+}
+#main_panel .ui-tabs-nav li a {
+	color: var(--r2-fg);
+	opacity: 0.75;
+	outline: none;
+	float: none;
+	display: block;
+	padding: 6px 12px;
+	/* reserved underline keeps every tab the same height */
+	border-bottom: 2px solid transparent;
+}
+#main_panel .ui-tabs-nav li.ui-tabs-active {
+	background: var(--r2-bg);
+}
+#main_panel .ui-tabs-nav li.ui-tabs-active a {
+	border-bottom-color: var(--r2-accent);
+}
+#main_panel .ui-tabs-nav li.ui-tabs-active a,
+#main_panel .ui-tabs-nav li a:hover {
+	color: var(--r2-fg);
+	opacity: 1;
+}
+#center_panel.ui-widget-content {
+	background: var(--r2-bg);
+	border-color: var(--r2-border);
+	color: var(--r2-fg-muted);
+}
+
+/* jquery.layout paints inner content panes white by default */
+.ui-layout-west .ui-layout-content,
+.ui-layout-east .ui-layout-content {
+	background: transparent;
+	color: var(--r2-fg-muted);
+}
+#information pre,
+#sections pre {
+	color: var(--r2-fg-muted);
+	font-family: monospace;
+	font-size: 12px;
+	margin: 4px 0;
+}
+#pnotes {
+	background: var(--r2-bg2);
+	color: var(--r2-fg);
+	border: 1px solid var(--r2-border);
+	font-family: monospace;
+}
+
+/* Console pane */
+#console_panel {
+	display: flex;
+	flex-direction: column;
+	padding: 0;
+	border-top: 1px solid var(--r2-border);
+}
+#cmd_output {
+	flex: 1 1 auto;
+	margin: 0;
+	padding: 6px 10px;
+	overflow-y: auto;
+	color: var(--r2-fg);
+	font-family: monospace;
+	font-size: 12px;
+}
+#cmd_input {
+	display: flex;
+	flex-direction: row-reverse; /* the "r2" label goes before the input */
+	align-items: center;
+	background: var(--r2-bg2);
+	border-top: 1px solid var(--r2-border);
+	padding: 4px 8px;
+}
+#cmd_input label {
+	color: var(--r2-accent);
+	font-family: monospace;
+	margin-right: 8px;
+}
+#cmd_input input#command {
+	flex: 1 1 auto;
+	background: transparent;
+	color: var(--r2-fg);
+	border: none;
+	outline: none;
+	font-family: monospace;
+	font-size: 13px;
+}
+#accordion1 .ui-accordion-header,
+#accordion2 .ui-accordion-header {
+	background: var(--r2-bg2);
+	color: var(--r2-fg);
+	border: 1px solid var(--r2-border);
+	border-radius: 3px;
+	outline: none;
+}
+#accordion1 .ui-accordion-header.ui-state-active,
+#accordion2 .ui-accordion-header.ui-state-active {
+	border-left: 3px solid var(--r2-accent);
+	color: var(--r2-fg);
+}
+#accordion1 .ui-accordion-content,
+#accordion2 .ui-accordion-content {
+	background: transparent;
+	color: var(--r2-fg-muted);
+	border: none;
+}
+/* Bulletproof the side panes against every jquery-ui state class, which
+   otherwise reintroduces the stock light-grey gradients on hover/focus */
+.ui-layout-west .ui-widget-header,
+.ui-layout-east .ui-widget-header,
+.ui-layout-west .ui-state-default,
+.ui-layout-east .ui-state-default,
+.ui-layout-west .ui-state-hover,
+.ui-layout-east .ui-state-hover,
+.ui-layout-west .ui-state-focus,
+.ui-layout-east .ui-state-focus,
+.ui-layout-west .ui-state-active,
+.ui-layout-east .ui-state-active {
+	background: var(--r2-bg2) !important;
+	color: var(--r2-fg) !important;
+	border-color: var(--r2-border) !important;
+	text-shadow: none;
+}
+.ui-layout-west .ui-widget-content,
+.ui-layout-east .ui-widget-content {
+	background: transparent !important;
+	color: var(--r2-fg-muted);
+}
+.ui-layout-resizer {
+	background: var(--r2-bg2) !important;
+}
+.ui-layout-resizer:hover,
+.ui-layout-resizer-dragging {
+	background: var(--r2-accent) !important;
+}
+.ui-layout-toggler {
+	background: var(--r2-border) !important;
+	color: var(--r2-fg) !important;
+}
+#history_bar .header-footer {
+	background: var(--r2-bg2);
+	color: var(--r2-fg-muted);
+	border: 1px solid var(--r2-border);
+}
+#switch_button {
+	color: var(--r2-accent);
+	cursor: pointer;
+}
+.right_label {
+	color: var(--r2-accent2);
+	float: right;
+}
+
+/* Sidebar trees: make every entry an easy, obvious click target */
+#accordion1 .jqtree-element,
+#accordion2 .jqtree-element {
+	display: block;
+	padding: 2px 4px;
+	border-radius: 3px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+#accordion1 .jqtree-element:hover,
+#accordion2 .jqtree-element:hover {
+	background-color: rgba(127, 127, 255, 0.15);
+}
+#accordion1 .jqtree-title,
+#accordion2 .jqtree-title {
+	cursor: pointer;
+}
+#accordion1 .addr,
+#accordion2 .addr {
+	display: inline-block;
+	min-width: 90%;
+	line-height: 1.5;
+	cursor: pointer;
+}
+#accordion1 .addr:hover,
+#accordion2 .addr:hover {
+	text-decoration: underline;
+}
+
+/* Accordion sections should scroll instead of clipping */
+#accordion1 > div,
+#accordion2 > div {
+	overflow-y: auto;
+}
+
+/* History bar entries are clickable too */
+#history .history {
+	cursor: pointer;
+}
+
+/* Settings view */
+#settings_tab .settings {
+	padding: 8px 14px;
+	color: rgb(180, 180, 180);
+	font-size: 13px;
+}
+#settings_tab h3 {
+	color: white;
+	margin: 14px 0 6px 0;
+	border-bottom: 1px solid rgb(60, 60, 60);
+	padding-bottom: 3px;
+}
+#settings_tab .settings_table {
+	border-collapse: collapse;
+	width: 100%;
+}
+#settings_tab .settings_table td {
+	padding: 2px 8px 2px 0;
+	vertical-align: middle;
+}
+#settings_tab .cfg_name {
+	font-family: monospace;
+	color: rgb(220, 220, 160);
+	white-space: nowrap;
+}
+#settings_tab .cfg_desc {
+	color: rgb(140, 140, 140);
+}
+#settings_tab .cfg_text,
+#settings_tab #settings_search {
+	background: rgb(35, 35, 35);
+	color: rgb(220, 220, 220);
+	border: 1px solid rgb(70, 70, 70);
+	border-radius: 3px;
+	padding: 2px 6px;
+}
+#settings_tab #settings_search {
+	width: 60%;
+	margin-bottom: 8px;
+}
+#settings_tab .cfg_select {
+	background: rgb(35, 35, 35);
+	color: rgb(220, 220, 220);
+	border: 1px solid rgb(70, 70, 70);
+}
+
+/* Projects view */
+#projects_tab .projects {
+	padding: 8px 14px;
+	color: var(--r2-fg-muted);
+}
+#projects_tab h3 {
+	color: var(--r2-fg);
+	margin: 14px 0 8px 0;
+	border-bottom: 1px solid var(--r2-border);
+	padding-bottom: 3px;
+}
+.prj_save input[type=text] {
+	background: var(--r2-bg2);
+	color: var(--r2-fg);
+	border: 1px solid var(--r2-border);
+	border-radius: 3px;
+	padding: 4px 8px;
+	width: 16em;
+}
+.prj_hint {
+	color: var(--r2-fg-muted);
+	font-size: 12px;
+	margin-left: 8px;
+}
+.prj_list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-top: 8px;
+}
+.prj_card {
+	background: var(--r2-bg2);
+	border: 1px solid var(--r2-border);
+	border-radius: 5px;
+	padding: 10px 14px;
+	min-width: 180px;
+}
+.prj_card:hover {
+	border-color: var(--r2-accent);
+}
+.prj_title {
+	color: var(--r2-fg);
+	font-family: monospace;
+	font-size: 14px;
+	margin-bottom: 2px;
+}
+.prj_meta {
+	color: var(--r2-fg-muted);
+	font-size: 11px;
+	margin-bottom: 8px;
+}
+.prj_info {
+	max-height: 200px;
+	overflow: auto;
+	color: var(--r2-fg-muted);
+	font-size: 11px;
+	margin-top: 8px;
+}
+.prj_legacy {
+	opacity: 0.7;
+}
+
+/* Buttons shared by the panels */
+#projects_tab input[type=button],
+#settings_tab input[type=button],
+#decompiler_tab input[type=button] {
+	background: var(--r2-bg);
+	color: var(--r2-fg);
+	border: 1px solid var(--r2-border);
+	border-radius: 3px;
+	padding: 3px 10px;
+	cursor: pointer;
+}
+#projects_tab input[type=button]:hover,
+#settings_tab input[type=button]:hover,
+#decompiler_tab input[type=button]:hover {
+	border-color: var(--r2-accent);
+	color: var(--r2-accent);
+}
+
+/* Entropy view */
+.entropy_panel {
+	padding: 10px 14px;
+}
+.entropy_title {
+	color: var(--r2-fg-muted);
+	font-size: 12px;
+	margin-bottom: 6px;
+}
+.entropy_svg {
+	width: 100%;
+	height: auto;
+	display: block;
+}
+.entropy_grid {
+	stroke: var(--r2-border);
+	stroke-width: 0.5;
+}
+.entropy_axis {
+	fill: var(--r2-fg-muted);
+	font-size: 10px;
+	font-family: monospace;
+}
+.entropy_bar {
+	fill: var(--r2-accent);
+	cursor: pointer;
+}
+.entropy_bar:hover {
+	fill: var(--r2-accent2);
+}
+.entropy_tip {
+	position: fixed;
+	background: var(--r2-bg2);
+	color: var(--r2-fg);
+	border: 1px solid var(--r2-border);
+	border-radius: 3px;
+	padding: 3px 8px;
+	font-family: monospace;
+	font-size: 12px;
+	pointer-events: none;
+	z-index: 1000;
+}
+
+/* Comments view */
+#comments_tab .comments {
+	padding: 8px 14px;
+}
+#comments_tab h3 {
+	color: var(--r2-fg);
+	margin: 8px 0;
+	border-bottom: 1px solid var(--r2-border);
+	padding-bottom: 3px;
+}
+.comments_table {
+	border-collapse: collapse;
+	width: 100%;
+	font-size: 13px;
+}
+.comments_table td {
+	padding: 3px 10px 3px 0;
+	vertical-align: top;
+}
+.comments_table tr:hover {
+	background: var(--r2-bg2);
+}
+.comment_text {
+	color: var(--r2-fg-muted);
+	font-family: monospace;
+	white-space: pre-wrap;
+}
+
+/* Color palette editor */
+.colors_bar {
+	margin-bottom: 10px;
+}
+#settings_tab .palette {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 14px;
+	margin-top: 8px;
+}
+#settings_tab .swatch {
+	color: var(--r2-fg-muted);
+	font-family: monospace;
+	font-size: 12px;
+	min-width: 150px;
+	cursor: pointer;
+}
+#settings_tab .swatch input[type=color] {
+	width: 22px;
+	height: 16px;
+	border: 1px solid var(--r2-border);
+	background: transparent;
+	padding: 0;
+	vertical-align: middle;
+	cursor: pointer;
+}
+
+/* Decompiler view */
+.dec_bar {
+	padding: 8px 12px;
+	color: var(--r2-fg-muted);
+	border-bottom: 1px solid var(--r2-border);
+	background: var(--r2-bg2);
+}
+.dec_bar select {
+	background: var(--r2-bg);
+	color: var(--r2-fg);
+	border: 1px solid var(--r2-border);
+	border-radius: 3px;
+}
+.dec_addr {
+	font-family: monospace;
+	color: var(--r2-accent);
+	margin-left: 8px;
+}
+#dec_settings {
+	padding: 6px 12px;
+	border-bottom: 1px solid var(--r2-border);
+	color: var(--r2-fg-muted);
+	font-size: 12px;
+	max-height: 220px;
+	overflow-y: auto;
+}
+#dec_settings .cfg_name {
+	font-family: monospace;
+	color: var(--r2-accent2);
+}
+#dec_settings .cfg_desc {
+	color: var(--r2-fg-muted);
+}
+.dec_stmt {
+	cursor: pointer;
+}
+.dec_stmt:hover {
+	text-decoration: underline;
+}
+
+#decompiler_tab pre.decompiler {
+	margin: 0;
+	padding: 8px 12px;
+	font-family: monospace;
+	font-size: 12px;
+	line-height: 1.45;
+	white-space: pre;
+	color: rgb(210, 210, 210);
+}
+#decompiler_tab .addr {
+	cursor: pointer;
+}
+#decompiler_tab .addr:hover {
+	text-decoration: underline;
+}
