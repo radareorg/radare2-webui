@@ -47,9 +47,34 @@ function iconButton(iconName, title, onclick = null) {
 	return button;
 }
 
+function selectInput(title, options, onchange = null, selected = null) {
+	const select = document.createElement('select');
+	select.className = 'widget-select';
+	select.title = title;
+	select.setAttribute('aria-label', title);
+	for (const option of options) {
+		const node = document.createElement('option');
+		node.value = option;
+		node.textContent = option;
+		if (option === selected) node.selected = true;
+		select.appendChild(node);
+	}
+	if (onchange !== null) select.addEventListener('change', () => onchange(select.value));
+	return select;
+}
+
+function toolbar(...children) {
+	const bar = document.createElement('div');
+	bar.className = 'widget-toolbar';
+	for (const child of children) bar.appendChild(child);
+	return bar;
+}
+
 export const Inputs = {
 	button: inputButton,
 	imgButton: imgButton,
 	iconButton: iconButton,
-	pictogramInputButton: pictogramInputButton
+	pictogramInputButton: pictogramInputButton,
+	select: selectInput,
+	toolbar: toolbar
 };

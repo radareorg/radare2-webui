@@ -15,9 +15,6 @@ export class DisassemblyGraphWidget extends BaseWidget {
 
 	init() {
 		this.backButton = Inputs.iconButton('undo', 'Back to Disassembly', () => uiContext.navigateTo(Widgets.DISASSEMBLY));
-		this.backButton.style.position = 'absolute';
-		this.backButton.style.top = '1em';
-		this.backButton.style.left = '1em';
 
 		r2Wrapper.registerListener(R2Actions.SEEK, () => {
 			if (this.displayed) {
@@ -27,7 +24,8 @@ export class DisassemblyGraphWidget extends BaseWidget {
 	}
 
 	draw() {
-		this.node.appendChild(this.backButton);
+		this.node.innerHTML = '';
+		this.node.appendChild(Inputs.toolbar(this.backButton));
 		this.node.appendChild(this.getGraph());
 	}
 
@@ -42,8 +40,13 @@ export class DisassemblyGraphWidget extends BaseWidget {
 		var tail = inColor ? '|H': '';
 		r2.cmd('agf' + tail, (d) => {
 			const pre = document.createElement('pre');
+			pre.style.margin = '0.5em';
 			pre.style.color = inColor ? 'white' : 'black';
-			pre.appendChild(formatOffsets(d))
+			if (d.trim().length === 0) {
+				pre.textContent = 'No graph at the current offset, analyze the function first.';
+			} else {
+				pre.appendChild(formatOffsets(d))
+			}
 			graph.appendChild(pre);
 		});
 

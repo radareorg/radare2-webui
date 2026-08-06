@@ -31,24 +31,18 @@ export class FlagsSpacesWidget extends BaseWidget {
 	
 	getPanel() {
 		var c = document.createElement('div');
-		if (this.inColor) {
-			c.style.backgroundColor = '#202020';
-		}
 
-		var header = document.createElement('div');
-		header.style.position = 'fixed';
-		header.style.margin = '0.5em';
+		var header = Inputs.toolbar(
+			Inputs.iconButton('undo', 'Back to flags', () => uiContext.navigateTo(Widgets.FLAGS)),
+			Inputs.button('Deselect', () => { this.current = null; r2.cmd('fs *', () => this.draw()); } ),
+			Inputs.button('Add', () => this.setFlagspace()),
+			Inputs.button('Delete', () => this.delFlagspace()),
+			Inputs.button('Rename', () => this.renameFlagspace()));
 		c.appendChild(header);
-
-		header.appendChild(Inputs.iconButton('undo', 'Back to flags', () => uiContext.navigateTo(Widgets.FLAGS)));
-		header.appendChild(Inputs.button('Deselect', () => { this.current = null; r2.cmd('fs *', () => this.draw()); } ));
-		header.appendChild(Inputs.button('Add', () => this.setFlagspace()));
-		header.appendChild(Inputs.button('Delete', () => this.delFlagspace()));
-		header.appendChild(Inputs.button('Rename', () => this.renameFlagspace()));
 
 		var content = document.createElement('div');
 		content.appendChild(document.createTextNode('Click on a row to select it.'));
-		content.style.paddingTop = '70px';
+		content.style.margin = '0.5em';
 		c.appendChild(content);
 
 		r2.cmd('fsj', (d) => {
@@ -93,7 +87,7 @@ export class FlagsSpacesWidget extends BaseWidget {
 					this.current = x.name;
 				});
 			});
-			table.insertInto(content);
+			table.insertInto(content, header);
 		});
 
 		return c;

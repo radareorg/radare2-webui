@@ -28,37 +28,38 @@ export class FlagsWidget extends BaseWidget {
 	
 	getPanel() {
 		var c = document.createElement('div');
-		if (this.inColor) {
-			c.style.backgroundColor = '#202020';
-		}
 
-		var header = document.createElement('div');
-		header.style.position = 'fixed';
-		header.style.margin = '0.5em';
-		c.appendChild(header);
-
-
-		header.appendChild(Inputs.button('Spaces', () => uiContext.navigateTo(Widgets.FLAGS_SPACE)));
-		header.appendChild(Inputs.button('Delete All', () => r2.cmd('f-*', () => this.draw())));
+		var toolbar = Inputs.toolbar(
+			Inputs.button('Spaces', () => uiContext.navigateTo(Widgets.FLAGS_SPACE)),
+			Inputs.button('Delete All', () => {
+				if (confirm('Delete all flags?')) {
+					r2.cmd('f-*', () => this.draw());
+				}
+			}));
+		c.appendChild(toolbar);
 
 		var content = document.createElement('div');
-		content.style.paddingTop = '50px';
 		c.appendChild(content);
 
-		r2.cmd('fj', function(d) {
-			let data = JSON.parse(d);
+		r2.cmd('fj', (d) => {
+			let data = [];
+			try {
+				data = JSON.parse(d);
+			} catch (e) {
+				console.error('flags: unexpected output', e);
+			}
 			var table = new Table(
-				['+Offset', 'Size', 'Name'],
+				['+Address', 'Size', 'Name'],
 				[true, true, false],
 				'flagsTable',
 				null,
 				Widgets.HEXDUMP);
 
 			data.map(x => {
-				table.addRow(['0x'+x.offset.toString(16), x.size, x.name])
-				//table.addRow(Object.values(x))
+				const addr = (typeof x.addr !== 'undefined') ? x.addr : x.offset;
+				table.addRow(['0x'+addr.toString(16), x.size, x.name])
 			});
-			table.insertInto(content);
+			table.insertInto(content, toolbar);
 		});
 
 		return c;

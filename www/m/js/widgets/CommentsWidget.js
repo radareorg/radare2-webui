@@ -27,20 +27,16 @@ export class CommentsWidget extends BaseWidget {
 	getPanel() {
 		var c = document.createElement('div');
 
-		var header = document.createElement('div');
-		header.style.position = 'fixed';
-		header.style.margin = '0.5em';
-		c.appendChild(header);
-
-		header.appendChild(Inputs.button('Notes', () => uiContext.navigateTo(Widgets.NOTES)));
+		var toolbar = Inputs.toolbar(
+			Inputs.button('Notes', () => uiContext.navigateTo(Widgets.NOTES)));
+		c.appendChild(toolbar);
 
 		var content = document.createElement('div');
-		content.style.paddingTop = '70px';
 		c.appendChild(content);
 
 		r2.cmd('CC', (d) => {
 			var table = new Table(
-				['+Offset', '~Comment'],
+				['+Address', '~Comment'],
 				[true, false],
 				'commentsTable',
 				(row, newVal) => {
@@ -54,7 +50,7 @@ export class CommentsWidget extends BaseWidget {
 
 					this.draw();
 				},
-				Widgets.HEXDUMP);
+				Widgets.DISASSEMBLY);
 
 			var lines = d.split(/\n/); //clickable offsets (d).split (/\n/);
 			for (var i in lines) {
@@ -63,7 +59,7 @@ export class CommentsWidget extends BaseWidget {
 					table.addRow([line[0], line[1]]);
 				}
 			}
-			table.insertInto(content);
+			table.insertInto(content, toolbar);
 		});
 
 		return c;

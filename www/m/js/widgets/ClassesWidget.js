@@ -29,39 +29,41 @@ export class ClassesWidget extends BaseWidget {
 	getPanel() {
 		var c = document.createElement('div');
 
-		var header = document.createElement('div');
-		header.style.position = 'fixed';
-		header.style.margin = '0.5em';
+		var header = Inputs.toolbar(
+			Inputs.button('Refresh', () => {
+				statusMessage('Analyzing symbols...');
+				r2.cmd('aa', () => {
+					statusMessage('done');
+					this.draw();
+				});
+			}));
 		c.appendChild(header);
 
-		header.appendChild(Inputs.button('Refresh', () => {
-			statusMessage('Analyzing symbols...');
-			r2.cmd('aa', () => {
-				statusMessage('done');
-				this.draw();
-			});
-		}));
-
 		var content = document.createElement('div');
-		content.style.paddingTop = '70px';
 		c.appendChild(content);
 
-		r2.cmd('ic', function(d) {
+		r2.cmd('icj', function(d) {
+			var data = [];
+			try {
+				data = JSON.parse(d);
+			} catch (e) {
+				console.error('classes: unexpected output', e);
+			}
 			var table = new Table(
-				['+Address', 'Type', 'Name'],
+				['+Address', 'Name', 'Methods'],
 				[false, true, false],
 				'classesTable',
 				null,
-				Widgets.CLASSES);
+				Widgets.DISASSEMBLY);
 
-			var lines = d.split(/\n/); //clickable offsets (d).split (/\n/);
-			for (var i in lines) {
-				var items = lines[i].match(/^(0x[0-9a-f]+)\s+([0-9]+)\s+([0-9]+(\s+\-&gt;\s+[0-9]+)?)\s+(.+)$/);
-				if (items !== null) {
-					table.addRow([items[1], items[5], items[2]]);
-				}
-			}
-			table.insertInto(content);
+			data.forEach(x => {
+				table.addRow([
+					'0x' + (x.addr || 0).toString(16),
+					x.classname || x.name,
+					(x.methods || []).length
+				]);
+			});
+			table.insertInto(content, header);
 		});
 
 		return c;

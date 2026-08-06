@@ -23,36 +23,33 @@ export class SearchWidget extends BaseWidget {
 	}
 
 	draw() {
+		this.node.innerHTML = '';
 		this.node.appendChild(this.getPanel());
 	}
 
 	getPanel() {
 		const c = document.createElement('div');
-		var header = document.createElement('div');
-		header.style.margin = '0.5em';
-		c.appendChild(header);
 
 		const form = document.createElement('input');
 		form.id = 'search_input';
-		form.className = 'mdl-card--expand mdl-textfield__input';
-		form.style.backgroundColor = 'white';
-		form.style.paddingLeft = '10px';
-		form.style.top = '3.5em';
-		form.style.height = '1.8em';
+		form.className = 'table-filter';
+		form.type = 'search';
+		form.placeholder = 'Hex pairs, "string" or expression...';
+		form.setAttribute('aria-label', 'Search query');
 		form.addEventListener('keypress', (e) => this.searchKey(e.keyCode));
 
-		header.appendChild(form);
-		header.appendChild(document.createElement('br'));
-
-		header.appendChild(Inputs.button('Hex', () => this.runSearch()));
-		header.appendChild(Inputs.button('String', () => this.runSearchString()));
-		header.appendChild(Inputs.button('Code', () => this.runSearchCode()));
-		header.appendChild(Inputs.button('ROP', () => this.runSearchROP()));
-		header.appendChild(Inputs.button('Magic', () => this.runSearchMagic()));
+		const header = Inputs.toolbar(
+			form,
+			Inputs.button('Hex', () => this.runSearch()),
+			Inputs.button('String', () => this.runSearchString()),
+			Inputs.button('Code', () => this.runSearchCode()),
+			Inputs.button('ROP', () => this.runSearchROP()),
+			Inputs.button('Magic', () => this.runSearchMagic()));
+		c.appendChild(header);
 
 		const content = document.createElement('div');
 		content.id = 'search_output';
-		content.style.paddingTop = '50px';
+		content.style.margin = '0.5em';
 		content.style.color = 'black';
 		content.className = 'pre';
 		c.appendChild(content);
@@ -61,10 +58,8 @@ export class SearchWidget extends BaseWidget {
 	}
 
 	searchKey(keyCode) {
-		var inp = document.getElementById('search_input');
 		if (keyCode === 13) {
-			this.runSearch(inp.value);
-			inp.value = '';
+			this.runSearch();
 		}
 	}
 

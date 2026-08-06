@@ -3,9 +3,8 @@ export class FortunesCard {
 	get DOM() { return this.card; }
 
 	constructor() {
-		this.currentFortune = this.getNewFortune();
-
 		this.build();
+		this.refresh();
 	}
 
 	build() {
@@ -18,7 +17,6 @@ export class FortunesCard {
 
 		this.fortuneBlock = document.createElement('div');
 		this.fortuneBlock.className = 'mdl-card__supporting-text mdl-color-text--grey-600';
-		this.fortuneBlock.innerHTML = this.currentFortune;
 
 		const action = document.createElement('div');
 		action.className = 'mdl-card__actions mdl-card--border';
@@ -36,15 +34,8 @@ export class FortunesCard {
 	}
 
 	refresh() {
-		this.currentFortune = this.getNewFortune();
-		this.fortuneBlock.innerHTML = this.currentFortune;
-	}
-
-	getNewFortune() {
-		let fortune;
-		r2.cmd('fo', function(d) {
-			fortune = d;
+		r2.cmd('fo', (fortune) => {
+			this.fortuneBlock.textContent = fortune.trim();
 		});
-		return fortune;
 	}
 }

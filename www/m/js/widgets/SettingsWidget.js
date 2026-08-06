@@ -17,6 +17,7 @@ export class SettingsWidget extends BaseWidget {
 	}
 
 	draw() {
+		this.node.innerHTML = '';
 		this.grid = document.createElement('div');
 		this.grid.className = 'mdl-grid';
 		this.node.appendChild(this.grid);
@@ -109,11 +110,6 @@ export class SettingsWidget extends BaseWidget {
 	}
 
 	drawColors(dom) {
-		var colors;
-		r2.cmdj('ecoj', function(data) {
-			colors = data;
-		});
-
 		uiSwitch(dom, 'Colors', r2Settings.getItem(r2Settings.keys.COLORS), function(param, state) {
 			r2Settings.setItem(r2Settings.keys.COLORS, state);
 		});
@@ -121,30 +117,35 @@ export class SettingsWidget extends BaseWidget {
 		// Randomize
 		uiActionButton(dom, function() {
 			r2.cmd('ecr', function() {
-				// TODO: tmp, should be replaced by event "color has changed"
-				uiContext.widgetContainer.updateManagers.updates.apply();
+				r2Wrapper.seek('$$');
 			});
 		}, 'Randomize');
 
 		// Set default
 		uiActionButton(dom, function() {
 			r2.cmd('ecd', function() {
-				// TODO: tmp, should be replaced by event "color has changed"
-				uiContext.widgetContainer.updateManagers.updates.apply();
+				r2Wrapper.seek('$$');
 			});
 		}, 'Reset colors');
 
-		uiSelect(dom, 'Theme', colors, colors.indexOf(r2Settings.getItem(r2Settings.keys.THEME)), function(theme) {
-			r2Settings.setItem(r2Settings.keys.THEME, theme);
+		// The theme list comes asynchronously from r2
+		r2.cmdj('ecoj', function(colors) {
+			if (!Array.isArray(colors)) {
+				return;
+			}
+			uiSelect(dom, 'Theme', colors, colors.indexOf(r2Settings.getItem(r2Settings.keys.THEME)), function(theme) {
+				r2Settings.setItem(r2Settings.keys.THEME, theme);
+			});
 		});
 	}
 
 
 	drawReset(dom) {
+		var _this = this;
 		uiActionButton(dom, function() {
 			r2Settings.resetAll();
-			// TODO, tmp (+ currently, would update only focused panel -> settings)
-			uiContext.widgetContainer.updateManagers.updates.apply();
+			_this.draw();
+			componentHandler.upgradeDom();
 		}, 'RESET');
 	}
 

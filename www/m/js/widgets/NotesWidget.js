@@ -19,22 +19,29 @@ export class NotesWidget extends BaseWidget {
 	}
 
 	draw() {
+		this.node.innerHTML = '';
 		this.node.appendChild(this.getPanel());
 	}
 
 	getPanel() {
 		var c = document.createElement('div');
 
-		var header = document.createElement('div');
-		header.style.position = 'fixed';
-		header.style.margin = '0.5em';
-		c.appendChild(header);
-
-		header.appendChild(Inputs.iconButton('undo', 'Back to Comments', () => uiContext.navigateTo(Widgets.COMMENTS)));
+		c.appendChild(Inputs.toolbar(
+			Inputs.iconButton('undo', 'Back to Comments', () => uiContext.navigateTo(Widgets.COMMENTS))));
 
 		var content = document.createElement('div');
-		content.style.paddingTop = '70px';
-		content.innerHTML = '<textarea rows=32 style="width:100%;height:100%"></textarea>';
+		content.style.margin = '0.5em';
+
+		const textarea = document.createElement('textarea');
+		textarea.rows = 32;
+		textarea.style.width = '100%';
+		textarea.style.boxSizing = 'border-box';
+		textarea.placeholder = 'Write your notes here, they are saved automatically.';
+		textarea.value = localStorage.getItem('notes') || '';
+		textarea.addEventListener('input', () => {
+			localStorage.setItem('notes', textarea.value);
+		});
+		content.appendChild(textarea);
 		c.appendChild(content);
 
 		return c;

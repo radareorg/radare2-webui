@@ -4,6 +4,14 @@
 	height:100%;
 }
 
+/**
+ * Constrain the widget slots to the viewport so each .rwidget is the
+ * real scroll container; required for the sticky toolbars to work.
+ */
+#content {
+	height: 100%;
+}
+
 .rwidget {
 	height:100%;
 	overflow:auto;
@@ -13,6 +21,54 @@
 .rwidget.dark {
 	background-color: #202020;
 	color: white;
+}
+
+/**
+ * Common widget toolbar: sticky on top of the scrolling widget with a
+ * solid background so the content never shows through, in both the
+ * full and the splitted layouts.
+ */
+.widget-toolbar {
+	position: sticky;
+	top: 0;
+	z-index: 90;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	padding: 0.25em 0.5em;
+	background-color: #fafafa;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+.rwidget.dark .widget-toolbar {
+	background-color: #2b2b2b;
+	color: white;
+}
+
+.widget-toolbar .toolbar-spacer {
+	flex-grow: 1;
+}
+
+.widget-toolbar .table-filter {
+	margin: 3px;
+	flex: 1 1 10em;
+	max-width: 24em;
+	height: 28px;
+	padding: 0 8px;
+	border: 1px solid rgba(0, 0, 0, 0.3);
+	border-radius: 2px;
+	background-color: white;
+}
+
+.widget-select {
+	margin: 3px;
+	height: 28px;
+	padding: 0 4px;
+	border: 1px solid rgba(0, 0, 0, 0.3);
+	border-radius: 2px;
+	background-color: white;
+	color: black;
+	font-size: 14px;
 }
 
 .rwidget.full {

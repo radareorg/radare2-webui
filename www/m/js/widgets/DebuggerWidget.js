@@ -31,13 +31,8 @@ export class DebuggerWidget extends BaseWidget {
 
 	getPanel() {
 		var c = document.createElement('div');
-		if (this.inColor) {
-			c.style.backgroundColor = '#202020';
-		}
 
-		var header = document.createElement('div');
-		header.style.position = 'fixed';
-		header.style.margin = '0.5em';
+		var header = Inputs.toolbar();
 		c.appendChild(header);
 
 		header.appendChild(Inputs.iconButton('keyboard_arrow_up', 'UP', () => r2.cmd('s--', () => this.draw())));
@@ -57,7 +52,6 @@ export class DebuggerWidget extends BaseWidget {
 		}));
 
 		var content = document.createElement('div');
-		content.style.paddingTop = '50px';
 		c.appendChild(content);
 
 		// stack

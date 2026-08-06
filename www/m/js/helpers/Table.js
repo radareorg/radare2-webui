@@ -43,6 +43,7 @@ export class Table {
 				this.cols[c] = this.cols[c].substr(1);
 			} else if (this.cols[c][0] === '~') {
 				this.contentEditable[c] = true;
+				this.cols[c] = this.cols[c].substr(1);
 			}
 
 			var th = document.createElement('th');
@@ -115,7 +116,11 @@ export class Table {
 		return tr;
 	}
 
-	insertInto(node) {
+	/**
+	 * Insert the table into node; when filterParent is provided (usually
+	 * a widget toolbar) the filter input is appended there instead.
+	 */
+	insertInto(node, filterParent = null) {
 		if (this.id !== false) {
 			const filter = document.createElement('input');
 			filter.className = 'table-filter';
@@ -128,7 +133,7 @@ export class Table {
 					row.hidden = !row.textContent.toLowerCase().includes(query);
 				}
 			});
-			node.appendChild(filter);
+			(filterParent || node).appendChild(filter);
 
 			for (const [column, heading] of [...this.thead.rows[0].cells].entries()) {
 				heading.classList.add('sortable');

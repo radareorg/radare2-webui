@@ -25,13 +25,6 @@ export class BasePreWidget extends BaseWidget {
 
 	/** @override */
 	init() {
-		if (typeof this.backButton === 'undefined') {
-			return;
-		}
-		this.backButton.style.position = 'absolute';
-		this.backButton.style.top = '1em';
-		this.backButton.style.left = '1em';
-
 		r2Wrapper.registerListener(R2Actions.SEEK, () => {
 			if (this.displayed) {
 				this.draw();
@@ -41,8 +34,9 @@ export class BasePreWidget extends BaseWidget {
 
 	/** @override */
 	draw() {
+		this.node.innerHTML = '';
 		if (typeof this.backButton !== 'undefined') {
-			this.node.appendChild(this.backButton);
+			this.node.appendChild(Inputs.toolbar(this.backButton));
 		}
 		this.node.appendChild(this.getPre());
 	}
@@ -50,8 +44,13 @@ export class BasePreWidget extends BaseWidget {
 	/** Format text from registered r2cmd and provides a <pre> element */
 	getPre() {
 		const pre = document.createElement('pre');
+		pre.style.margin = '0.5em';
 		r2.cmd(this.r2cmd, output => {
-			pre.appendChild(this.formatFunc(output));
+			if (output.trim().length === 0) {
+				pre.textContent = 'No output for "' + this.r2cmd.split('|')[0] + '" at the current offset.';
+			} else {
+				pre.appendChild(this.formatFunc(output));
+			}
 		});
 		return pre;
 	}

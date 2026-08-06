@@ -4,6 +4,7 @@ import {OverviewWidget} from './OverviewWidget';
 import {HexdumpWidget} from './HexdumpWidget';
 import {DebuggerWidget} from './DebuggerWidget';
 import {FunctionsWidget} from './FunctionsWidget';
+import {ClassesWidget} from './ClassesWidget';
 import {FlagsWidget} from './FlagsWidget';
 import {FlagsSpacesWidget} from './FlagsSpacesWidget';
 import {SearchWidget} from './SearchWidget';
@@ -72,6 +73,9 @@ export class WidgetFactory {
 			break;
 		case Widgets.FUNCTIONS:
 			this.widgets[widget] = new FunctionsWidget();
+			break;
+		case Widgets.CLASSES:
+			this.widgets[widget] = new ClassesWidget();
 			break;
 		case Widgets.FLAGS:
 			this.widgets[widget] = new FlagsWidget();

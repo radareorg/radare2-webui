@@ -8,6 +8,14 @@ tr.active {
 	max-width: 24em;
 }
 
+/* Tables fit the widget width and resize with the window */
+.rwidget .mdl-data-table {
+	width: calc(100% - 1em);
+	margin: 0.5em;
+	white-space: normal;
+	word-break: break-word;
+}
+
 th.sortable {
 	cursor: pointer;
 }

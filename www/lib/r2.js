@@ -521,11 +521,11 @@ r2.getTextLogger = function(obj) {
 			for (let i = 0; i < ret.length; i++) {
 				var message = ret[i];
 				obj.events['message']({
-					'id': message[0],
-					'text': message[1]
+					'id': message.id,
+					'text': message.msg
 				});
-				if (message[0] > obj.last) {
-					obj.last = message[0];
+				if (message.id > obj.last) {
+					obj.last = message.id;
 				}
 			}
 			if (cb) {

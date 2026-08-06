@@ -30,9 +30,7 @@ export class FunctionsWidget extends BaseWidget {
 	getPanel() {
 		var c = document.createElement('div');
 
-		var header = document.createElement('div');
-		header.style.position = 'fixed';
-		header.style.margin = '0.5em';
+		var header = Inputs.toolbar();
 		c.appendChild(header);
 
 		header.appendChild(Inputs.button('Symbols', () => {
@@ -76,10 +74,15 @@ export class FunctionsWidget extends BaseWidget {
 		}));
 
 		var content = document.createElement('div');
-		content.style.paddingTop = '70px';
 		c.appendChild(content);
 
-		r2.cmd('afl', function(d) {
+		r2.cmd('aflj', function(d) {
+			var data = [];
+			try {
+				data = JSON.parse(d);
+			} catch (e) {
+				console.error('functions: unexpected output', e);
+			}
 			var table = new Table(
 				['+Address', 'Name', 'Size', 'CC'],
 				[false, true, false, false],
@@ -87,14 +90,10 @@ export class FunctionsWidget extends BaseWidget {
 				null,
 				Widgets.DISASSEMBLY);
 
-			var lines = d.split(/\n/); //clickable offsets (d).split (/\n/);
-			for (var i in lines) {
-				var items = lines[i].match(/^(0x[0-9a-f]+)\s+([0-9]+)\s+([0-9]+(\s+\-&gt;\s+[0-9]+)?)\s+(.+)$/);
-				if (items !== null) {
-					table.addRow([items[1], items[5], items[2], items[3]]);
-				}
-			}
-			table.insertInto(content);
+			data.forEach(x => {
+				table.addRow(['0x' + x.addr.toString(16), x.name, x.realsz || x.size, x.cc]);
+			});
+			table.insertInto(content, header);
 		});
 
 		return c;

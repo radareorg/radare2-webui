@@ -42,7 +42,7 @@ function ready() {
 	onClick('menu_search', () => uiContext.navigateTo(Widgets.SEARCH));
 	onClick('menu_script', () => uiContext.navigateTo(Widgets.SCRIPTS));
 	onClick('menu_comments', () => uiContext.navigateTo(Widgets.COMMENTS));
-	onClick('menu_help', () => alert('todo'));
+	onClick('menu_help', () => window.open('https://book.rada.re/', '_blank'));
 
 	// Left sub-menu
 	// onClick('menu_project_save', saveProject);

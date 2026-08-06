@@ -957,53 +957,70 @@ function has_scrollbar(divnode) {
 }
 
 function on_scroll(event) {
-	// console.log($(event.target).scrollTop());
-	if (!r2ui._dis.scrolling) {
-		var enyo = $('#radareApp').length ? true : false;
-		var panel_disas = false;
-		if (!enyo) panel_disas = $('#main_panel').tabs('option', 'active') === 0 ? true : false;
-		r2ui._dis.scrolling = true;
-		if (r2ui._dis.display == 'flat' && (enyo || panel_disas)) {
-			var scroll_offset = null;
-			var top_offset = null;
-			var addr = null;
-			if (enyo) {
-				scroll_offset = $('#main_panel').scrollTop();
-				top_offset = $('#gbox').height() - $('#main_panel').height() - 10;
-				container_element = $('#center_panel');
-			} else {
-				scroll_offset = $('#center_panel').scrollTop();
-				top_offset = $('#gbox').height() - $('#center_panel').height() - 10;
-				container_element = $('#disasm_tab');
-			}
-			if (has_scrollbar($('#center_panel')[0])) {
-				if (scroll_offset === 0) {
-					addr = '0x' + r2ui._dis.instructions[0].addr.toString(16);
-					// console.log("Scroll en top", scroll_offset, top_offset, addr);
-					r2.get_disasm_before(addr, 50, function(x) {
-						// console.log(x.length);
-						r2ui._dis.instructions = x.concat(r2ui._dis.instructions);
-					});
-					container_element.html('<div id=\'canvas\' class=\'canvas enyo-selectable ec_gui_background\'></div>');
-					render_instructions(r2ui._dis.instructions);
-					scroll_to_address(addr);
-					rehighlight_iaddress(r2ui._dis.selected_offset);
-				} else if (scroll_offset > top_offset) {
-					// console.log("Scroll en top", scroll_offset, top_offset)
-					addr = '0x' + r2ui._dis.instructions[r2ui._dis.instructions.length - 1].addr.toString(16);
-					r2.get_disasm_after(addr, 100, function(x) {
-						r2ui._dis.instructions = r2ui._dis.instructions.slice(0, -1).concat(x);
-					});
-					container_element.html('<div id=\'canvas\' class=\'canvas enyo-selectable ec_gui_background\'></div>');
-					render_instructions(r2ui._dis.instructions);
-					scroll_to_address(addr);
-					rehighlight_iaddress(r2ui._dis.selected_offset);
-				}
-			}
+	if (r2ui._dis.scrolling) return;
+	if (r2ui._dis.display != 'flat') return;
+	var enyo = $('#radareApp').length ? true : false;
+	if (!enyo && $('#main_panel').tabs('option', 'active') !== 0) return;
+	var ins = r2ui._dis.instructions;
+	if (!ins || ins.length === 0) return;
+	var container = enyo ? $('#main_panel') : $('#center_panel');
+	var content = enyo ? $('#center_panel') : $('#disasm_tab');
+	var el = container[0];
+	if (!has_scrollbar(el)) return;
+
+	// Start fetching before the edge is reached so scrolling feels continuous
+	var margin = 400;
+	var at_top = el.scrollTop < margin;
+	var at_bottom = el.scrollTop + el.clientHeight > el.scrollHeight - margin;
+	if (!at_top && !at_bottom) return;
+	r2ui._dis.scrolling = true;
+
+	// Remember the first visible instruction and its viewport position so the
+	// re-render is pixel-stable instead of jumping around
+	var crect = el.getBoundingClientRect();
+	var anchor = null;
+	var anchor_delta = 0;
+	$(el).find('.insaddr').each(function() {
+		var r = this.getBoundingClientRect();
+		if (r.bottom >= crect.top) {
+			anchor = get_address_from_class(this);
+			anchor_delta = r.top - crect.top;
+			return false;
 		}
-		r2ui._dis.scrolling = false;
-		event.preventDefault();
+	});
+
+	// Keep a bounded sliding window so re-render cost stays constant
+	var MAX_INSTRUCTIONS = 600;
+	var fetched = 0;
+	var addr;
+	if (at_top) {
+		addr = '0x' + ins[0].addr.toString(16);
+		r2.get_disasm_before(addr, 100, function(x) {
+			fetched = x.length;
+			ins = x.concat(ins);
+		});
+		if (ins.length > MAX_INSTRUCTIONS) ins = ins.slice(0, MAX_INSTRUCTIONS);
+	} else {
+		addr = '0x' + ins[ins.length - 1].addr.toString(16);
+		r2.get_disasm_after(addr, 100, function(x) {
+			fetched = x.length - 1; // first entry duplicates the last one shown
+			ins = ins.slice(0, -1).concat(x);
+		});
+		if (ins.length > MAX_INSTRUCTIONS) ins = ins.slice(ins.length - MAX_INSTRUCTIONS);
 	}
+	if (fetched <= 0) { // hit the beginning/end of the file, nothing to do
+		r2ui._dis.scrolling = false;
+		return;
+	}
+	r2ui._dis.instructions = ins;
+	content.html('<div id=\'canvas\' class=\'canvas enyo-selectable ec_gui_background\'></div>');
+	render_instructions(ins);
+	if (anchor !== null) {
+		var a = $(el).find('.insaddr.addr_' + anchor)[0];
+		if (a) el.scrollTop += a.getBoundingClientRect().top - crect.top - anchor_delta;
+	}
+	rehighlight_iaddress(r2ui._dis.selected_offset);
+	r2ui._dis.scrolling = false;
 }
 
 function scroll_to_element(element) {

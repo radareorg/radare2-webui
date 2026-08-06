@@ -20,24 +20,26 @@ export class ScriptWidget extends BaseWidget {
 
 	draw() {
 		this.toggleFoo = '';
+		this.node.innerHTML = '';
 		this.node.appendChild(this.getPanel());
 	}
 
 	getPanel() {
 		var c = document.createElement('div');
 
-		c.appendChild(Inputs.button('Run', () => this.runScript()));
-		c.appendChild(Inputs.button('Indent', () => this.indentScript()));
-		c.appendChild(Inputs.button('Output', () => this.toggleScriptOutput()));
-		// c.appendChild(Inputs.button('Console', () => uiContext.navigateTo(Widgets.CONSOLE)));
-
-		c.appendChild(document.createElement('br'));
+		c.appendChild(Inputs.toolbar(
+			Inputs.button('Run', () => this.runScript()),
+			Inputs.button('Output', () => this.toggleScriptOutput())));
 
 		const textarea = document.createElement('textarea');
 		textarea.id = 'script';
 		textarea.rows = 20;
 		textarea.className = 'pre';
 		textarea.style.width = '100%';
+		textarea.style.boxSizing = 'border-box';
+		textarea.addEventListener('input', () => {
+			localStorage.setItem('script', textarea.value);
+		});
 		c.appendChild(textarea);
 
 		c.appendChild(document.createElement('br'));
@@ -67,13 +69,6 @@ export class ScriptWidget extends BaseWidget {
 				this.toggleFoo = '';
 			}
 		}
-	}
-
-	indentScript() {
-		var str = document.getElementById('script').value;
-		var indented = /* NOT DEFINED js_beautify*/ (str);
-		document.getElementById('script').value = indented;
-		localStorage.script = indented;
 	}
 
 	runScript() {
