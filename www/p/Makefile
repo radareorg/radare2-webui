@@ -10,7 +10,7 @@ node_modules:
 dist release:
 	npm install
 	npx gulp release
-	rm -f $(DISTZIP)
+	rm -f ../../dist/$(DISTZIP)
 	cd ../../dist && zip -r $(DISTZIP) p
 
 all: build
