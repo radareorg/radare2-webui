@@ -102,7 +102,7 @@ DisasmPanel.prototype.render = function(mode) {
 
 				r2.cmdj('pdj 1 @' + address, function(x) {
 					if (x) {
-						if (x[0].fcn_addr == x[0].offset) {
+						if (x[0].fcn_addr == x[0].addr) {
 							$(document).contextmenu('showEntry', 'define', false);
 							$(document).contextmenu('showEntry', 'undefine', true);
 						} else {
@@ -230,7 +230,7 @@ DisasmPanel.prototype.handleInputTextChange = function() {
 			var type = 'offsets';
 			r2.cmdj('afij @ ' + r2ui._dis.selected_offset, function(x) {
 				if (x !== null && x !== undefined) {
-					if ('0x' + x[0].offset.toString(16) === r2ui._dis.selected_offset) {
+					if ('0x' + x[0].addr.toString(16) === r2ui._dis.selected_offset) {
 						type = 'functions';
 					}
 				}

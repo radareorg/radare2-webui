@@ -16,6 +16,17 @@
 
 	<!-- jQuery -->
 	<script type="text/javascript" src="./vendors/jquery.min.js"></script>
+	<script type="text/javascript">
+	// jQuery 3 compatibility for legacy plugins: jquery.layout reads the
+	// .selector property and jquery.onoff registers $.event.fixHooks entries,
+	// all removed in jQuery 3 (event props are lifted natively since 3.4).
+	jQuery.fn.selector = '';
+	jQuery.event.fixHooks = jQuery.event.fixHooks || {};
+	jQuery.event.mouseHooks = jQuery.event.mouseHooks || {
+		props: ('button buttons clientX clientY offsetX offsetY pageX pageY ' +
+			'screenX screenY toElement').split(' ')
+	};
+	</script>
 	<script type="text/javascript" src="./vendors/jquery.scrollTo.min.js"></script>
 	<script type="text/javascript" src="./vendors/jquery.layout-latest.min.js"></script> <!-- Resize pane -->
 	<script type="text/javascript" src="./vendors/jquery-ui.min.js"></script>

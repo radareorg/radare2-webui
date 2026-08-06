@@ -382,11 +382,11 @@ function render_graph(x) {
 	if (obj[0] === undefined) return false;
 	if (obj[0].blocks === undefined) return false;
 	var graph = new BBGraph();
-	r2ui.current_fcn_offset = obj[0].blocks[0].ops[0].offset;
+	r2ui.current_fcn_offset = obj[0].blocks[0].ops[0].addr;
 
 	for (var bn = 0; bn < obj[0].blocks.length; bn++) {
 		var bb = obj[0].blocks[bn];
-		var addr = bb.offset;
+		var addr = bb.addr;
 		if (bb['trace'] !== undefined) {
 			var bbinfo = r2ui.get_fcn_BB(r2ui.current_fcn_offset, addr);
 			if (bbinfo !== undefined) {
@@ -472,14 +472,14 @@ function render_instructions(instructions) {
 	var accumulated_heigth = flatcanvas_rect.top;
 	var lines = [];
 	var targets = {};
-	var first_address = instructions[0].offset;
-	var last_address = instructions[instructions.length - 1].offset;
+	var first_address = instructions[0].addr;
+	var last_address = instructions[instructions.length - 1].addr;
 	for (var i in instructions) {
 		var ins = instructions[i];
 
 		if ((ins.type == 'jmp' || ins.type == 'cjmp') && ins.jump !== undefined && ins.jump !== null) {
 			var line = {};
-			line.from = ins.offset;
+			line.from = ins.addr;
 			if (last_address < ins.jump) {
 				line.to_end = false;
 				line.to = last_address;
@@ -560,7 +560,7 @@ function render_instructions(instructions) {
 				var y0 = (from_rect.top + from_rect.bottom) / 2;
 				var to_rect = getOffsetRect(to_element);
 				var y1 = (to_rect.top + to_rect.bottom) / 2;
-				if (line.to == instructions[0].offset) {
+				if (line.to == instructions[0].addr) {
 					y1 = 0;
 				}
 
@@ -645,7 +645,7 @@ function toBoolean(str) {
 
 function html_for_instruction(ins) {
 	var idump = '<div class="instruction enyo-selectable">';
-	var offset = '0x' + ins.offset.toString(16);
+	var offset = '0x' + ins.addr.toString(16);
 	var address = offset;
 	var asm_flags = (r2.settings['asm.flags']);
 	var asm_bytes = (r2.settings['asm.bytes']);
@@ -978,7 +978,7 @@ function on_scroll(event) {
 			}
 			if (has_scrollbar($('#center_panel')[0])) {
 				if (scroll_offset === 0) {
-					addr = '0x' + r2ui._dis.instructions[0].offset.toString(16);
+					addr = '0x' + r2ui._dis.instructions[0].addr.toString(16);
 					// console.log("Scroll en top", scroll_offset, top_offset, addr);
 					r2.get_disasm_before(addr, 50, function(x) {
 						// console.log(x.length);
@@ -990,7 +990,7 @@ function on_scroll(event) {
 					rehighlight_iaddress(r2ui._dis.selected_offset);
 				} else if (scroll_offset > top_offset) {
 					// console.log("Scroll en top", scroll_offset, top_offset)
-					addr = '0x' + r2ui._dis.instructions[r2ui._dis.instructions.length - 1].offset.toString(16);
+					addr = '0x' + r2ui._dis.instructions[r2ui._dis.instructions.length - 1].addr.toString(16);
 					r2.get_disasm_after(addr, 100, function(x) {
 						r2ui._dis.instructions = r2ui._dis.instructions.slice(0, -1).concat(x);
 					});
@@ -1071,7 +1071,7 @@ function get_offset_flag(offset) {
 	var old_value = '';
 	r2.cmdj('fs offsets;fj', function(x) {
 		for (var i in x) {
-			if ('0x' + x[i].offset.toString(16) == offset) {
+			if ('0x' + x[i].addr.toString(16) == offset) {
 				old_value = x[i].name;
 				break;
 			}

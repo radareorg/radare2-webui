@@ -13,7 +13,7 @@ StringsPanel.prototype.render = function() {
 			var f = strings[i];
 			var fd = {
 				offset: f.paddr,
-				label: atob(f.string),
+				label: f.string,
 				children: [
 				{label: 'vaddr: ' + '0x' + f.vaddr.toString(16)},
 				{label: 'paddr: ' + '0x' + f.paddr.toString(16)},
@@ -38,7 +38,7 @@ StringsPanel.prototype.render = function() {
 				for (var i in strings) {
 					var f = strings[i];
 					str.toLowerCase();
-					str1 = atob(f.string).slice(0, -1);
+					str1 = f.string.slice(0, -1);
 					str1.toLowerCase();
 					// Searches all the occurence of the string with fixed length
 					if ($('#string_length').val()) {
@@ -46,7 +46,7 @@ StringsPanel.prototype.render = function() {
 						if (str1.indexOf(str) >= 0 && f.length == len) {
 							var fd = {
 								offset: f.paddr,
-								label: atob(f.string),
+								label: f.string,
 								children: [
 								{label: 'vaddr: ' + '0x' + f.vaddr.toString(16)},
 								{label: 'paddr: ' + '0x' + f.paddr.toString(16)},
@@ -60,7 +60,7 @@ StringsPanel.prototype.render = function() {
 						if (str1.indexOf(str) >= 0) {
 							var fd = {
 								offset: f.paddr,
-								label: atob(f.string),
+								label: f.string,
 								children: [
 								{label: 'vaddr: ' + '0x' + f.vaddr.toString(16)},
 								{label: 'paddr: ' + '0x' + f.paddr.toString(16)},
@@ -89,14 +89,14 @@ StringsPanel.prototype.render = function() {
 											var f = strings[i];
 											str = $('#search_string').val();
 											str.toLowerCase();
-											str1 = atob(f.string).slice(0, -1);
+											str1 = f.string.slice(0, -1);
 											str1.toLowerCase();
 											if (str.length > 0 && $('#string_length').val()) {
 												len = $('#string_length').val();
 												if (f.length == len && str1.indexOf(str) >= 0) {
 													var fd = {
 														offset: f.paddr,
-														label: atob(f.string),
+														label: f.string,
 														children: [
 														{label: 'vaddr: ' + '0x' + f.vaddr.toString(16)},
 														{label: 'paddr: ' + '0x' + f.paddr.toString(16)},
@@ -111,7 +111,7 @@ StringsPanel.prototype.render = function() {
 												if (f.length == len) {
 													var fd = {
 														offset: f.paddr,
-														label: atob(f.string),
+														label: f.string,
 														children: [
 														{label: 'vaddr: ' + '0x' + f.vaddr.toString(16)},
 														{label: 'paddr: ' + '0x' + f.paddr.toString(16)},

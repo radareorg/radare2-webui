@@ -305,7 +305,7 @@ r2.update_flags = function() {
 		if (fs !== undefined && fs !== null) {
 			r2.flags = {};
 			for (var f in fs) {
-				var addr = '0x' + fs[f].offset.toString(16);
+				var addr = '0x' + fs[f].addr.toString(16);
 				addr = address_canonicalize(addr);
 				if (addr in r2.flags) {
 					var fl = r2.flags[addr];

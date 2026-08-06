@@ -162,8 +162,8 @@ r2ui.prev_instruction = function() {
 			for (var i in x.ops) {
 				if (i === 0) continue;
 				var opcode = x.ops[i];
-				if (opcode.offset == offset) {
-					offset =  x.ops[i - 1].offset;
+				if (opcode.addr == offset) {
+					offset =  x.ops[i - 1].addr;
 					break;
 				}
 			}

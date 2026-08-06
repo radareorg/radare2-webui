@@ -247,14 +247,14 @@ function render_functions(functions) {
 		var f = functions[i];
 		if (f.name !== undefined) {
 			var is_import = false;
-			for (var k in imports) if (f.offset === imports[k].plt) is_import = true;
+			for (var k in imports) if (f.addr === imports[k].plt) is_import = true;
 			if (is_import) continue;
 			var fd = {
-				offset: f.offset,
-				label: '<span class=\'flag function addr addr_' + '0x' + f.offset.toString(16) + '\'>' + f.name + '</span>',
-				children: [{label: 'offset: ' + '0x' + f.offset.toString(16)},  {label: 'size: ' + f.size}]
+				offset: f.addr,
+				label: '<span class=\'flag function addr addr_' + '0x' + f.addr.toString(16) + '\'>' + f.name + '</span>',
+				children: [{label: 'offset: ' + '0x' + f.addr.toString(16)},  {label: 'size: ' + f.size}]
 			};
-			if (f.callrefs.length > 0) {
+			if (f.callrefs && f.callrefs.length > 0) {
 				var xrefs = {label: 'xrefs:', children: []};
 				for (var j in f.callrefs) {
 					xrefs.children[xrefs.children.length] = '<span class=\'xref addr addr_0x' + f.callrefs[j].addr.toString(16)  + '\'>0x' + f.callrefs[j].addr.toString(16) + '</span> (' + (f.callrefs[j].type == 'C' ? 'call' : 'jump') + ')';
@@ -292,9 +292,9 @@ function render_symbols(symbols) {
 	for (var i in symbols) {
 		var s = symbols[i];
 		var sd = {
-			offset: s.addr,
-			label: '<span class=\'flag symbol addr addr_' + '0x' + s.addr.toString(16) + '\'>' + s.name + '</span>',
-			children: [{label: 'offset: ' + '0x' + s.addr.toString(16)}, {label: 'size: ' + s.size}] };
+			offset: s.vaddr,
+			label: '<span class=\'flag symbol addr addr_' + '0x' + s.vaddr.toString(16) + '\'>' + s.name + '</span>',
+			children: [{label: 'offset: ' + '0x' + s.vaddr.toString(16)}, {label: 'size: ' + s.size}] };
 		data[data.length] = sd;
 	}
 	data = data.sort(function(a, b) {return a.offset - b.offset;});
@@ -321,9 +321,9 @@ function render_flags(flags) {
 	for (var i in flags) {
 		var f = flags[i];
 		var fd = {
-			offset: f.offset,
-			label: '<span class=\'flag addr addr_' + '0x' + f.offset.toString(16) + '\'>' + f.name + '</span>',
-			children: [{label: 'offset: ' + '0x' + f.offset.toString(16)}, {label: 'size: ' + f.size}] };
+			offset: f.addr,
+			label: '<span class=\'flag addr addr_' + '0x' + f.addr.toString(16) + '\'>' + f.name + '</span>',
+			children: [{label: 'offset: ' + '0x' + f.addr.toString(16)}, {label: 'size: ' + f.size}] };
 		data[data.length] = fd;
 	}
 	data = data.sort(function(a, b) {return a.offset - b.offset;});
@@ -337,7 +337,7 @@ function render_sections(sections) {
 		var f = sections[i];
 		var fd = {
 			offset: f.paddr,
-			label: '0x' + f.addr.toString(16) + ': ' + f.name,
+			label: '0x' + f.vaddr.toString(16) + ': ' + f.name,
 			children: [
 				{label: 'vaddr: ' + '0x' + f.vaddr.toString(16)},
 				{label: 'paddr: ' + '0x' + f.paddr.toString(16)},
