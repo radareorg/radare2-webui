@@ -49,7 +49,6 @@ export class GraphCard {
 		const textLegend = document.createElementNS(xmlns, 'text');
 		textLegend.setAttribute('x', '0.3');
 		textLegend.setAttribute('y', '0.2');
-		textLegend.setAttribute('font-family', 'Roboto');
 		textLegend.setAttribute('font-size', '0.1');
 		textLegend.setAttribute('fill', '#888');
 		textLegend.setAttribute('text-anchor', 'top');
@@ -60,7 +59,6 @@ export class GraphCard {
 		const textValue = document.createElementNS(xmlns, 'text');
 		textValue.setAttribute('x', '0.5');
 		textValue.setAttribute('y', '0.5');
-		textValue.setAttribute('font-family', 'Roboto');
 		textValue.setAttribute('font-size', '0.3');
 		textValue.setAttribute('fill', '#888');
 		textValue.setAttribute('text-anchor', 'middle');

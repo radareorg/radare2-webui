@@ -77,7 +77,6 @@ export class EntropyCard {
 			text.setAttribute('x', width * i + 2);
 			text.setAttribute('y', height + 10);
 			text.setAttribute('fill', color);
-			text.setAttribute('font-family', 'Roboto');
 			text.setAttribute('font-size', 12);
 			text.setAttribute('transform', 'rotate(-90, ' + width * i + ', ' + height + ')');
 			text.textContent = '0x' + cur.addr.toString(16);

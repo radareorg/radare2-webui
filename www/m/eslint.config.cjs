@@ -9,6 +9,8 @@ module.exports = [
 			globals: {
 				...globals.browser,
 				r2: 'readonly',
+				dialogPolyfill: 'readonly',
+				saveAs: 'readonly',
 				componentHandler: 'readonly'
 			}
 		},

@@ -1074,7 +1074,6 @@ export class Hexdump extends RadareInfiniteBlock {
 		var labelCheckboxBE = document.createElement('label');
 		labelCheckboxBE.classList.add('mdl-checkbox');
 		labelCheckboxBE.classList.add('mdl-js-checkbox');
-		labelCheckboxBE.classList.add('mdl-js-ripple-effect');
 		labelCheckboxBE.appendChild(checkboxBigEndian);
 		labelCheckboxBE.appendChild(textBigEndian);
 
@@ -1096,7 +1095,6 @@ export class Hexdump extends RadareInfiniteBlock {
 		var labelCheckboxSelection = document.createElement('label');
 		labelCheckboxSelection.classList.add('mdl-checkbox');
 		labelCheckboxSelection.classList.add('mdl-js-checkbox');
-		labelCheckboxSelection.classList.add('mdl-js-ripple-effect');
 		labelCheckboxSelection.appendChild(checboxSelection);
 		labelCheckboxSelection.appendChild(textSelection);
 		if (!this.writable) {
@@ -1121,7 +1119,6 @@ export class Hexdump extends RadareInfiniteBlock {
 		var labelFlags = document.createElement('label');
 		labelFlags.classList.add('mdl-checkbox');
 		labelFlags.classList.add('mdl-js-checkbox');
-		labelFlags.classList.add('mdl-js-ripple-effect');
 		labelFlags.appendChild(checkboxFlags);
 		labelFlags.appendChild(textFlags);
 

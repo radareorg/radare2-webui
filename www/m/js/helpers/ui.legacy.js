@@ -1,5 +1,5 @@
 function uiButton(href, label, type) {
-	var classes = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect ';
+	var classes = 'mdl-button mdl-js-button mdl-button--raised ';
 	// classes += 'mdl-color--accent mdl-color-text--accent-contrast';
 	if (type === 'active') {
 		var st = 'style="background-color:#f04040 !important"';
@@ -10,7 +10,7 @@ function uiButton(href, label, type) {
 
 function uiCheckList(grp, id, label) {
 	var output = '<li>';
-	output += '<label for="' + grp + '" class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect">';
+	output += '<label for="' + grp + '" class="mdl-checkbox mdl-js-checkbox">';
 	output += '<input type="checkbox" id="' + id + '" class="mdl-checkbox__input" />';
 	output += '<span class="mdl-checkbox__label">' + label + '</span>';
 	output += '</label></li>';
@@ -49,7 +49,7 @@ function uiSwitch(dom, name, isChecked, onChange) {
 	var id = 'switch-' + (++idSwitch);
 
 	var label = document.createElement('label');
-	label.className = 'mdl-switch mdl-js-switch mdl-js-ripple-effect';
+	label.className = 'mdl-switch mdl-js-switch';
 	label.for = id;
 	dom.appendChild(label);
 
@@ -80,7 +80,7 @@ function uiActionButton(dom, action, label) {
 	button.addEventListener('click', action);
 	dom.appendChild(button);
 
-	var classes = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect ';
+	var classes = 'mdl-button mdl-js-button mdl-button--raised ';
 	classes += 'mdl-color--accent mdl-color-text--accent-contrast';
 	button.className = classes;
 	button.style.margin = '3px';
@@ -124,7 +124,7 @@ function uiSelect(dom, name, list, defaultOffset, onChange) {
 // function uiSwitch(d) {
 // 	// TODO: not yet done
 // 	var out = d;
-// 	out += '<label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-1">';
+// 	out += '<label class="mdl-switch mdl-js-switch" for="switch-1">';
 // 	out += '<input type="checkbox" id="switch-1" class="mdl-switch__input" checked />';
 // 	out += '<span class="mdl-switch__label"></span>';
 // 	out += '</label>';
@@ -140,13 +140,5 @@ function uiBlock(d) {
 		out += '<br />' + D.name + ': ';
 		out += uiCombo(D.buttons);
 	}
-	return out;
-}
-
-function uiRoundButton(a, b, c) {
-	var out = '';
-	out += '<button onclick=' + a + ' class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect" ' + c + '>';
-	out += '<i class="material-icons" style="opacity:1">' + b + '</i>';
-	out += '</button>';
 	return out;
 }

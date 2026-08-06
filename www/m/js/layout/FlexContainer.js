@@ -79,9 +79,8 @@ export class FlexContainer {
 		content.appendChild(icon);
 
 		var iIcon = document.createElement('i');
-		iIcon.className = 'material-icons';
+		iIcon.className = 'material-icons mi-error_outline';
 		iIcon.style.fontSize = '54px';
-		iIcon.innerHTML = 'error_outline';
 		icon.appendChild(iIcon);
 
 		this.textDialog = document.createElement('p');

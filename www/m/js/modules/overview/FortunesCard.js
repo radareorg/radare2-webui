@@ -24,7 +24,7 @@ export class FortunesCard {
 		action.className = 'mdl-card__actions mdl-card--border';
 		
 		const refreshButton = document.createElement('a');
-		refreshButton.className = 'mdl-button mdl-js-button mdl-js-ripple-effect';
+		refreshButton.className = 'mdl-button mdl-js-button';
 		refreshButton.innerHTML = 'Next';
 		refreshButton.addEventListener('click', () => this.refresh());
 

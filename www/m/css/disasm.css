@@ -22,7 +22,7 @@
 }
 
 .disasm.flex-body {
-	font-family: "Roboto Mono", "DejaVu Sans Mono", Console, Courier New, monospace;
+	font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
 	font-weight:bold;
 }
 
@@ -75,6 +75,6 @@ table.disasm-table-dialog, table.disasm-table-dialog th, table.disasm-table-dial
 }
 
 table.disasm-table-dialog td {
-	font-family: "Roboto Mono", "DejaVu Sans Mono", Console, Courier New, monospace;
+	font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
 	text-align: center;
 }

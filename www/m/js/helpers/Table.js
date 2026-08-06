@@ -1,11 +1,11 @@
 import {applySeek} from '../helpers/Format';
 
 /**
- * Handling DataTables with jQuery plugin
+ * Lightweight sortable/filterable table.
  *
  * @param {Array} cols - List of columns, add "+" at beginning to specify a clickable field (seek method)
  * @param {Array} nonum - List of booleans, set true if non-numeric
- * @param {String} id - Id (DOM) of the current table, internal usage for DataTable plugin
+	 * @param {String} id - Id (DOM) of the current table
  */
 export class Table {
 	constructor(cols, nonum, id, onChange, seekNavigation = null) {
@@ -25,7 +25,7 @@ export class Table {
 	init() {
 		this.root = document.createElement('table');
 		this.root.className = 'mdl-data-table mdl-data-table--selectable mdl-shadow--2dp';
-		if (this.root.id !== false) {
+		if (this.id !== false) {
 			this.root.id = this.id;
 		}
 
@@ -38,10 +38,10 @@ export class Table {
 		this.thead.appendChild(tr);
 
 		for (var c in this.cols) {
-			if (this.cols[c][0] == '+') {
+			if (this.cols[c][0] === '+') {
 				this.clickableOffset[c] = true;
 				this.cols[c] = this.cols[c].substr(1);
-			} else if (this.cols[c][0] == '~') {
+			} else if (this.cols[c][0] === '~') {
 				this.contentEditable[c] = true;
 			}
 
@@ -116,9 +116,41 @@ export class Table {
 	}
 
 	insertInto(node) {
-		node.appendChild(this.root);
 		if (this.id !== false) {
-			$('#' + this.id).DataTable();
+			const filter = document.createElement('input');
+			filter.className = 'table-filter';
+			filter.type = 'search';
+			filter.placeholder = 'Filter';
+			filter.setAttribute('aria-label', 'Filter table');
+			filter.addEventListener('input', () => {
+				const query = filter.value.toLowerCase();
+				for (const row of this.getRows()) {
+					row.hidden = !row.textContent.toLowerCase().includes(query);
+				}
+			});
+			node.appendChild(filter);
+
+			for (const [column, heading] of [...this.thead.rows[0].cells].entries()) {
+				heading.classList.add('sortable');
+				heading.tabIndex = 0;
+				let ascending = false;
+				const sort = () => {
+					ascending = !ascending;
+					const numeric = !this.nonum[column];
+					const value = row => row.cells[column].textContent.trim();
+					const compare = numeric
+						? (a, b) => Number(value(a)) - Number(value(b))
+						: (a, b) => value(a).localeCompare(value(b));
+					this.getRows().sort((a, b) => ascending ? compare(a, b) : compare(b, a))
+						.forEach(row => this.tbody.appendChild(row));
+					heading.setAttribute('aria-sort', ascending ? 'ascending' : 'descending');
+				};
+				heading.addEventListener('click', sort);
+				heading.addEventListener('keydown', event => {
+					if (event.key === 'Enter' || event.key === ' ') sort();
+				});
+			}
 		}
+		node.appendChild(this.root);
 	}
 }

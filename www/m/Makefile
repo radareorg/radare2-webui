@@ -10,13 +10,12 @@ all: build
 build: node_modules
 
 dist release: node_modules
+	rm -rf ../../dist/m
 	mkdir -p ../../dist/m
-	cp -f index.html ../../dist/m/index.html
-	cp -rf css ../../dist/m
 	npx webpack-cli --output-path $$PWD/www/
 	npx gulp release
 	cp $$PWD/www/* ../../dist/m/.
-	rm -f $(DISTZIP)
+	rm -f ../../dist/$(DISTZIP)
 	cd ../../dist && ls -la && zip -r $(DISTZIP) m
 	@echo zip -r ../../dist/$(DISTZIP) m
 

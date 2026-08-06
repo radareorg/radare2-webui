@@ -1,13 +1,58 @@
-/* Rules for sizing the icon. */
+/* 21-glyph subset of Material Icons (Apache-2.0). */
+@font-face {
+	font-family: r2-icons;
+	font-style: normal;
+	font-weight: 400;
+	src: url(data:font/woff2;base64,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) format('woff2');
+}
+.material-icons {
+	display: inline-block;
+	font: normal 24px/1 r2-icons;
+	font-style: normal;
+	text-rendering: optimizeLegibility;
+	vertical-align: middle;
+	width: 1em;
+}
+.mi-aspect_ratio:before { content: '\e85b'; }
+.mi-search:before { content: '\e8b6'; }
+.mi-settings:before { content: '\e8b8'; }
+.mi-gps_fixed:before { content: '\e1b3'; }
+.mi-arrow_drop_down:before { content: '\e5c5'; }
+.mi-home:before { content: '\e88a'; }
+.mi-receipt:before { content: '\e8b0'; }
+.mi-dashboard:before { content: '\e871'; }
+.mi-play_circle_outline:before { content: '\e039'; }
+.mi-list:before { content: '\e896'; }
+.mi-flag:before { content: '\e153'; }
+.mi-extension:before { content: '\e87b'; }
+.mi-forum:before { content: '\e0bf'; }
+.mi-help_outline:before { content: '\e8fd'; }
+.mi-keyboard_arrow_up:before { content: '\e316'; }
+.mi-keyboard_arrow_down:before { content: '\e313'; }
+.mi-error_outline:before { content: '\e001'; }
+.mi-room:before { content: '\e8b4'; }
+.mi-mode_edit:before { content: '\e254'; }
+.mi-find_replace:before { content: '\e881'; }
+.mi-undo:before { content: '\e166'; }
 .material-icons.md-18 { font-size: 18px; }
 .material-icons.md-24 { font-size: 24px; }
 .material-icons.md-36 { font-size: 36px; }
 .material-icons.md-48 { font-size: 48px; }
-
-/* Rules for using icons as black on a light background. */
 .material-icons.md-dark { color: rgba(0, 0, 0, 0.54); }
 .material-icons.md-dark.md-inactive { color: rgba(0, 0, 0, 0.26); }
-
-/* Rules for using icons as white on a dark background. */
 .material-icons.md-light { color: rgba(255, 255, 255, 0.6); }
 .material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }
+.mdl-layout__drawer-button .material-icons {
+	font: 0/1 sans-serif;
+	height: 14px;
+	width: 18px;
+}
+.mdl-layout__drawer-button .material-icons:before {
+	background: currentColor;
+	box-shadow: 0 -6px currentColor, 0 6px currentColor;
+	content: '';
+	display: block;
+	height: 2px;
+	margin-top: 6px;
+	width: 18px;
+}

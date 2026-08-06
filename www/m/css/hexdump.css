@@ -26,7 +26,7 @@
 }
 
 .hex.flex-body {
-	font-family: "Roboto Mono", "DejaVu Sans Mono", Console, Courier New, monospace;
+	font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
 	font-weight: bold;
 }
 
@@ -63,7 +63,7 @@ ul.hexpairs li input, ul.ascii li input {
 	background:rgba(255,255,255,0.33) !important;
 	color:white !important;
 	font-size:inherit;
-	font-family: "Roboto Mono", "Console";
+	font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
 	font-weight: bold;
 	width:18px;
 	text-align:center;

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-html, body {
-  font-family: 'Roboto', 'Helvetica', sans-serif;
+html, body, button, input, select, textarea, .mdl-button, .mdl-data-table {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 .demo-avatar {
   width: 48px;
@@ -258,7 +258,7 @@ ul {
 }
 
 .pre, pre {
-  font-family: "Roboto Mono", "DejaVu Sans Mono", Console, Courier New, monospace;
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
   color: grey;
   white-space: pre;
 }
@@ -268,7 +268,7 @@ textarea, input {
   background-color: #f0f0f0;
   color: black;
   padding-left:1em;
-  font-family: "Roboto Mono", monospace;
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
   width: 100%;
 }
 
@@ -379,4 +379,23 @@ mdl-fixed {
   position:fixed;
   padding-left: 8px;
   top:4em;
+}
+
+.mdl-selectfield {
+  display: inline-block;
+  margin: 8px 0;
+  min-width: 180px;
+  position: relative;
+}
+.mdl-selectfield__select {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid rgba(0, 0, 0, .3);
+  padding: 8px 0;
+  width: 100%;
+}
+.mdl-selectfield__label {
+  color: #666;
+  display: block;
+  font-size: 12px;
 }

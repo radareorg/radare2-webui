@@ -4,7 +4,7 @@
 	width: 100%;
 	border-radius: 10px;
 	background-color: black;
-	font-family: "Roboto Mono", monospace;
+	font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
 	color: white;
 }
 
@@ -12,7 +12,7 @@
 	border-radius: 10px;
 	overflow:scroll;
 	width: 100%;
-	font-family: "Roboto Mono", monospace;
+	font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
 	color: white;
 	white-space: pre-wrap;
 	padding-bottom: 2em;
@@ -33,5 +33,5 @@
 	font-size: 1.2em;
 	width: 100%;
 	overflow: hidden;
-	font-family: "Roboto Mono", monospace;
+	font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
 }

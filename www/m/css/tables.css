@@ -1,3 +1,18 @@
 tr.active {
     background-color: #EEEEEE;
 }
+
+.table-filter {
+	display: block;
+	margin: 8px 0;
+	max-width: 24em;
+}
+
+th.sortable {
+	cursor: pointer;
+}
+
+th.sortable:after {
+	content: ' \2195';
+	opacity: .45;
+}

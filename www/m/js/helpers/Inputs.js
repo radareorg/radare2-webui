@@ -4,11 +4,10 @@ const MARGIN = '3px';
 
 function pictogramInputButton(iconName, name, onclick = null) {
 	const button = document.createElement('a');
-	button.className = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect';
+	button.className = 'mdl-button mdl-js-button mdl-button--raised';
 	button.style.margin = MARGIN;
 	const icon = document.createElement('i')
-	icon.className = 'material-icons';
-	icon.innerHTML = iconName;
+	icon.className = 'material-icons mi-' + iconName;
 	button.appendChild(icon);
 	button.appendChild(document.createTextNode(name));
 	if (onclick !== null) button.addEventListener('click', onclick);
@@ -17,7 +16,7 @@ function pictogramInputButton(iconName, name, onclick = null) {
 
 function inputButton(name, onclick = null) {
 	const button = document.createElement('a');
-	button.className = 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect';
+	button.className = 'mdl-button mdl-js-button mdl-button--raised';
 	button.style.margin = MARGIN;
 	button.textContent = name;
 	if (onclick !== null) button.addEventListener('click', onclick);
@@ -26,12 +25,11 @@ function inputButton(name, onclick = null) {
 
 function imgButton(iconName, title, onclick = null) {
 	const button = document.createElement('button');
-	button.className = 'mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect';
+	button.className = 'mdl-button mdl-js-button mdl-button--fab';
 	button.style.margin = MARGIN;
 	button.title = title;
 	const icon = document.createElement('i')
-	icon.className = 'material-icons';
-	icon.textContent = iconName;
+	icon.className = 'material-icons mi-' + iconName;
 	button.appendChild(icon);
 	if (onclick !== null) button.addEventListener('click', onclick);
 	return button;
@@ -39,12 +37,11 @@ function imgButton(iconName, title, onclick = null) {
 
 function iconButton(iconName, title, onclick = null) {
 	const button = document.createElement('button');
-	button.className = 'mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect';
+	button.className = 'mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab';
 	button.style.margin = MARGIN;
 	button.title = title;
 	const icon = document.createElement('i')
-	icon.className = 'material-icons md-dark';
-	icon.innerHTML = iconName;
+	icon.className = 'material-icons md-dark mi-' + iconName;
 	button.appendChild(icon);
 	if (onclick !== null) button.addEventListener('click', onclick);
 	return button;

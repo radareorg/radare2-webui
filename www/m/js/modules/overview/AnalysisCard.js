@@ -37,7 +37,7 @@ export class AnalysisCard {
 		this.card.appendChild(action);
 
 		const analyseButton = document.createElement('a');
-		analyseButton.className = 'mdl-button mdl-js-button mdl-js-ripple-effect mdl-color--blue-grey-50 mdl-color-text--blue-greu-50';
+		analyseButton.className = 'mdl-button mdl-js-button mdl-color--blue-grey-50 mdl-color-text--blue-greu-50';
 		analyseButton.textContent = 'Analyse',
 		analyseButton.addEventListener('click', () => this.analyse());
 		action.appendChild(analyseButton);
@@ -47,8 +47,7 @@ export class AnalysisCard {
 		action.appendChild(spacer);
 
 		const icon = document.createElement('i');
-		icon.className = 'material-icons';
-		icon.textContent = 'room';
+		icon.className = 'material-icons mi-room';
 		action.appendChild(icon);
 
 		this.addAnalysisOptions(choiceList);
@@ -63,7 +62,7 @@ export class AnalysisCard {
 			dom.appendChild(li);
 
 			const label = document.createElement('label');
-			label.className = 'mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect';
+			label.className = 'mdl-checkbox mdl-js-checkbox';
 			label.for = methodId;
 			li.appendChild(label);
 

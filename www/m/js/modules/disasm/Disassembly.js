@@ -218,7 +218,7 @@ export class Disassembly extends RadareInfiniteBlock {
 
 			var wrappingLabel = document.createElement('label');
 			wrappingLabel.for = this.analysisMethods[i].ugly;
-			wrappingLabel.className = 'mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect';
+			wrappingLabel.className = 'mdl-checkbox mdl-js-checkbox';
 			li.appendChild(wrappingLabel);
 
 			var input = document.createElement('input');
@@ -429,7 +429,7 @@ export class Disassembly extends RadareInfiniteBlock {
 		more.id = 'disasm_more';
 
 		const moreMenu = document.createElement('ul');
-		moreMenu.className = 'mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect';
+		moreMenu.className = 'mdl-menu mdl-menu--bottom-left mdl-js-menu';
 		moreMenu.setAttribute('for', 'disasm_more');
 
 		const subPanels = {

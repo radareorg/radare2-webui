@@ -1,9 +1,11 @@
-const { src, dest, task, series, parallel, watch } = require('gulp');
+const { src, dest, series, parallel, watch } = require('gulp');
+const fs = require('fs');
+const path = require('path');
+const csstree = require('css-tree');
+const CleanCSS = require('clean-css');
 var cleanCSS = require('gulp-clean-css'),
 	concat = require('gulp-concat'),
-	replace = require('gulp-replace'),
 	uglify = require('gulp-uglify'),
-	uglifycss = require('gulp-uglifycss'),
 	htmlmin = require('gulp-html-minifier-terser'),
 	eslint = require('gulp-eslint-new');
 
@@ -15,6 +17,15 @@ var paths = {
 };
 
 const EXT_LIBS = './node_modules' ; // ./vendors
+const MATERIAL_JS = [
+	'/material-design-lite/src/mdlComponentHandler.js',
+	'/material-design-lite/src/layout/layout.js',
+	'/material-design-lite/src/menu/menu.js',
+	'/material-design-lite/src/checkbox/checkbox.js',
+	'/material-design-lite/src/switch/switch.js',
+	'/material-design-lite/src/textfield/textfield.js',
+	'/material-design-lite/src/tabs/tabs.js'
+].map(file => EXT_LIBS + file);
 
 /**
  * Dependencies management
@@ -25,95 +36,67 @@ const _depR2Js = function() {
 		.pipe(concat('r2.js'))
 		.pipe(dest(paths.dev));
 };
-const _copyUglifiedVendors = function() {
-	return src(
-		EXT_LIBS+'/dialog-polyfill/dist/dialog-polyfill.js')
+const _copyMaterialJs = function() {
+	return src(MATERIAL_JS)
+		.pipe(concat('material.min.js'))
 		.pipe(uglify())
 		.pipe(dest(paths.dev + 'vendors/'));
 };
-const _copyVendors = function() {
-	return src([
-		EXT_LIBS+'/jquery/dist/jquery.min.js',
-		EXT_LIBS+'/material-design-lite/material.min.js',
-		EXT_LIBS+'/mdl-selectfield/dist/mdl-selectfield.min.js',
-		EXT_LIBS+'/file-saver/dist/FileSaver.min.js'])
-		.pipe(dest(paths.dev + 'vendors/'));
-};
-const _copyDataTables = function() {
-	return src(EXT_LIBS+'/datatables.net/js/dataTables.min.js')
-		.pipe(concat('jquery.dataTables.min.js'))
-		.pipe(dest(paths.dev + 'vendors/'));
+
+const _copyMaterialCss = async function() {
+	const sourceFiles = [
+		'index.html',
+		...findFiles('js', '.js')
+	];
+	const used = new Set();
+	for (const file of sourceFiles) {
+		for (const word of fs.readFileSync(file, 'utf8').match(/[a-zA-Z_][a-zA-Z0-9_-]*/g) || []) {
+			used.add(word);
+		}
+	}
+	for (const className of [
+		'has-drawer', 'has-placeholder', 'is-active', 'is-animating',
+		'is-casting-shadow', 'is-checked', 'is-dirty', 'is-disabled',
+		'is-focused', 'is-invalid', 'is-small-screen', 'is-upgraded', 'is-visible',
+		'mdl-checkbox__box-outline', 'mdl-checkbox__focus-helper',
+		'mdl-checkbox__tick-outline', 'mdl-layout__container',
+		'mdl-layout__drawer-button', 'mdl-layout__obfuscator', 'mdl-menu__container',
+		'mdl-menu__outline', 'mdl-switch__focus-helper', 'mdl-switch__thumb',
+		'mdl-switch__track'
+	]) used.add(className);
+
+	const ast = csstree.parse(fs.readFileSync(
+		EXT_LIBS + '/material-design-lite/material.min.css', 'utf8'));
+	csstree.walk(ast, {
+		visit: 'Rule',
+		enter: function(node, item, ruleList) {
+			if (node.prelude.type !== 'SelectorList') return;
+			node.prelude.children.forEach((selector, item, list) => {
+				let keep = true;
+				csstree.walk(selector, child => {
+					if ((child.type === 'ClassSelector' || child.type === 'IdSelector') &&
+						!used.has(child.name)) keep = false;
+				});
+				if (!keep) list.remove(item);
+			});
+			if (node.prelude.children.isEmpty && ruleList) ruleList.remove(item);
+		}
+	});
+	const css = new CleanCSS({ level: 2 }).minify(csstree.generate(ast));
+	if (css.errors.length) throw new Error(css.errors.join('\n'));
+	fs.mkdirSync(paths.dev + 'vendors', { recursive: true });
+	fs.writeFileSync(paths.dev + 'vendors/material.min.css', css.styles);
 };
 
+const _dependencies = parallel(_copyMaterialJs, _copyMaterialCss, _depR2Js);
 
-/*
-const _vendorsSrcmaps = function() {
-	return src([
-		EXT_LIBS+'/material-design-lite/material.min.js.map',
-		EXT_LIBS+'/mdl-selectfield/dist/mdl-selectfield.min.js.map'])
-		.pipe(dest(paths.dev + 'vendors/'));
-};
-*/
-
-//task('dependencies:vendors-srcmaps', parallel(['bower']), function() {})
-// ./vendors
-
-const _copyDialogCss = function() {
-	return src(EXT_LIBS+'/dialog-polyfill/dialog-polyfill.css')
-		.pipe(uglifycss({
-			"maxLineLen": 80,
-			"uglyComments": true
-		}))
-		.pipe(dest(paths.dev + 'vendors/'));
-};
-const _copyMaterialCss = function() {
-	return src([
-		EXT_LIBS+'/mdl-selectfield/dist/mdl-selectfield.min.css',
-		EXT_LIBS+'/material-design-lite/material.min.css'])
-		.pipe(dest(paths.dev + 'vendors/'));
-};
-const _copyDataTablesCss = function() {
-	return src(EXT_LIBS+'/datatables.net-dt/css/dataTables.dataTables.min.css')
-		.pipe(concat('jquery.dataTables.min.css'))
-		.pipe(dest(paths.dev + 'vendors/'));
-};
-const _copyMaterialIconsCss = function() {
-	return src(EXT_LIBS+'/material-design-icons-iconfont/dist/material-design-icons.css')
-		.pipe(uglifycss({
-			"maxLineLen": 80,
-			"uglyComments": true
-		}))
-		.pipe(dest(paths.dev + 'vendors/'));
-};
-const _depCss = parallel(_copyDialogCss, _copyMaterialCss, _copyDataTablesCss, _copyMaterialIconsCss);
-
-const _copyRobotoCss = function() {
-	return src([
-		EXT_LIBS+'/@fontsource/roboto/latin-{100,300,400,500,700,900}.css',
-		EXT_LIBS+'/@fontsource/roboto/latin-{400,700}-italic.css'
-	])
-		.pipe(concat('fonts.css'))
-		.pipe(dest(paths.dev + 'vendors/fonts/'));
-};
-const _copyRobotoFonts = function() {
-	return src([
-		EXT_LIBS+'/@fontsource/roboto/files/roboto-latin-{100,300,400,500,700,900}-normal.woff{,2}',
-		EXT_LIBS+'/@fontsource/roboto/files/roboto-latin-{400,700}-italic.woff{,2}'
-	], {
-		base: EXT_LIBS + '/@fontsource/roboto/',
-		encoding: false
-	})
-		.pipe(dest(paths.dev + 'vendors/fonts/'));
-};
-const _copyMaterialIconFonts = function() {
-	return src(
-		EXT_LIBS+'/material-design-icons-iconfont/dist/fonts/*.{eot,ttf,woff,woff2}',
-		{encoding: false})
-		.pipe(dest(paths.dev + 'vendors/fonts/'));
-};
-const _depFonts = parallel(_copyRobotoCss, _copyRobotoFonts, _copyMaterialIconFonts);
-
-const _dependencies = parallel(_copyVendors, _copyDataTables, _copyUglifiedVendors, /* _vendorsSrcmaps, */ _depCss, _depFonts, _depR2Js);
+function findFiles(dir, extension) {
+	return fs.readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
+		const file = path.join(dir, entry.name);
+		return entry.isDirectory() ? findFiles(file, extension) :
+			(file.endsWith(extension) ? [file] : []);
+	});
+}
 
 
 /**
@@ -130,7 +113,7 @@ const _checkstyle = function() {
 // All legacy code should be nammed with this extension *.legacy.js
 
 const _jsLegacy = function() {
-	return src('./js/*/**/*.legacy.js')
+	return src(['./js/*/**/*.legacy.js', '!./js/helpers/uiTables.legacy.js'])
 		.pipe(concat('legacy.js'))
 		.pipe(dest(paths.dev));
 };
@@ -163,10 +146,9 @@ const _css = function() {
 };
 
 const _img =  function() {
-	return src('./images/*', {encoding: false})
+	return src('./images/icon.png', {encoding: false})
 		.pipe(dest(paths.dev + 'images/'));
 };
-//const _allFonts = series(_dependencies);
 const _styles = parallel(_css, _img);
 
 const _html =  function() {
@@ -175,7 +157,12 @@ const _html =  function() {
 };
 
 
-const _build = parallel( _html, _dependencies, _js, _styles);
+const _cleanBuild = function(done) {
+	fs.rmSync(paths.dev, { recursive: true, force: true });
+	done();
+};
+
+const _build = series(_cleanBuild, parallel( _html, _dependencies, _js, _styles));
 const _default = parallel( _build, _checkstyle);
 
 
@@ -197,7 +184,7 @@ const _minifyReleaseJs = function() {
 };
 const _minifyReleaseHtml = function() {
 	return src(paths.dev + 'index.html')
-		.pipe(htmlmin({collapseWhitespace: true}))
+		.pipe(htmlmin({collapseWhitespace: true, removeComments: true}))
 		.pipe(dest(paths.dist));
 };
 const _preRelease = parallel(_copyReleaseAssets, _minifyReleaseJs, _minifyReleaseHtml);
