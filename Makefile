@@ -23,7 +23,7 @@ enyo:
 	$(MAKE) -C www/enyo build
 
 material:
-	$(MAKE) -C www/m build
+	$(MAKE) -C www/m dist
 
 tiles:
 	$(MAKE) -C www/t build
