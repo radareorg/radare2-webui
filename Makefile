@@ -42,10 +42,10 @@ runm:
 	r2 -q -e http.sandbox=false -e http.homeroot=dist -e http.ui=m -c=H /bin/ls
 
 runt:
-	r2 -q -e http.homeroot=dist -e http.ui=t -c=H /bin/ls
+	r2 -q -e http.root=dist -e http.ui=t -c=H /bin/ls
 
 runp:
-	r2 -q -e http.homeroot=dev -e http.ui=p -c=H /bin/ls
+	r2 -q -e http.root=dev -e http.ui=p -c=H /bin/ls
 
 #####################
 # Building releases #
