@@ -5,11 +5,10 @@ import cleanCSS from 'gulp-clean-css';
 import concat from 'gulp-concat';
 import gulpUtil from 'gulp-util';
 
-const R2 = '../lib/';
 const DEST = '../../dist/t/'
 
 gulp.task('default', async function() {
-	await gulp.src(['js/tiled.js', 'js/modals.js', R2 + 'r2.js', 'js/main.js'])
+	await gulp.src(['js/t.js'])
 		// .pipe(uglify())
 		.pipe(uglify().on('error', gulpUtil.log))
 		.pipe(concat('app.js'))

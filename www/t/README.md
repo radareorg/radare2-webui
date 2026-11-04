@@ -1,23 +1,15 @@
-Tiled r2 webui
-==============
+r2 tiles
+========
 
-widgets required
-----------------
+A minimal, keyboard driven tiling frontend for radare2, in the spirit of dwm.
 
-notes: notepad with textarea to put your notes there
-disasm: proper disasm widget
-hexdump: proper hexdump widget
-assemble: assemble instructions
-console:
-scrips:
-floating/modal frame. invalidating the rest.
+    make -C www/t build && r2 -e http.root=$PWD/dist -e http.ui=t -c=H /bin/ls
 
-features
---------
-follow in ->
+Panes are r2 commands. `$R` expands to the pane height in rows, and commands
+without `@` follow the current seek. Layout, panes and command history persist
+in localStorage. Press `?` for the keys; `alt` is the window manager modifier.
 
-Frames must have the following properties:
- - update() -> refresh the contents (run r2 command again, generate html, etc.)
- - seek(off) -> used by follow in...
- - selected
- - name -> we need a method to rename frames
+    alt+j/k   focus        alt+enter  zoom        alt+p   new pane
+    alt+h/l   master size  alt+t/m/g  layouts     alt+1-9 tags
+    j/k       step / move  :          command     g       goto
+    enter     follow       u/U        seek undo   /       filter

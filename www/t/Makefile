@@ -1,13 +1,6 @@
 VERSION=0.1.1
 NPMBIN=node_modules/.bin
 
-GLOBALS=
-GLOBALS+=--global _
-GLOBALS+=--global r2
-GLOBALS+=--global alert
-GLOBALS+=--global prompt
-GLOBALS+=--global Tiled
-GLOBALS+=--global html
 
 DISTZIP=radare2-webui-t-$(VERSION).zip
 
@@ -40,4 +33,4 @@ mrproper: clean
 
 
 indent:
-	$(NPMBIN)/semistandard $(GLOBALS) --fix js/*.js
+	$(NPMBIN)/semistandard --fix js/*.js
