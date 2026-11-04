@@ -1,6 +1,6 @@
 import {BaseWidget} from './BaseWidget';
 import {Inputs} from '../helpers/Inputs';
-import {formatOffsets} from '../helpers/Format';
+import {formatOffsets, formatHtmlOffsets} from '../helpers/Format';
 import {r2Wrapper, R2Actions} from '../core/R2Wrapper';
 
 export class DebuggerWidget extends BaseWidget {
@@ -43,16 +43,12 @@ export class DebuggerWidget extends BaseWidget {
 		header.appendChild(Inputs.button('Cont', () => r2.cmd(this.nativeDebugger ? 'dc' : 'aec', () => this.draw())));
 		header.appendChild(Inputs.button('BP', () => r2.cmd('db $$', () => this.draw())));
 		header.appendChild(Inputs.button('REG', () => {
-			var expr = prompt('register=value');
-			if (expr === null) {
+			const [reg, value] = (prompt('register=value') || '').split('=');
+			const val = r2Name(reg, 'register') && r2Expr(value, 'value');
+			if (!val) {
 				return;
 			}
-			const m = expr.match(/^\s*(\w+)\s*=(.+)$/);
-			const value = m && r2Expr(m[2]);
-			if (!value) {
-				return r2Invalid('register=value');
-			}
-			expr = m[1] + '=' + value;
+			const expr = reg.trim() + '=' + val;
 			if (this.nativeDebugger) {
 				r2.cmd('dr ' + expr + ';.dr*', () => this.draw());
 			} else {
@@ -72,10 +68,11 @@ export class DebuggerWidget extends BaseWidget {
 			pre.appendChild(formatOffsets(d));
 			content.appendChild(pre);			
 		});
-		r2.cmd(rcmd + '=;s cur;f-cur;pd 128' + (this.inColor ? '|H' : ''), function(d) {
+		const inColor = this.inColor;
+		r2.cmd(rcmd + '=;s cur;f-cur;pd 128' + (inColor ? '|H' : ''), function(d) {
 			const pre = document.createElement('pre');
 			pre.style.color = 'grey';
-			pre.appendChild(formatOffsets(d));
+			pre.appendChild(inColor ? formatHtmlOffsets(d) : formatOffsets(d));
 			content.appendChild(pre);	
 		});
 

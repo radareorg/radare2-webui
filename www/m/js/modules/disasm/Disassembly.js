@@ -6,6 +6,7 @@ import {uiContext} from '../../core/UIContext';
 import {Widgets} from '../../widgets/Widgets';
 import {Inputs} from '../../helpers/Inputs';
 import {applySeek, formatOffset} from '../../helpers/Format';
+import {sanitizeHtml} from '../../helpers/SafeHtml';
 import {r2Wrapper} from '../../core/R2Wrapper';
 
 export class Disassembly extends RadareInfiniteBlock {
@@ -292,43 +293,16 @@ export class Disassembly extends RadareInfiniteBlock {
 
 	onfctmenu(evt, fct) {
 		evt.preventDefault();
-
 		fct = r2Name(fct);
-		if (fct === null) {
-			return;
-		}
-		var offset;
-		r2.cmd('?v ' + fct, function(hex) {
-			offset = hex;
-		});
-
-		var newName = prompt('Rename?', fct);
-		if (newName === null || newName === '') {
-			return;
-		}
-		newName = r2Name(newName);
-		offset = r2Expr(offset);
-		if (newName === null || offset === null) {
-			return r2Invalid('name');
-		}
-
-		r2.cmd('fr ' + newName + '@ ' + offset);
+		const newName = fct && r2Name(prompt('Rename?', fct), 'name');
+		newName && r2.cmd('fr ' + newName + ' @ ' + fct);
 	}
 
 	onvarmenu(evt, varName) {
 		evt.preventDefault();
-
-		var newName = prompt('Rename?', varName);
-		if (newName === null || newName === '') {
-			return;
-		}
 		varName = r2Name(varName);
-		newName = r2Name(newName);
-		if (varName === null || newName === null) {
-			return r2Invalid('name');
-		}
-
-		r2.cmd('afvn ' + varName + ' ' + newName);
+		const newName = varName && r2Name(prompt('Rename?', varName), 'name');
+		newName && r2.cmd('afvn ' + varName + ' ' + newName);
 	}
 
 	refreshContextMenu(offset) {
@@ -385,7 +359,8 @@ export class Disassembly extends RadareInfiniteBlock {
 	 * Draw a chunk before or after the current content
 	 */
 	drawChunk(chunk, domAnchor) {
-		domAnchor.innerHTML = chunk.data;
+		domAnchor.innerHTML = '';
+		domAnchor.appendChild(sanitizeHtml(chunk.data));
 		// TODO Dirty workaround, see with worker usage
 		const seekableElements = domAnchor.getElementsByClassName('r2seek');
 		for (const el of seekableElements) {
@@ -469,7 +444,7 @@ export class Disassembly extends RadareInfiniteBlock {
 
 		container.appendChild(more);
 		container.appendChild(moreMenu);
-		container.appendChild(Inputs.iconButton('mode_edit', 'Write', () => write()));
+		container.appendChild(Inputs.iconButton('mode_edit', 'Write', () => write(() => { this.nav.cleanOldData(); this.draw(); })));
 		container.appendChild(Inputs.iconButton('find_replace', 'Open Analyze window', () => this.openAnalysisDialog()));
 		dom.appendChild(container);
 
@@ -610,24 +585,17 @@ export class Disassembly extends RadareInfiniteBlock {
 
 		/** argType: 'text' (base64 encoded), 'name' or 'expr' */
 		var applyOp = function(offset, cmd, prompting, argType) {
-			offset = r2Expr(offset);
-			if (offset === null) {
-				return r2Invalid('offset');
-			}
 			if (typeof prompting !== 'undefined') {
 				var arg = prompt(prompting + '?');
-				if (arg === null || arg === '') {
+				if (argType === 'text') {
+					arg = arg && 'base64:' + r2StrToBase64(arg);
+				} else {
+					arg = (argType === 'expr') ? r2Expr(arg, prompting) : r2Name(arg, prompting);
+				}
+				if (!arg) {
 					return;
 				}
-				if (argType === 'text') {
-					arg = 'base64:' + r2StrToBase64(arg);
-				} else {
-					arg = (argType === 'expr') ? r2Expr(arg) : r2Name(arg);
-					if (arg === null) {
-						return r2Invalid(prompting);
-					}
-				}
-				cmd = cmd.trim() + ' ' + arg;
+				cmd += ' ' + arg;
 			}
 
 			r2.cmd(cmd + ' @' + offset);

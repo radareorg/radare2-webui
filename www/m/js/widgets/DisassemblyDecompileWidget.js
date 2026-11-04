@@ -3,7 +3,7 @@ import {Inputs} from '../helpers/Inputs';
 
 import {uiContext} from '../core/UIContext';
 import {Widgets} from './Widgets';
-import {formatOffsets} from '../helpers/Format';
+import {formatHtmlOffsets} from '../helpers/Format';
 import {r2Wrapper, R2Actions} from '../core/R2Wrapper';
 
 export class DisassemblyDecompileWidget extends BaseWidget {
@@ -65,7 +65,7 @@ export class DisassemblyDecompileWidget extends BaseWidget {
 				if (d.trim().length === 0) {
 					this.drawEmptyHint();
 				} else {
-					this.output.appendChild(formatOffsets(d));
+					this.output.appendChild(formatHtmlOffsets(d));
 				}
 			});
 		});

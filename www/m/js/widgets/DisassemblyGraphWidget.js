@@ -3,7 +3,7 @@ import {Inputs} from '../helpers/Inputs';
 
 import {uiContext} from '../core/UIContext';
 import {Widgets} from './Widgets';
-import {formatOffsets} from '../helpers/Format';
+import {formatOffsets, formatHtmlOffsets} from '../helpers/Format';
 import {r2Wrapper, R2Actions} from '../core/R2Wrapper';
 
 const inColor = true; // TODO inColor
@@ -45,7 +45,7 @@ export class DisassemblyGraphWidget extends BaseWidget {
 			if (d.trim().length === 0) {
 				pre.textContent = 'No graph at the current offset, analyze the function first.';
 			} else {
-				pre.appendChild(formatOffsets(d))
+				pre.appendChild(inColor ? formatHtmlOffsets(d) : formatOffsets(d));
 			}
 			graph.appendChild(pre);
 		});

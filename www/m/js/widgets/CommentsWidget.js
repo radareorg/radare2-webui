@@ -40,10 +40,7 @@ export class CommentsWidget extends BaseWidget {
 				[true, false],
 				'commentsTable',
 				(row, newVal) => {
-					var offset = r2Expr(row[0]);
-					if (offset === null) {
-						return;
-					}
+					var offset = row[0];
 
 					// remove
 					r2.cmd('CC- @ ' + offset);

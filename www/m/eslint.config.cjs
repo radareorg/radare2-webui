@@ -17,8 +17,7 @@ module.exports = [
 				r2Hex: 'readonly',
 				r2Quoted: 'readonly',
 				r2StrToHex: 'readonly',
-				r2StrToBase64: 'readonly',
-				r2Invalid: 'readonly'
+				r2StrToBase64: 'readonly'
 			}
 		},
 		rules: {

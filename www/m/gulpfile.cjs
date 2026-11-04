@@ -126,7 +126,7 @@ const _jsLegacy = function() {
 // TODO --
 // task('js:workers',
 const _jsWorkers = function() {
-	return src(['./workers/*.js', './js/helpers/tools.legacy.js'])
+	return src('./workers/*.js')
 		.pipe(dest(paths.dev));
 };
 

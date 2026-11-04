@@ -90,7 +90,6 @@ document.addEventListener('DOMContentLoaded', ready, false);
 document.body.onkeypress = function(e) {
 	if (e.ctrlKey) {
 		const keys = [
-			// panelConsole,
 			// panelDisasm,
 			// panelDebug,
 			// panelHexdump,

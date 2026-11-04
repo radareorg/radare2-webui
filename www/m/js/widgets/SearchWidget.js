@@ -63,53 +63,36 @@ export class SearchWidget extends BaseWidget {
 		}
 	}
 
+	search(cmd) {
+		cmd && r2.cmd(cmd, searchResults);
+	}
+
+	getText(text) {
+		return text || document.getElementById('search_input').value;
+	}
+
 	runSearchMagic() {
-		r2.cmd('/m', searchResults);
+		this.search('/m');
 	}
 
 	runSearchCode(text) {
-		if (!text) {
-			text = document.getElementById('search_input').value;
-		}
-		const cmd = r2Quoted('/c ' + text);
-		if (cmd === null) {
-			return r2Invalid('search');
-		}
-		r2.cmd(cmd, searchResults);
+		this.search(r2Quoted('/c ' + this.getText(text), 'search'));
 	}
 
 	runSearchString(text) {
-		if (!text) {
-			text = document.getElementById('search_input').value;
-		}
-		if (text) {
-			r2.cmd('/x ' + r2StrToHex(text), searchResults);
-		}
+		const str = this.getText(text);
+		this.search(str && '/x ' + r2StrToHex(str));
 	}
 
 	runSearchROP(text) {
-		if (!text) {
-			text = document.getElementById('search_input').value;
-		}
-		const cmd = r2Quoted('/R ' + text);
-		if (cmd === null) {
-			return r2Invalid('search');
-		}
-		r2.cmd(cmd, searchResults);
+		this.search(r2Quoted('/R ' + this.getText(text), 'search'));
 	}
 
+	/** Hexpairs, or a "quoted string" */
 	runSearch(text) {
-		if (!text) {
-			text = document.getElementById('search_input').value;
-		}
-		if (text.length > 1 && text.startsWith('"') && text.endsWith('"')) {
-			r2.cmd('/x ' + r2StrToHex(text.slice(1, -1)), searchResults);
-		} else {
-			const hex = r2Hex(text);
-			if (hex === null) {
-				return r2Invalid('hexpairs');
-			}
-			r2.cmd('/x ' + hex, searchResults);
-		}
+		text = this.getText(text);
+		const str = text.match(/^"(.+)"$/);
+		const hex = str ? r2StrToHex(str[1]) : r2Hex(text, 'hexpairs');
+		this.search(hex && '/x ' + hex);
 	}
 }

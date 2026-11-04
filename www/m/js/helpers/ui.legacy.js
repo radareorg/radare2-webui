@@ -1,45 +1,3 @@
-function uiButton(href, label, type) {
-	var classes = 'mdl-button mdl-js-button mdl-button--raised ';
-	// classes += 'mdl-color--accent mdl-color-text--accent-contrast';
-	if (type === 'active') {
-		var st = 'style="background-color:#f04040 !important"';
-		return '&nbsp;<a href="' + href.replace(/"/g, '\'') + '" class="' + classes + '" ' + st + '>' + label + '</a>';
-	}
-	return '&nbsp;<a href="' + href.replace(/"/g, '\'') + '" class="' + classes + '">' + label + '</a>';
-}
-
-function uiCheckList(grp, id, label) {
-	var output = '<li>';
-	output += '<label for="' + grp + '" class="mdl-checkbox mdl-js-checkbox">';
-	output += '<input type="checkbox" id="' + id + '" class="mdl-checkbox__input" />';
-	output += '<span class="mdl-checkbox__label">' + label + '</span>';
-	output += '</label></li>';
-
-	return output;
-}
-
-var comboId = 0;
-function uiCombo(d) {
-	var funName = 'combo' + (++comboId);
-	var fun = funName + ' = function(e) {';
-	fun += ' var sel = document.getElementById("opt_' + funName + '");';
-	fun += ' var opt = sel.options[sel.selectedIndex].value;';
-	fun += ' switch (opt) {';
-	for (var a in d) {
-		fun += 'case "' + d[a].name + '": ' + d[a].js + '(' + d[a].name + ');break;';
-	}
-	fun += '}}';
-	// CSP violation here
-	eval(fun);
-	var out = '<select id="opt_' + funName + '" onchange="' + funName + '()">';
-	for (var a in d) {
-		var def = (d[a].default) ? ' default' : '';
-		out += '<option' + def + '>' + d[a].name + '</option>';
-	}
-	out += '</select>';
-	return out;
-}
-
 /**
  * Add a switch, with a name "label", define default state by isChecked
  * callbacks are bound when un-checked.
@@ -119,26 +77,4 @@ function uiSelect(dom, name, list, defaultOffset, onChange) {
 	label.for = id;
 	label.innerHTML = name;
 	div.appendChild(label);
-}
-
-// function uiSwitch(d) {
-// 	// TODO: not yet done
-// 	var out = d;
-// 	out += '<label class="mdl-switch mdl-js-switch" for="switch-1">';
-// 	out += '<input type="checkbox" id="switch-1" class="mdl-switch__input" checked />';
-// 	out += '<span class="mdl-switch__label"></span>';
-// 	out += '</label>';
-// 	return out;
-// }
-
-function uiBlock(d) {
-	var classes = 'mdl-card__supporting-text mdl-shadow--2dp mdl-color-text--blue-grey-50 mdl-cell';
-	var styles = 'display:inline-block;margin:5px;color:black !important;background-color:white !important';
-	var out = '';
-	for (var i in d.blocks) {
-		var D = d.blocks[i];
-		out += '<br />' + D.name + ': ';
-		out += uiCombo(D.buttons);
-	}
-	return out;
 }

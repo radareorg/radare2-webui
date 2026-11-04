@@ -1,64 +1,32 @@
 /**
- * Helpers to build r2 commands from untrusted input (prompts, names coming
- * from the binary...) without allowing command injection (; | @ > ` ~ ! etc)
- * Each function returns null when the value is not safe to use.
+ * Validate untrusted input (prompts, names from the binary) before using it
+ * in r2 commands, so it can not inject others (; | @ > ` ~ ! ...).
+ * Return the value, or null if empty (cancelled prompt) or unsafe, alerting
+ * in the later case when `what` is given.
  */
-
-/** Single word argument: flag, function, variable or flagspace name */
-function r2Name(str) {
-	if (typeof str !== 'string') {
-		return null;
+function r2Check(regex, str, what) {
+	str = (typeof str === 'number') ? '' + str : (typeof str === 'string') ? str.trim() : '';
+	if (str === '' || regex.test(str)) {
+		return str || null;
 	}
-	str = str.trim();
-	return /^[\w.:\-]+$/.test(str) ? str : null;
-}
-
-/** Numeric expression: address, size, math (0x100, sym.main+4, $$...) */
-function r2Expr(str) {
-	if (typeof str === 'number') {
-		return '' + str;
+	if (what) {
+		alert('Invalid ' + what);
 	}
-	if (typeof str !== 'string') {
-		return null;
-	}
-	str = str.trim();
-	return /^[\w.$+\-*/%()&: ]+$/.test(str) ? str : null;
-}
-
-/** Hexpairs, allowing the '.' wildcard and ':' mask used by /x */
-function r2Hex(str) {
-	if (typeof str !== 'string') {
-		return null;
-	}
-	str = str.replace(/\s+/g, '');
-	return /^[0-9a-fA-F.:]+$/.test(str) ? str : null;
-}
-
-/** Wraps a whole command in double quotes so r2 does not parse ; | @ > ... */
-function r2Quoted(cmd) {
-	if (typeof cmd !== 'string' || /["\r\n]/.test(cmd)) {
-		return null;
-	}
-	return '"' + cmd + '"';
-}
-
-/** Encodes text as UTF-8 hexpairs, used to write or search arbitrary strings */
-function r2StrToHex(str) {
-	return Array.from(new TextEncoder().encode(str))
-		.map((b) => b.toString(16).padStart(2, '0'))
-		.join('');
-}
-
-/** Encodes text as UTF-8 base64 for commands accepting the base64: prefix */
-function r2StrToBase64(str) {
-	let bin = '';
-	for (const b of new TextEncoder().encode(str)) {
-		bin += String.fromCharCode(b);
-	}
-	return window.btoa(bin);
-}
-
-function r2Invalid(what) {
-	alert('Invalid ' + what);
 	return null;
 }
+
+/** Flag, function, variable or flagspace name */
+function r2Name(str, what) { return r2Check(/^[\w.:-]+$/, str, what); }
+
+/** Address, size or math expression (0x100, sym.main+4, $$...) */
+function r2Expr(str, what) { return r2Check(/^[\w.$+\-*/%()&: ]+$/, str, what); }
+
+/** Hexpairs, allowing the '.' wildcard and ':' mask used by /x */
+function r2Hex(str, what) { return r2Check(/^[0-9a-fA-F.:]+$/, str && str.replace(/\s+/g, ''), what); }
+
+/** Whole command wrapped in double quotes, so r2 does not parse ; | @ > ... */
+function r2Quoted(cmd, what) { return r2Check(/^[^"\r\n]+$/, cmd, what) && '"' + cmd + '"'; }
+
+/** Arbitrary text as UTF-8 hexpairs (for wx, /x) or base64 (for base64: args) */
+function r2StrToHex(str) { return Array.from(new TextEncoder().encode(str), (b) => b.toString(16).padStart(2, '0')).join(''); }
+function r2StrToBase64(str) { return window.btoa(String.fromCharCode(...new TextEncoder().encode(str))); }

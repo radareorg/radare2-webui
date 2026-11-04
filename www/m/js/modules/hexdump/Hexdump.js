@@ -532,7 +532,7 @@ export class Hexdump extends RadareInfiniteBlock {
 			target.busy = true;
 
 			// Keep the first 2 valid hex characters
-			var regex = target.value.match(/$([a-fA-F0-9]{2})^/);
+			var regex = target.value.match(/^[a-fA-F0-9]{2}$/);
 			if (regex === null) {
 				if (typeof target.parentNode === 'undefined') {
 					// Solving event conflict
@@ -747,13 +747,9 @@ export class Hexdump extends RadareInfiniteBlock {
 			{ name: 'String', fct: (evt, range) => exportOp('string', range, 'pcs', 'txt') }
 		];
 		var applyOp = (range, operande) => {
-			var val = prompt('Value (valid hexpair):');
+			var val = r2Hex(prompt('Value (valid hexpair):'), 'hexpair');
 			if (val === null) {
 				return;
-			}
-			val = r2Hex(val);
-			if (val === null) {
-				return r2Invalid('hexpair');
 			}
 			var op = operande + ' ' + val + ' ' + (range.to - range.from) + ' @' + range.from;
 			r2.cmd(op, () => console.log('Call: ' + op));
@@ -803,13 +799,9 @@ export class Hexdump extends RadareInfiniteBlock {
 			{
 				name: 'Set flag',
 				fct: (evt, range) => {
-					var name = prompt('Flag\'s name:');
+					var name = r2Name(prompt('Flag\'s name:'), 'flag name');
 					if (name === null) {
 						return;
-					}
-					name = r2Name(name);
-					if (name === null) {
-						return r2Invalid('flag name');
 					}
 					r2.cmd('f ' + name + ' ' + (range.to - range.from + 1) + ' @' + range.from, () => {
 						this.nav.refreshCurrent(() => this.draw());

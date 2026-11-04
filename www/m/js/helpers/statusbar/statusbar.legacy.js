@@ -226,31 +226,7 @@ function statusFullscreen() {
 }
 
 
-function addButton(label, callback) {
-	var a = document.createElement('a');
-	a.href = 'javascript:'+callback+'()';
-	a.innerHTML = label;
-	return a;
-}
-
-function initializeStatusbarTitle() {
-	return;
-	var title = document.getElementById('statusbar_title');
-	var div = document.createElement('div');
-	title.class = 'statusbar_title';
-	title.id = 'statusbar_title';
-	div.className = 'statusbar_title';
-	div.style.textAlign = 'right';
-	div.appendChild (addButton ('v ', 'statusToggle'));
-	div.appendChild (addButton ('^ ', 'statusFullscreen'));
-	div.appendChild (addButton ('$ ', 'statusConsole'));
-	div.appendChild (addButton ('> ', 'statusBarAtRight'));
-	title.parentNode.replaceChild (div, title);
-	// title.parentNode.insertBefore (div, title);
-}
-
 function statusInitialize() {
-	initializeStatusbarTitle();
 	var statusbar = document.getElementById('statusbar');
 	statusbar.innerHTML = '';
 	statusbar.parentNode.addEventListener('click', function() {

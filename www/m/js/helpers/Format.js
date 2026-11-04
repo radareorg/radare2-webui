@@ -1,6 +1,9 @@
 import {r2Wrapper} from '../core/R2Wrapper';
+import {sanitizeHtml} from './SafeHtml';
 
 const offsetRegex = new RegExp(/(0x[a-zA-Z0-9]+|(?:sym|fcn|str)\.[\.a-zA-Z0-9_]+)/, "g");
+// Non-global copy, test() on a global regex is stateful through lastIndex
+const isOffsetRegex = new RegExp(offsetRegex.source);
 
 /** Takes a block and makes all offsets clickables */
 export function formatOffsets(str, navigateTo = null) {
@@ -14,10 +17,17 @@ export function formatOffsets(str, navigateTo = null) {
 	return node;
 }
 
+/** Same as formatOffsets for r2 HTML output (`|H`), sanitized to keep only formatting */
+export function formatHtmlOffsets(html, navigateTo = null) {
+	const node = document.createElement('span');
+	node.appendChild(sanitizeHtml(html, (text) => formatOffsets(text, navigateTo)));
+	return node;
+}
+
 /** Read the value and format if it's exactly an offset */
 export function formatOffset(str, navigateTo = null) {
 	let chunkNode;
-	if (offsetRegex.test(str)) {
+	if (isOffsetRegex.test(str)) {
 		chunkNode = document.createElement('a');
 		chunkNode.textContent = str;
 		applySeek(chunkNode, str, navigateTo);

@@ -13,3 +13,4 @@ global.InfiniteScrolling = InfiniteScrolling;
 chai.use(sinonChai);
 
 jsdomGlobal();
+global.DOMParser = window.DOMParser;

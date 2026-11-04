@@ -47,12 +47,8 @@ export class HexPairNavigator extends BlockNavigator {
 			value: value
 		});
 
-		const hex = r2Hex(value);
-		const addr = r2Expr(offset);
-		if (hex === null || addr === null) {
-			return r2Invalid('hexpair');
-		}
-		r2.cmd('wx ' + hex + ' @' + addr, function() {});
+		const hex = r2Hex(value, 'hexpair');
+		hex && r2.cmd('wx ' + hex + ' @' + offset, function() {});
 	}
 
 	/**

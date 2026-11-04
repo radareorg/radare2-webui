@@ -29,19 +29,13 @@ class R2Wrapper {
 	seek(value, widget = null) {
 		// TODO fetch s++ / s-- cmd
 		// TODO keep track of current offset
-		let addr = value;
 		if (typeof value === 'undefined') {
-			addr = prompt('address');
+			value = prompt('address');
 		} else if (typeof value === 'number') {
-			addr = '0x' + value.toString(16);
+			value = '0x' + value.toString(16);
 		}
-
-		if (!addr || addr.trim() === '') {
-			return;
-		}
-		addr = r2Expr(addr);
+		const addr = r2Expr(value, 'address');
 		if (addr === null) {
-			r2Invalid('address');
 			return;
 		}
 
@@ -164,6 +158,6 @@ r2Conf[SettingItems.ANAL_HAS_NEXT] = { name: 'analHasNext', defVal: true, apply:
 r2Conf[SettingItems.ANAL_SKIP_NOPS] = { name: 'analSkipNops', defVal: true, apply: function(p) { console.log('analSkipNops is ' + p); } };
 r2Conf[SettingItems.ANAL_NON_CODE] = { name: 'analNonCode', defVal: false, apply: function(p) { console.log('analNonCode is ' + p); } };
 r2Conf[SettingItems.COLORS] = { name: 'colors', defVal: 3, apply: function(p) { inColor = p; r2.cmd('e scr.color=' + p);} };
-r2Conf[SettingItems.THEME] = { name: 'theme', defVal: 'none', apply: function(p) { r2.cmd('eco ' + p); } }; // TODO
+r2Conf[SettingItems.THEME] = { name: 'theme', defVal: 'none', apply: function(p) { p = r2Name(p); p && r2.cmd('eco ' + p); } }; // TODO
 
 export const r2Settings = new SettingsManager(SettingItems, r2Conf);

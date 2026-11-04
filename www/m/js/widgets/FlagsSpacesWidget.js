@@ -67,11 +67,10 @@ export class FlagsSpacesWidget extends BaseWidget {
 
 				a.addEventListener('click', (e) => {
 					console.log(x.name, e);
-					const name = r2Name(x.name);
-					if (name === null) {
+					if (r2Name(x.name) === null) {
 						return;
 					}
-					r2.cmd('fs ' + name, (h)=>{
+					r2.cmd('fs ' + x.name, (h)=>{
 						this.activeEls = this.activeEls.filter(e => {
 							e.classList.remove(['active']);
 							return false;
@@ -97,55 +96,20 @@ export class FlagsSpacesWidget extends BaseWidget {
 		return c;
 	}
 
+	fsCmd(cmd, name) {
+		const fs = r2Name(name, 'flagspace');
+		fs && r2.cmd(cmd + fs, () => this.draw());
+	}
+
 	setFlagspace() {
-		let fs = this.current;
-		if (!fs) {
-			fs = prompt('name');
-		}
-		if (!fs) {
-			return;
-		}
-		fs = r2Name(fs);
-		if (fs === null) {
-			return r2Invalid('flagspace');
-		}
-		r2.cmd('fs ' + fs, () => {
-			this.draw();
-		});
+		this.fsCmd('fs ', this.current || prompt('name'));
 	}
 
 	renameFlagspace() {
-		let fs = this.current;
-		if (!fs) {
-			fs = prompt('name');
-		}
-		if (!fs) {
-			return;
-		}
-		fs = r2Name(fs);
-		if (fs === null) {
-			return r2Invalid('flagspace');
-		}
-		r2.cmd('fsr ' + fs, () => {
-			this.draw();
-		});
+		this.fsCmd('fsr ', this.current || prompt('name'));
 	}
 
-
 	delFlagspace() {
-		let fs = this.current;
-		if (!fs) {
-			fs = '.';
-		}
-		if (!fs) {
-			return;
-		}
-		fs = r2Name(fs);
-		if (fs === null) {
-			return r2Invalid('flagspace');
-		}
-		r2.cmd('fs-' + fs, () => {
-			this.draw();
-		});
+		this.fsCmd('fs-', this.current || '.');
 	}
 }
