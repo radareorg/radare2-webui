@@ -392,7 +392,7 @@ export class Hexdump extends RadareInfiniteBlock {
 			offset.appendChild(offsetEl);
 			const hex = int2fixedHex(chunk.offset + (i * this.nbColumns), 8);
 			const offsetElA = document.createElement('a');
-			offsetElA.innerHTML = hex;
+			offsetElA.textContent = hex;
 			applySeek(offsetElA);
 			offsetEl.appendChild(offsetElA);
 
@@ -500,7 +500,7 @@ export class Hexdump extends RadareInfiniteBlock {
 				contentNode = document.createTextNode(word);
 			} else {
 				contentNode = document.createElement('a');
-				contentNode.innerHTML = '0x' + words[x];
+				contentNode.textContent = '0x' + words[x];
 				applySeek(contentNode);
 			}
 			hexpairEl.appendChild(contentNode);
@@ -539,7 +539,7 @@ export class Hexdump extends RadareInfiniteBlock {
 					return;
 				}
 				alert('Wrong format, expected: [a-fA-F0-9]{2}');
-				target.parentNode.innerHTML = target.initValue;
+				target.parentNode.textContent = target.initValue;
 				return;
 			}
 
@@ -547,8 +547,8 @@ export class Hexdump extends RadareInfiniteBlock {
 			target = target.parentNode;
 			var initial = this.nav.reportChange(target.offset, value);
 
-			target.innerHTML = value;
-			target.assoc.innerHTML = hexPairToASCII(value);
+			target.textContent = value;
+			target.assoc.textContent = hexPairToASCII(value);
 			if (initial !== null) {
 				target.classList.add('modified');
 				target.assoc.classList.add('modified');
@@ -567,14 +567,14 @@ export class Hexdump extends RadareInfiniteBlock {
 			target = target.parentNode;
 			var initial = this.nav.reportChange(target.assoc.offset, hex);
 
-			target.innerHTML = value;
-			target.assoc.innerHTML = hex;
+			target.textContent = value;
+			target.assoc.textContent = hex;
 			if (initial !== null) {
 				target.classList.add('modified');
 				target.assoc.classList.add('modified');
 				this.colorizeByte(target, value);
 				this.colorizeByte(target.assoc, value);
-				this.onChangeCallback(target.assoc.offset, target.assoc.innerHTML, hex);
+				this.onChangeCallback(target.assoc.offset, target.assoc.textContent, hex);
 			}
 
 			target.removeEventListener('keydown', editableAsciiEvent.keydown);
@@ -631,8 +631,8 @@ export class Hexdump extends RadareInfiniteBlock {
 					evt.preventDefault();
 					var form = document.createElement('input');
 					form.maxLength = 2;
-					form.initValue = evt.target.innerHTML;
-					form.value = evt.target.innerHTML;
+					form.initValue = evt.target.textContent;
+					form.value = evt.target.textContent;
 					form.pattern = '[a-fA-F0-9]{2}';
 					evt.target.innerHTML = '';
 					evt.target.appendChild(form);
@@ -649,7 +649,7 @@ export class Hexdump extends RadareInfiniteBlock {
 					evt.preventDefault();
 					var form = document.createElement('input');
 					form.maxLength = 1;
-					form.value = evt.target.innerHTML;
+					form.value = evt.target.textContent;
 					form.pattern = '(.){1}';
 					evt.target.innerHTML = '';
 					evt.target.appendChild(form);

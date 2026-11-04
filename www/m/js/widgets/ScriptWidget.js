@@ -62,10 +62,10 @@ export class ScriptWidget extends BaseWidget {
 		var o = document.getElementById('scriptOutput');
 		if (o) {
 			if (this.toggleFoo === '') {
-				this.toggleFoo = o.innerHTML;
-				o.innerHTML = '';
+				this.toggleFoo = o.textContent;
+				o.textContent = '';
 			} else {
-				o.innerHTML = this.toggleFoo;
+				o.textContent = this.toggleFoo;
 				this.toggleFoo = '';
 			}
 		}
@@ -79,7 +79,7 @@ export class ScriptWidget extends BaseWidget {
 			var msg = '"use strict";' +
 			'function log(x) { var a = ' +
 			'document.getElementById(\'scriptOutput\'); ' +
-			'if (a) a.innerHTML += x + \'\\n\'; }\n';
+			'if (a) a.appendChild(document.createTextNode(x + \'\\n\')); }\n';
 			// CSP violation here
 			eval(msg + str);
 		} catch (e) {

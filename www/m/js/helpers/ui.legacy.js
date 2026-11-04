@@ -102,7 +102,7 @@ function uiSelect(dom, name, list, defaultOffset, onChange) {
 
 	for (var i = 0 ; i < list.length ; i++) {
 		var option = document.createElement('option');
-		option.innerHTML = list[i];
+		option.textContent = list[i];
 		option.value = list[i];
 		select.appendChild(option);
 		if (i === defaultOffset) {

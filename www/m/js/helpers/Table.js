@@ -67,18 +67,18 @@ export class Table {
 			var td = document.createElement('td');
 			if (this.clickableOffset[i]) {
 				const a = document.createElement('a');
-				a.innerHTML = cells[i];
+				a.textContent = cells[i];
 				td.appendChild(a);
 				applySeek(a, cells[i], this.seekNavigation);				
 			} else if (typeof cells[i] === 'object') {
 				td.appendChild(cells[i]);
 			} else {
-				td.innerHTML = cells[i];
+				td.textContent = cells[i];
 			}
 
 			if (this.contentEditable[i]) {
 				var _this = this;
-				td.initVal = td.innerHTML;
+				td.initVal = td.textContent;
 				td.contentEditable = true;
 				td.busy = false;
 
@@ -86,12 +86,12 @@ export class Table {
 					if (evt.target.busy) {
 						return;
 					}
-					if (evt.target.initVal === evt.target.innerHTML) {
+					if (evt.target.initVal === evt.target.textContent) {
 						return;
 					}
 					evt.target.busy = true;
-					_this.onChange(cells, evt.target.innerHTML);
-					evt.target.initVal = evt.target.innerHTML;
+					_this.onChange(cells, evt.target.textContent);
+					evt.target.initVal = evt.target.textContent;
 					evt.target.busy = false;
 				});
 
@@ -99,13 +99,13 @@ export class Table {
 					if (evt.keyCode !== 13 || evt.target.busy) {
 						return;
 					}
-					if (evt.target.initVal === evt.target.innerHTML) {
+					if (evt.target.initVal === evt.target.textContent) {
 						return;
 					}
 					evt.preventDefault();
 					evt.target.busy = true;
-					_this.onChange(cells, evt.target.innerHTML);
-					evt.target.initVal = evt.target.innerHTML;
+					_this.onChange(cells, evt.target.textContent);
+					evt.target.initVal = evt.target.textContent;
 					evt.target.busy = false;
 					evt.target.blur();
 				});

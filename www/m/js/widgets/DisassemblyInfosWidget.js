@@ -12,7 +12,7 @@ export class DisassemblyInfosWidget extends BasePreWidget {
 			'Infos',
 			x => {
 				const container = document.createElement('span');
-				container.innerHTML = x;
+				container.textContent = x;
 				return container;
 			},			'afi',
 			Inputs.iconButton('undo', 'Back to Disassembly', () => uiContext.navigateTo(Widgets.DISASSEMBLY)));

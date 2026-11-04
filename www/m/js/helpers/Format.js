@@ -19,11 +19,11 @@ export function formatOffset(str, navigateTo = null) {
 	let chunkNode;
 	if (offsetRegex.test(str)) {
 		chunkNode = document.createElement('a');
-		chunkNode.innerHTML = str;
+		chunkNode.textContent = str;
 		applySeek(chunkNode, str, navigateTo);
 	} else {
 		chunkNode = document.createElement('span');
-		chunkNode.innerHTML = str;
+		chunkNode.textContent = str;
 	}
 
 	return chunkNode;

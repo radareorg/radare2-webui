@@ -279,8 +279,7 @@ function submit(cmd) {
 	}
 	r2.cmd(cmd, function(res) {
 		res += '\n';
-		output.innerHTML += ' > '
-			+ cmd + '\n' + res;
+		output.appendChild(document.createTextNode(' > ' + cmd + '\n' + res));
 		input.value = '';
 		var bar = document.getElementById('statusbar_scroll');
 		bar.scrollTop = bar.scrollHeight;

@@ -14,7 +14,7 @@ function console_submit(cmd) {
 		return;
 	}
 	r2.cmd(cmd, function(res) {
-		output.innerHTML += ' > ' + cmd + '\n' + res;
+		output.appendChild(document.createTextNode(' > ' + cmd + '\n' + res));
 		input.value = '';
 		setTimeout(function() {
 			window.scrollTo('console_input');
@@ -80,7 +80,7 @@ function panelConsole() {
 	c.innerHTML = html;
 	c.style.backgroundColor = '#303030';
 	c.style.height = '100%';
-	document.getElementById('console_output').innerHTML = lastConsoleOutput;
+	document.getElementById('console_output').textContent = lastConsoleOutput;
 	console_ready();
 }
 
@@ -90,6 +90,6 @@ function runCommand(text) {
 	}
 	r2.cmd(text, function(d) {
 		lastConsoleOutput = '\n' + d;
-		document.getElementById('output').innerHTML = lastConsoleOutput;
+		document.getElementById('output').textContent = lastConsoleOutput;
 	});
 }

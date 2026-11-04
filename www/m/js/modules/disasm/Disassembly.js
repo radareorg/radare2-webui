@@ -830,7 +830,7 @@ export class Disassembly extends RadareInfiniteBlock {
 					const hex = '0x' + list[i][keys[j]].toString(16);
 					td.appendChild(formatOffset(hex));
 				} else {
-					td.innerHTML = list[i][keys[j]];
+					td.textContent = list[i][keys[j]];
 				}
 			}
 		}
