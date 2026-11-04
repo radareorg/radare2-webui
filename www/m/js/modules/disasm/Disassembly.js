@@ -382,13 +382,13 @@ export class Disassembly extends RadareInfiniteBlock {
 						return function(evt) {
 							return _this.onfctmenu(evt, id);
 						};
-					}(spans[i].id));
+					}(spans[i].title));
 				} else if (spans[i].className.indexOf('var') !== -1) {
 					spans[i].addEventListener('contextmenu', function(id) {
 						return function(evt) {
 							return _this.onvarmenu(evt, id);
 						};
-					}(spans[i].id));
+					}(spans[i].title));
 				}
 			}
 		}

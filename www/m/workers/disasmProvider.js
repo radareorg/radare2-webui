@@ -71,12 +71,12 @@ function getChunk(where, howManyLines) {
 
 		var fct = extractFct(lines[i]);
 		if (fct !== null) {
-			lines[i] = '<span class=\'fcn\' id=\'' + escapeAttr(fct) + '\'>' + lines[i] + '</span>';
+			lines[i] = '<span class=\'fcn\' title=\'' + escapeAttr(fct) + '\'>' + lines[i] + '</span>';
 		}
 
 		var variable = extractVar(lines[i]);
 		if (variable !== null) {
-			lines[i] = '<span class=\'var\' id=\'' + escapeAttr(variable) + '\'>' + lines[i] + '</span>';
+			lines[i] = '<span class=\'var\' title=\'' + escapeAttr(variable) + '\'>' + lines[i] + '</span>';
 		}
 
 		var offset = extractOffset(lines[i]);

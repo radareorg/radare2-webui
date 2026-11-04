@@ -21,9 +21,9 @@ describe('sanitizeHtml', function () {
 		Assert.include(out, '<span style="color:red">s</span>');
 	});
 
-	it('keeps worker classes and ids, filters unknown classes', function () {
-		Assert.equal(render('<pre id="block1" title="1"><span class="fcn evil" id="a\'b">f</span></pre>'),
-			'<pre id="block1" title="1"><span id="a\'b" class="fcn">f</span></pre>');
+	it('keeps worker classes and offset ids, filters unknown classes and ids', function () {
+		Assert.equal(render('<pre id="block1" title="1"><span class="fcn evil" id="statusbar" title="a\'b">f</span><span id="16">o</span></pre>'),
+			'<pre id="block1" title="1"><span title="a\'b" class="fcn">f</span><span id="16">o</span></pre>');
 	});
 
 	it('escapes entity-decoded text', function () {

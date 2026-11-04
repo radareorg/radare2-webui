@@ -32,7 +32,8 @@ function cleanNode(src, dst, linkify) {
 			continue;
 		}
 		const el = document.createElement(child.tagName.toLowerCase());
-		el.id = child.id;
+		// Only offsets, so names from the binary can't clobber ids used by the UI
+		el.id = /^(block)?\d+$/.test(child.id) ? child.id : '';
 		el.title = child.title;
 		el.className = Array.from(child.classList).filter((c) => allowedClasses.includes(c)).join(' ');
 		const color = (child.getAttribute('color') || '').trim();
