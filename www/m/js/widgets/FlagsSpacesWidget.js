@@ -67,7 +67,11 @@ export class FlagsSpacesWidget extends BaseWidget {
 
 				a.addEventListener('click', (e) => {
 					console.log(x.name, e);
-					r2.cmd('fs ' + x.name, (h)=>{
+					const name = r2Name(x.name);
+					if (name === null) {
+						return;
+					}
+					r2.cmd('fs ' + name, (h)=>{
 						this.activeEls = this.activeEls.filter(e => {
 							e.classList.remove(['active']);
 							return false;
@@ -101,6 +105,10 @@ export class FlagsSpacesWidget extends BaseWidget {
 		if (!fs) {
 			return;
 		}
+		fs = r2Name(fs);
+		if (fs === null) {
+			return r2Invalid('flagspace');
+		}
 		r2.cmd('fs ' + fs, () => {
 			this.draw();
 		});
@@ -113,6 +121,10 @@ export class FlagsSpacesWidget extends BaseWidget {
 		}
 		if (!fs) {
 			return;
+		}
+		fs = r2Name(fs);
+		if (fs === null) {
+			return r2Invalid('flagspace');
 		}
 		r2.cmd('fsr ' + fs, () => {
 			this.draw();
@@ -127,6 +139,10 @@ export class FlagsSpacesWidget extends BaseWidget {
 		}
 		if (!fs) {
 			return;
+		}
+		fs = r2Name(fs);
+		if (fs === null) {
+			return r2Invalid('flagspace');
 		}
 		r2.cmd('fs-' + fs, () => {
 			this.draw();

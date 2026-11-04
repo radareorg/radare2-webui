@@ -1,19 +1,23 @@
 function write() {
 	var str = prompt('hexpairs, quoted string or :assembly');
-	if (str != '') {
+	if (str) {
+		var cmd;
 		switch (str[0]) {
 		case ':':
-			str = str.substring(1);
-			r2.cmd('"wa ' + str + '"', update);
+			cmd = r2Quoted('wa ' + str.substring(1));
 			break;
 		case '"':
-			str = str.replace(/"/g, '');
-			r2.cmd('w ' + str, update);
+			cmd = 'wx ' + r2StrToHex(str.replace(/"/g, ''));
 			break;
 		default:
-			r2.cmd('wx ' + str, update);
+			var hex = r2Hex(str);
+			cmd = hex && 'wx ' + hex;
 			break;
 		}
+		if (!cmd) {
+			return r2Invalid('input');
+		}
+		r2.cmd(cmd, update);
 	}
 }
 
@@ -23,7 +27,7 @@ function comment() {
 		if (addr === '-') {
 			r2.cmd('CC-');
 		} else {
-			r2.cmd('"CC ' + addr + '"');
+			r2.cmd('CC base64:' + r2StrToBase64(addr));
 		}
 		update();
 	}
@@ -33,9 +37,13 @@ function flag() {
 	var addr = prompt('flag');
 	if (addr) {
 		if (addr === '-') {
-			r2.cmd('f' + addr);
+			r2.cmd('f-');
 		} else {
-			r2.cmd('f ' + addr);
+			var name = r2Name(addr);
+			if (name === null) {
+				return r2Invalid('flag name');
+			}
+			r2.cmd('f ' + name);
 		}
 		update();
 	}
@@ -44,6 +52,10 @@ function flag() {
 function block() {
 	var size = prompt('block');
 	if (size && size.trim()) {
+		size = r2Expr(size);
+		if (size === null) {
+			return r2Invalid('size');
+		}
 		r2.cmd('b ' + size);
 		update();
 	}
@@ -52,6 +64,10 @@ function block() {
 function flagsize() {
 	var size = prompt('size');
 	if (size && size.trim()) {
+		size = r2Expr(size);
+		if (size === null) {
+			return r2Invalid('size');
+		}
 		r2.cmd('fl $$ ' + size);
 		update();
 	}

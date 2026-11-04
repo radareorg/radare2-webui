@@ -11,7 +11,14 @@ module.exports = [
 				r2: 'readonly',
 				dialogPolyfill: 'readonly',
 				saveAs: 'readonly',
-				componentHandler: 'readonly'
+				componentHandler: 'readonly',
+				r2Name: 'readonly',
+				r2Expr: 'readonly',
+				r2Hex: 'readonly',
+				r2Quoted: 'readonly',
+				r2StrToHex: 'readonly',
+				r2StrToBase64: 'readonly',
+				r2Invalid: 'readonly'
 			}
 		},
 		rules: {

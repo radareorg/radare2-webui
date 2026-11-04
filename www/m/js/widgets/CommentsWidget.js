@@ -40,13 +40,16 @@ export class CommentsWidget extends BaseWidget {
 				[true, false],
 				'commentsTable',
 				(row, newVal) => {
-					var offset = row[0];
+					var offset = r2Expr(row[0]);
+					if (offset === null) {
+						return;
+					}
 
 					// remove
 					r2.cmd('CC- @ ' + offset);
 
 					// add new
-					r2.cmd('CCu base64:' + window.btoa(newVal) + ' @ ' + offset);
+					r2.cmd('CCu base64:' + r2StrToBase64(newVal) + ' @ ' + offset);
 
 					this.draw();
 				},

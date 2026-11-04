@@ -39,6 +39,11 @@ class R2Wrapper {
 		if (!addr || addr.trim() === '') {
 			return;
 		}
+		addr = r2Expr(addr);
+		if (addr === null) {
+			r2Invalid('address');
+			return;
+		}
 
 		r2.cmd('s ' + addr, () => {
 			widget && uiContext.navigateTo(widget);

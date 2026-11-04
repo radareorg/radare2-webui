@@ -71,32 +71,45 @@ export class SearchWidget extends BaseWidget {
 		if (!text) {
 			text = document.getElementById('search_input').value;
 		}
-		r2.cmd('"/c ' + text + '"', searchResults);
+		const cmd = r2Quoted('/c ' + text);
+		if (cmd === null) {
+			return r2Invalid('search');
+		}
+		r2.cmd(cmd, searchResults);
 	}
 
 	runSearchString(text) {
 		if (!text) {
 			text = document.getElementById('search_input').value;
 		}
-		r2.cmd('/ ' + text, searchResults);
+		if (text) {
+			r2.cmd('/x ' + r2StrToHex(text), searchResults);
+		}
 	}
 
 	runSearchROP(text) {
 		if (!text) {
 			text = document.getElementById('search_input').value;
 		}
-		r2.cmd('"/R ' + text + '"', searchResults);
+		const cmd = r2Quoted('/R ' + text);
+		if (cmd === null) {
+			return r2Invalid('search');
+		}
+		r2.cmd(cmd, searchResults);
 	}
 
 	runSearch(text) {
 		if (!text) {
 			text = document.getElementById('search_input').value;
 		}
-		if (text.startsWith('"') && text.endsWith('"')) {
-			const a = text.replace(/"/g, '');
-			r2.cmd('/ ' + a, searchResults);
+		if (text.length > 1 && text.startsWith('"') && text.endsWith('"')) {
+			r2.cmd('/x ' + r2StrToHex(text.slice(1, -1)), searchResults);
 		} else {
-			r2.cmd('"/x ' + text + '"', searchResults);
+			const hex = r2Hex(text);
+			if (hex === null) {
+				return r2Invalid('hexpairs');
+			}
+			r2.cmd('/x ' + hex, searchResults);
 		}
 	}
 }

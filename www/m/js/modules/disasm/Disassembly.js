@@ -293,6 +293,10 @@ export class Disassembly extends RadareInfiniteBlock {
 	onfctmenu(evt, fct) {
 		evt.preventDefault();
 
+		fct = r2Name(fct);
+		if (fct === null) {
+			return;
+		}
 		var offset;
 		r2.cmd('?v ' + fct, function(hex) {
 			offset = hex;
@@ -301,6 +305,11 @@ export class Disassembly extends RadareInfiniteBlock {
 		var newName = prompt('Rename?', fct);
 		if (newName === null || newName === '') {
 			return;
+		}
+		newName = r2Name(newName);
+		offset = r2Expr(offset);
+		if (newName === null || offset === null) {
+			return r2Invalid('name');
 		}
 
 		r2.cmd('fr ' + newName + '@ ' + offset);
@@ -312,6 +321,11 @@ export class Disassembly extends RadareInfiniteBlock {
 		var newName = prompt('Rename?', varName);
 		if (newName === null || newName === '') {
 			return;
+		}
+		varName = r2Name(varName);
+		newName = r2Name(newName);
+		if (varName === null || newName === null) {
+			return r2Invalid('name');
 		}
 
 		r2.cmd('afvn ' + varName + ' ' + newName);
@@ -594,17 +608,26 @@ export class Disassembly extends RadareInfiniteBlock {
 			_this.addLongListDialog(output);
 		};
 
-		var applyOp = function(offset, cmd, prompting) {
-			var arg = '';
+		/** argType: 'text' (base64 encoded), 'name' or 'expr' */
+		var applyOp = function(offset, cmd, prompting, argType) {
+			offset = r2Expr(offset);
+			if (offset === null) {
+				return r2Invalid('offset');
+			}
 			if (typeof prompting !== 'undefined') {
-				arg = prompt(prompting + '?');
-				if (arg === '') {
+				var arg = prompt(prompting + '?');
+				if (arg === null || arg === '') {
 					return;
 				}
-			}
-
-			if (arg !== '') {
-				cmd += ' ' + arg;
+				if (argType === 'text') {
+					arg = 'base64:' + r2StrToBase64(arg);
+				} else {
+					arg = (argType === 'expr') ? r2Expr(arg) : r2Name(arg);
+					if (arg === null) {
+						return r2Invalid(prompting);
+					}
+				}
+				cmd = cmd.trim() + ' ' + arg;
 			}
 
 			r2.cmd(cmd + ' @' + offset);
@@ -656,7 +679,7 @@ export class Disassembly extends RadareInfiniteBlock {
 			// { name: 'merge up (join this and previous function)', shortcut: 'k', fct: function(evt, offset) { return applyOp(offset, 'k'); } },
 			// { name: 'highlight word', shortcut: 'h', fct: function(evt, offset) { return applyOp(offset, 'h'); } },
 			// { name: 'manpage for current call', shortcut: 'm', fct: function(evt, offset) { return applyOp(offset, 'm'); } },
-			{ aoj: false, name: 'add comment', shortcut: ';', fct: function(evt, offset) { return applyOp(offset, 'CC', 'Name'); } },
+			{ aoj: false, name: 'add comment', shortcut: ';', fct: function(evt, offset) { return applyOp(offset, 'CC', 'Comment', 'text'); } },
 			{ aoj: false, name: 'set flag', shortcut: 'f', fct: function(evt, offset) { return applyOp(offset, 'f', 'Name'); } },
 			{ aoj: true, name: 'rename flag', shortcut: 'n', fct: function(evt, offset) { return applyOp(offset, 'fr', 'Name'); } },
 			// { name: 'rename function', shortcut: 'r', fct: function(evt, offset) { return applyOp(offset, 'r'); } },
@@ -665,7 +688,7 @@ export class Disassembly extends RadareInfiniteBlock {
 			// { name: 'set strings in current block', shortcut: 'S', fct: function(evt, offset) { return applyOp(offset, 'S'); } },
 			// { name: 'undefine metadata here', shortcut: 'u', fct: function(evt, offset) { return applyOp(offset, 'u'); } },
 			{ aoj: false, name: 'find xrefs', shortcut: 'x', fct: function(evt, offset) { return displayRes(offset, 'axtj'); } },
-			{ aoj: false, name: 'as data', shortcut: 'D', fct: function(evt, offset) { return applyOp(offset, 'Cd ', 'Size'); } },
+			{ aoj: false, name: 'as data', shortcut: 'D', fct: function(evt, offset) { return applyOp(offset, 'Cd', 'Size', 'expr'); } },
 			{ aoj: false, name: 'as code', shortcut: 'F', fct: function(evt, offset) { return applyOp(offset, 'C-'); } },
 			{ aoj: false, name: 'as string', shortcut: 'S', fct: function(evt, offset) { return applyOp(offset, 'Cs'); } },
 			// { name: 'set as 32bit word', shortcut: 'w', fct: function(evt, offset) { return applyOp(offset, 'w'); } },

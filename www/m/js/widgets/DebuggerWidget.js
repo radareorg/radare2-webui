@@ -44,6 +44,15 @@ export class DebuggerWidget extends BaseWidget {
 		header.appendChild(Inputs.button('BP', () => r2.cmd('db $$', () => this.draw())));
 		header.appendChild(Inputs.button('REG', () => {
 			var expr = prompt('register=value');
+			if (expr === null) {
+				return;
+			}
+			const m = expr.match(/^\s*(\w+)\s*=(.+)$/);
+			const value = m && r2Expr(m[2]);
+			if (!value) {
+				return r2Invalid('register=value');
+			}
+			expr = m[1] + '=' + value;
 			if (this.nativeDebugger) {
 				r2.cmd('dr ' + expr + ';.dr*', () => this.draw());
 			} else {

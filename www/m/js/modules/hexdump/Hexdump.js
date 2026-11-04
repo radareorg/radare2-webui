@@ -748,6 +748,13 @@ export class Hexdump extends RadareInfiniteBlock {
 		];
 		var applyOp = (range, operande) => {
 			var val = prompt('Value (valid hexpair):');
+			if (val === null) {
+				return;
+			}
+			val = r2Hex(val);
+			if (val === null) {
+				return r2Invalid('hexpair');
+			}
 			var op = operande + ' ' + val + ' ' + (range.to - range.from) + ' @' + range.from;
 			r2.cmd(op, () => console.log('Call: ' + op));
 			this.nav.updateModifications();
@@ -797,6 +804,13 @@ export class Hexdump extends RadareInfiniteBlock {
 				name: 'Set flag',
 				fct: (evt, range) => {
 					var name = prompt('Flag\'s name:');
+					if (name === null) {
+						return;
+					}
+					name = r2Name(name);
+					if (name === null) {
+						return r2Invalid('flag name');
+					}
 					r2.cmd('f ' + name + ' ' + (range.to - range.from + 1) + ' @' + range.from, () => {
 						this.nav.refreshCurrent(() => this.draw());
 					});
