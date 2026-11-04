@@ -30,6 +30,22 @@ file's location. Confirming the picker opens the selected binaries in new tabs.
 | Open URL dialog | Cmd+L | Ctrl+L |
 | Quit all windows | Cmd+Q | Ctrl+Q |
 
+Build and install on macOS or Linux from this directory:
+
+```sh
+make all
+make user-install
+r2wui /bin/ls
+make user-uninstall
+make clean
+```
+
+The Makefile selects the platform using `uname -s`. Installation puts the `r2wui`
+launcher in `R2PM_BINDIR` (queried with `r2pm -H R2PM_BINDIR` when unset) and the
+native app and web assets in `../share/r2wui` relative to that directory. Override
+the destination with `make user-install BINDIR=/path/to/bin`; use the same
+override to uninstall. Installed files remain usable after `make clean`.
+
 ## macOS
 
 Requires macOS 11+ and the Xcode command line tools to build. Cocoa, WebKit and
