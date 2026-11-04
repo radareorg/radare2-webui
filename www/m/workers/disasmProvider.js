@@ -30,6 +30,11 @@ function extractVar(str) {
 	return res[2];
 }
 
+// Input comes from r2's |H filter, so it is already entity-encoded text
+function escapeAttr(str) {
+	return str.replace(/["'<>]/g, (c) => '&#' + c.charCodeAt(0) + ';');
+}
+
 // TODO dirty 
 function prepareClickableOffsets(x) {
 	x = x.replace(/0x([a-zA-Z0-9]*)/g,
@@ -66,12 +71,12 @@ function getChunk(where, howManyLines) {
 
 		var fct = extractFct(lines[i]);
 		if (fct !== null) {
-			lines[i] = '<span class=\'fcn\' id=\'' + fct + '\'>' + lines[i] + '</span>';
+			lines[i] = '<span class=\'fcn\' id=\'' + escapeAttr(fct) + '\'>' + lines[i] + '</span>';
 		}
 
 		var variable = extractVar(lines[i]);
 		if (variable !== null) {
-			lines[i] = '<span class=\'var\' id=\'' + variable + '\'>' + lines[i] + '</span>';
+			lines[i] = '<span class=\'var\' id=\'' + escapeAttr(variable) + '\'>' + lines[i] + '</span>';
 		}
 
 		var offset = extractOffset(lines[i]);
