@@ -1,0 +1,3 @@
+#include "resource.h"
+
+IDI_R2WEBUI ICON "../assets/icons/r2webui.ico"
