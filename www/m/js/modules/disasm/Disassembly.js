@@ -331,11 +331,7 @@ export class Disassembly extends RadareInfiniteBlock {
 		var isTopMax = (list[0] === 0);
 
 		// If we are already at top
-		if (this.isTopMax && isTopMax) {
-			return;
-		} else {
-			this.isTopMax = isTopMax;
-		}
+		this.isTopMax = isTopMax;
 
 		// reset container
 		this.container.getBody().innerHTML = '';
@@ -372,6 +368,12 @@ export class Disassembly extends RadareInfiniteBlock {
 		for (var i = 0 ; i < spans.length; i++) {
 			if (spans[i].tagName === 'SPAN') {
 				if (spans[i].className.indexOf('offset') !== -1) {
+					spans[i].addEventListener('click', (evt) => {
+						if (evt.target.closest('a') || window.getSelection().toString()) return;
+						const selected = this.container.getBody().querySelector('.selected-instruction');
+						if (selected) selected.classList.remove('selected-instruction');
+						evt.currentTarget.classList.add('selected-instruction');
+					});
 					spans[i].addEventListener('contextmenu', function(id) {
 						return function(evt) {
 							return _this.oncontextmenu(evt, id);
@@ -446,6 +448,16 @@ export class Disassembly extends RadareInfiniteBlock {
 		container.appendChild(moreMenu);
 		container.appendChild(Inputs.iconButton('mode_edit', 'Write', () => write(() => { this.nav.cleanOldData(); this.draw(); })));
 		container.appendChild(Inputs.iconButton('find_replace', 'Open Analyze window', () => this.openAnalysisDialog()));
+		container.appendChild(Inputs.button('Analyze function', () => {
+			statusMessage('Analyzing function...');
+			const selected = this.container.getBody().querySelector('.selected-instruction');
+			const address = selected && /^\d+$/.test(selected.id) ? ' @ ' + selected.id : '';
+			r2.cmd('af' + address, (out) => {
+				statusMessage(out.trim() || 'Function analyzed');
+				this.nav.cleanOldData();
+				this.nav.crunchingData(() => this.draw());
+			});
+		}));
 		dom.appendChild(container);
 
 		componentHandler.upgradeDom(); // TODO should be called when controls are binded to DOM

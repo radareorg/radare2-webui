@@ -41,6 +41,10 @@ div.disasm span:hover.offset, div.disasm span:hover.fcn {
 	background-color: rgb(64, 64, 64);
 }
 
+div.disasm span.selected-instruction {
+	background-color: rgba(100, 160, 255, 0.5);
+}
+
 ul#disasm-history {
 	display: inline-block;
 }

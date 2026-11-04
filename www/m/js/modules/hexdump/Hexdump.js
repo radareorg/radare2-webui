@@ -68,7 +68,7 @@ export class Hexdump extends RadareInfiniteBlock {
 		}
 
 		window.addEventListener('mousedown', (evt) => {
-			if (evt.button !== 0 || this.contextMenuOpen) {
+			if (evt.button !== 0 || this.contextMenuOpen || (this.content && this.content.contains(evt.target))) {
 				return;
 			}
 			this.cleanSelection();
@@ -658,11 +658,6 @@ export class Hexdump extends RadareInfiniteBlock {
 					form.focus();
 				});
 			} else {
-				hexpairEl.addEventListener('click', () => {
-					this.beingSelected = false;
-					this.cleanSelection();
-				});
-
 				const stopSelection = () => {
 					this.beingSelected = false;
 					window.removeEventListener('mouseup', stopSelection);
@@ -674,7 +669,10 @@ export class Hexdump extends RadareInfiniteBlock {
 					}
 					evt.preventDefault();
 					this.beingSelected = true;
+					this.cleanSelection();
 					this.selectionFirst = evt.target;
+					this.selectionEnd = evt.target;
+					this.processSelection(false);
 					window.addEventListener('mouseup', stopSelection);
 				});
 

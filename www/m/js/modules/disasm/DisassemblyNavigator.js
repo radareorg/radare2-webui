@@ -132,7 +132,7 @@ export class DisassemblyNavigator extends BlockNavigator {
 
 		// go up of 1 screen, take first in order
 
-		var fromOffset = offset - line2offset(this.howManyLines);
+		var fromOffset = Math.max(0, offset - line2offset(this.howManyLines));
 		var endOffset = fromOffset + (3 * line2offset(this.howManyLines));
 
 		var existingIntervals = this.getOverlappingIntervals(fromOffset, endOffset);
@@ -259,7 +259,7 @@ export class DisassemblyNavigator extends BlockNavigator {
 	}
 
 	go(dir) {
-		this.currentOffset += dir * (this.howManyLines * 2);
+		this.currentOffset = Math.max(0, this.currentOffset + dir * (this.howManyLines * 2));
 		this.populateFrom(this.currentOffset);
 	}
 
