@@ -811,6 +811,9 @@ function bindControls () {
   $('hint').onclick = () => showHelp();
   $('helpclose').onclick = () => showHelp(false);
   $('newpane').onclick = openPane;
+  $('analyzefunction').onclick = () => functionAction('af');
+  $('unanalyzefunction').onclick = () => functionAction('af-');
+  $('commentbutton').onclick = editComment;
   $('projectsbutton').onclick = uiTools.openProjects;
   $('openfilebutton').onclick = uiTools.openFileDialog;
   $('notesbutton').onclick = uiTools.openNotes;
@@ -881,6 +884,28 @@ const menuValue = (item) => typeof item === 'string' ? item : item.value;
 const firstAddr = (h) => (h.match(/data-a="(0x[0-9a-f]+)"/) || [])[1];
 const quote = (s) => '"' + s.replace(/"/g, '') + '"';
 const jsonList = async (c, fn) => { try { return JSON.parse(await r2At(cur, c)).map(fn); } catch (e) { return []; } };
+
+async function functionAction (command) {
+  const target = { addr: cur ? cur.addr : seek };
+  try {
+    const out = strip(await r2At(target, command)).trim();
+    if (out) toast(out);
+    await refreshAll();
+  } catch (e) { toast(e.message); }
+}
+
+async function editComment () {
+  const target = { addr: cur ? cur.addr : seek };
+  try {
+    const current = (await r2At(target, 'CC.')).replace(/\r?\n$/, '');
+    menu('Comment at ' + target.addr, [], async (value) => {
+      try {
+        await r2At(target, value ? 'CCu base64:' + encodeText(value) : 'CC-');
+        await refreshAll();
+      } catch (e) { toast(e.message); }
+    }, { raw: true, value: current, hint: 'Edit and press Enter to save. Clear the text and press Enter to delete.' });
+  } catch (e) { toast(e.message); }
+}
 
 async function evalMenu (query = '', values) {
   try {
@@ -1129,7 +1154,7 @@ function paneKey (k) {
       menu('xrefs to ' + (p ? p.addr : seek), jsonList('axtj', (x) => `${norm(String(x.from))}  ${x.type}  ${x.fcn_name || ''}  ${x.opcode || ''}`),
         (v) => seekPane(p, v.split(' ')[0]));
       break;
-    case ';': menu('comment at ' + (p ? p.addr : seek), [], (v) => cmd(quote('CC ' + v)), { raw: true }); break;
+    case ';': editComment(); break;
     case 'n': menu('rename function', [], (v) => cmd('afn ' + v.replace(/[^\w.]/g, '_')), { raw: true }); break;
     case 'o': wmKey('KeyP'); break;
     case 'q': closePane(); break;
