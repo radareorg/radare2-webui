@@ -67,10 +67,11 @@ export class FlagsSpacesWidget extends BaseWidget {
 
 				a.addEventListener('click', (e) => {
 					console.log(x.name, e);
-					if (r2Name(x.name) === null) {
+					const name = r2Name(x.name);
+					if (name === null) {
 						return;
 					}
-					r2.cmd('fs ' + x.name, (h)=>{
+					r2.cmd('fs ' + name, (h)=>{
 						this.activeEls = this.activeEls.filter(e => {
 							e.classList.remove(['active']);
 							return false;

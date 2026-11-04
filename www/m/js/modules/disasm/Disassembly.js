@@ -585,6 +585,10 @@ export class Disassembly extends RadareInfiniteBlock {
 
 		/** argType: 'text' (base64 encoded), 'name' or 'expr' */
 		var applyOp = function(offset, cmd, prompting, argType) {
+			offset = r2Expr(offset, 'offset');
+			if (offset === null) {
+				return;
+			}
 			if (typeof prompting !== 'undefined') {
 				var arg = prompt(prompting + '?');
 				if (argType === 'text') {
