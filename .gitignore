@@ -5,6 +5,7 @@ www/m/www
 dev/
 dist/
 .config
+.pmai/
 *.log
 npm-debug.log*
 *~
