@@ -1,0 +1,21 @@
+# Native builds, bundled web assets, and compiler module caches.
+/macos/build/
+/linux/build/
+/windows/build/
+*.app/
+*.dSYM/
+*.o
+*.obj
+*.res
+*.exe
+*.pdb
+*.ilk
+*.idb
+*.pch
+
+# Local OS and Python cache files.
+.DS_Store
+__pycache__/
+*.py[cod]
+
+# assets/icons/ contains packaged app resources and is intentionally tracked.
