@@ -25,7 +25,10 @@
     "url": "git://github.com/radare/radare2-webui.git"
   },
   "type": "module",
-  "scripts": {},
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "test:integration": "node test/http.integration.js"
+  },
   "version": "0.10.2",
   "devDependencies": {
     "gulp": "^5.0.0",

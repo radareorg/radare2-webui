@@ -9,30 +9,83 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); c
 #tags b { padding: 0 6px; color: var(--dim); font-weight: normal; cursor: pointer; }
 #tags b.o { color: var(--fg); }
 #tags b.on { background: var(--acc); color: #000; }
-#lay { color: var(--acc); }
+#lay { color: var(--acc); cursor: pointer; }
+#lay:hover { color: #fff; }
 #seek { color: #fff; }
-#title { flex: 1; overflow: hidden; text-overflow: ellipsis; color: var(--dim); }
+#title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--dim); }
 #hint { color: var(--dim); }
+#bar button, #helpclose { flex-shrink: 0; font: inherit; color: var(--fg); background: transparent; border: 1px solid var(--bd); border-radius: 3px; padding: 0 6px; cursor: pointer; }
+#bar button:hover, #helpclose:hover { border-color: var(--acc); color: var(--acc); }
+#bar button:focus-visible, #helpclose:focus-visible { outline: 1px solid var(--acc); }
+#bar #hint { width: 18px; height: 18px; padding: 0; border-radius: 50%; display: grid; place-items: center; line-height: 1; }
 #wm { position: absolute; top: var(--bar); left: 0; right: 0; bottom: 0; }
 .pane { position: absolute; display: flex; flex-direction: column; background: var(--pane); border: 1px solid var(--bd); border-radius: 3px;
 	transition: left .12s, top .12s, width .12s, height .12s, border-color .12s; }
 .pane.f { border-color: var(--acc); box-shadow: 0 0 12px #e5a50a22; }
-.pane > header { padding: 1px 6px; color: var(--dim); background: #0006; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pane > header { display: flex; align-items: center; gap: 6px; padding: 1px 6px; color: var(--dim); background: #0006; white-space: nowrap; }
+.pane > header > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.pane > header > button { flex-shrink: 0; font: inherit; line-height: 1; padding: 0 3px; border: 0; background: transparent; color: inherit; cursor: pointer; }
+.pane > header > button:hover, .pane > header > button:focus-visible { color: var(--acc); outline: 1px solid var(--acc); }
+.pane > header > button.tied { color: var(--acc); background: var(--sel); }
+.decompiler { display: flex; gap: 6px; padding: 3px 6px; border-bottom: 1px solid var(--bd); }
+.decompiler[hidden] { display: none; }
+.decompiler select { min-width: 0; max-width: 50%; font: inherit; color: var(--fg); background: var(--bg); border: 1px solid var(--bd); }
 .pane.f > header { color: var(--acc); }
-.pane > pre { flex: 1; margin: 0; padding: 2px 6px; overflow: auto; white-space: pre; }
+.pane > pre { flex: 1; min-height: 0; margin: 0; padding: 2px 6px; overflow: auto; overscroll-behavior: contain; white-space: pre; font: inherit; }
 .pane pre div { min-height: 1.35em; }
 .pane pre div.c { background: var(--sel); }
 .pane.f pre div.c { box-shadow: inset 2px 0 var(--acc); }
 .pane.busy > header::after { content: " …"; }
-a[data-a] { color: inherit; text-decoration: none; cursor: pointer; }
-a[data-a]:hover { text-decoration: underline; }
+a[data-a], a[data-symbol] { color: inherit; text-decoration: none; cursor: pointer; }
+a[data-a]:hover, a[data-symbol]:hover { text-decoration: underline; }
+[data-byte] { cursor: text; }
+[data-byte].selected { background: var(--acc); color: #000; }
+.splitter { position: absolute; z-index: 2; touch-action: none; }
+.splitter.x { width: 8px; cursor: col-resize; }
+.splitter.y { height: 8px; cursor: row-resize; }
+.splitter:hover { background: #e5a50a44; }
+#wm.resizing .pane { transition: none; }
+#wm.resize-x, #wm.resize-x * { cursor: col-resize !important; }
+#wm.resize-y, #wm.resize-y * { cursor: row-resize !important; }
 #menu { position: fixed; top: 15%; left: 50%; transform: translateX(-50%); width: min(720px, 94vw); background: #000; border: 1px solid var(--acc);
 	border-radius: 4px; box-shadow: 0 10px 40px #000c; z-index: 9; }
 #mi { width: 100%; font: inherit; font-size: 14px; padding: 8px 10px; border: 0; outline: 0; background: transparent; color: #fff; }
+#menuhint { padding: 0 10px 8px; color: var(--dim); }
 #ml { max-height: 50vh; overflow: auto; }
 #ml div { padding: 1px 10px; white-space: pre; overflow: hidden; text-overflow: ellipsis; }
 #ml div.c { background: var(--acc); color: #000; }
-#help { position: fixed; inset: 8% 15%; padding: 12px 20px; overflow: auto; background: #000e; border: 1px solid var(--acc); border-radius: 4px; z-index: 9; white-space: pre; }
+.detail { color: var(--dim); margin-left: 12px; font-weight: normal; }
+#ml div { display: flex; gap: 8px; }
+#ml div .detail { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+#ml div.c .detail { color: #313131; }
+.dialog { position: fixed; inset: 8% max(12px, 8vw); z-index: 10; background: var(--pane); border: 1px solid var(--acc); border-radius: 4px; padding: 12px; overflow: auto; }
+.dialog[hidden] { display: none; }
+.dialog header, .dialog footer, .toolrow, #projectsave { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.dialog header strong { flex: 1; }
+.dialog button, .dialog input, .dialog textarea { font: inherit; background: var(--bg); color: var(--fg); border: 1px solid var(--bd); border-radius: 3px; padding: 5px 8px; }
+.dialog button { cursor: pointer; }
+.dialog button:hover { border-color: var(--acc); }
+.dialog button:disabled { opacity: .5; cursor: wait; }
+.dialog input:not([type="checkbox"]) { min-width: 160px; }
+#projectdir { width: min(65vw, 700px); }
+#projectfilter { display: block; width: 100%; margin: 10px 0; }
+.managerlist { max-height: 45vh; overflow: auto; margin: 10px 0; }
+.managerlist > div, .managerlist > button { display: flex; align-items: center; gap: 12px; width: 100%; padding: 6px 8px; border-bottom: 1px solid var(--bd); text-align: left; }
+.managerlist > div > span { flex: 1; }
+.managerlist > button.selected { border-color: var(--acc); background: var(--sel); }
+#projectopen { margin-bottom: 12px; }
+#projectsave input { width: min(50vw, 600px); }
+#fileopen { display: flex; align-items: center; gap: 12px; }
+#filepath { width: min(55vw, 700px); }
+#managerstatus, #notesstatus { color: var(--dim); white-space: pre-wrap; }
+#packageoutput { max-height: 25vh; overflow: auto; white-space: pre-wrap; }
+#packagefilter { flex: 1; }
+#notes { z-index: 9; }
+#notestext { display: block; width: 100%; height: calc(100% - 100px); resize: none; margin-bottom: 12px; }
+#noteslabel { color: var(--dim); }
+#help { position: fixed; inset: 8% max(12px, 8vw); padding: 12px 20px; overflow: auto; background: #000e; border: 1px solid var(--acc); border-radius: 4px; z-index: 9; }
+#helptext { font: inherit; white-space: pre; }
+#helpclose { position: sticky; top: 0; float: right; background: var(--bg); padding: 3px 8px; }
 #toast { position: fixed; right: 12px; bottom: 12px; padding: 6px 12px; background: #000; border-left: 3px solid var(--acc); opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 10; }
 #toast.on { opacity: 1; }
 ::-webkit-scrollbar { width: 6px; height: 6px; }

@@ -8,7 +8,7 @@ import gulpUtil from 'gulp-util';
 const DEST = '../../dist/t/'
 
 gulp.task('default', async function() {
-	await gulp.src(['js/t.js'])
+	await gulp.src(['js/t.js', 'js/tools.js'])
 		// .pipe(uglify())
 		.pipe(uglify().on('error', gulpUtil.log))
 		.pipe(concat('app.js'))
