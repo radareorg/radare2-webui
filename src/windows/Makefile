@@ -12,7 +12,7 @@ all: build\r2webui.exe webui
 webui:
 	@if not exist build\webui\t mkdir build\webui\t
 	copy /y ..\..\www\t\index.html build\webui\t\index.html
-	copy /y ..\..\www\t\js\t.js build\webui\t\app.js
+	copy /b /y ..\..\www\t\js\t.js+..\..\www\t\js\tools.js build\webui\t\app.js
 	copy /y ..\..\www\t\css\style.css build\webui\t\stylesheet.css
 	@for %U in (m p enyo) do @if exist ..\..\dist\%U\index.html xcopy /e /i /y /q ..\..\dist\%U build\webui\%U
 	@for %U in (m p enyo) do @if not exist build\webui\%U\index.html if exist ..\..\dev\%U\index.html xcopy /e /i /y /q ..\..\dev\%U build\webui\%U

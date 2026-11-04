@@ -14,9 +14,9 @@ webui: $(WEBUI_DIR)/t/index.html $(WEBUI_DIR)/t/app.js $(WEBUI_DIR)/t/stylesheet
 $(WEBUI_DIR)/t/index.html: $(WEBUI_SOURCE)/index.html
 	mkdir -p $(WEBUI_DIR)/t
 	cp $< $@
-$(WEBUI_DIR)/t/app.js: $(WEBUI_SOURCE)/js/t.js
+$(WEBUI_DIR)/t/app.js: $(WEBUI_SOURCE)/js/t.js $(WEBUI_SOURCE)/js/tools.js ../webui.mk
 	mkdir -p $(WEBUI_DIR)/t
-	cp $< $@
+	cat $(WEBUI_SOURCE)/js/t.js $(WEBUI_SOURCE)/js/tools.js > $@
 $(WEBUI_DIR)/t/stylesheet.css: $(WEBUI_SOURCE)/css/style.css
 	mkdir -p $(WEBUI_DIR)/t
 	cp $< $@

@@ -143,7 +143,8 @@ do not require ImageMagick or Python.
 ### Frontend assets
 
 The default Tiles UI is copied directly from `www/t` into each build's `webui/t`
-directory: HTML, `js/t.js` → `app.js`, and `css/style.css` → `stylesheet.css`.
+directory: HTML, `js/t.js` + `js/tools.js` → `app.js`, and
+`css/style.css` → `stylesheet.css`.
 This build step uses no npm packages. Already-built Material, Panels and Enyo
 frontends are also copied from the repository's `dist` or `dev` directories
 when available. Build those frontends using the repository's existing build
